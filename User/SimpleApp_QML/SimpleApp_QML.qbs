@@ -60,6 +60,7 @@ CppApplication {
         qbs.install: true
         qbs.installDir: "/home/pi/Software"
     }
+    //test
 }
 
 
