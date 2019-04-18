@@ -1,11 +1,9 @@
 import qbs
 
 QtApplication {
-    consoleApplication: true
     condition: !project.isAndroid
     name: "cu-devmngr"
-
-    type: ["application"]
+    consoleApplication: true
 
     cpp.includePaths: [
         "../../Libs/CuPlugins/"

@@ -7,7 +7,6 @@ import qbs.TextFile
 QtApplication {
     condition: project.isWindows
     name: "cu-serverconf"
-    type: ["application"]
     consoleApplication: false
     cpp.cxxLanguageVersion: "c++17"
 

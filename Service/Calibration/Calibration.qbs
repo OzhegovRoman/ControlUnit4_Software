@@ -5,7 +5,6 @@ import qbs.File
 CppApplication{
     condition: project.isWindows
     name: "cu-devcalibration"
-    type: ["application"]
     consoleApplication: false
 
     // preparation RC_File
@@ -21,7 +20,6 @@ CppApplication{
             "*.rc.tmp"
         ]
     }
-
 
     cpp.cxxLanguageVersion: "c++17"
     cpp.includePaths: [

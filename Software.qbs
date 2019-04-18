@@ -17,7 +17,7 @@ Project {
     property bool buildAll:         false
     property bool buildLibraries:   true
     property bool buildService:     true
-    property bool buildSystem:      false
+    property bool buildSystem:      true
     property bool buildUser:        false
 
     property bool isWindows: qbs.targetOS.contains("windows");
@@ -38,7 +38,7 @@ Project {
         "Installer/Installer.qbs",
         "Libs/Libs.qbs",
         "Service/Service.qbs",
-//        "System/System.qbs",
+        "System/System.qbs",
 //        "Tests/Tests.qbs",
 //        "User/User.qbs",
 //        "Utils/Utils.qbs",

@@ -5,8 +5,6 @@ QtApplication {
     condition: !project.isAndroid
     name: "cu-devboot"
 
-    type: ["application"]
-
     cpp.includePaths: [
         "../../Libs/CuPlugins/"
     ]

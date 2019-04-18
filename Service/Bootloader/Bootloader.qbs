@@ -1,11 +1,9 @@
 import qbs
 
 QtApplication {
+    condition: project.isWindows
     consoleApplication: false
     name: "Bootloader"
-
-
-    condition: project.isWindows
 
     cpp.includePaths: [
         "../../Libs/CuPlugins/"
