@@ -17,8 +17,8 @@ Project {
     property bool buildAll:         false
     property bool buildLibraries:   true
     property bool buildService:     true
-    property bool buildSystem:      true
-    property bool buildUser:        false
+    property bool buildSystem:      false
+    property bool buildUser:        true
 
     property bool isWindows: qbs.targetOS.contains("windows");
     property bool isAndroid: qbs.targetPlatform.contains("android")
@@ -39,10 +39,7 @@ Project {
         "Libs/Libs.qbs",
         "Service/Service.qbs",
         "System/System.qbs",
-//        "Tests/Tests.qbs",
-//        "User/User.qbs",
-//        "Utils/Utils.qbs",
-//        "Android/Android.qbs"
+        "User/User.qbs",
     ]
 }
 
@@ -105,4 +102,7 @@ Project {
     1.1.3 - Рефакторинг кода, разделение на открытую и закрытую часть
 
     //TODO: сделать отдельное правило для всех raspberryPi приложений для правильного деплоя
+    //TODO: проверить код для распберри
+    //TODO: Проверить инсталятор
+
 */
