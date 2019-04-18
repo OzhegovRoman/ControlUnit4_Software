@@ -3,60 +3,27 @@ import qbs.TextFile
 import qbs.File
 
 CppApplication{
-    name: "cu-devcalibration"
-
     condition: project.isWindows
-
+    name: "cu-devcalibration"
+    type: ["application"]
     consoleApplication: false
 
     // preparation RC_File
-    property string description: "Calibration for Scontel's ControlUnits modules"
-    property string internalName: "Calibrator"
-
     Depends {name: "RC_Prepare"}
-
-    Rule {
-        condition: project.isWindows
-        multiplex: true
-        alwaysRun: true
-        Artifact {
-            filePath: product.name+"_generated.rc"
-            fileTags: "rc"
-        }
-        prepare: {
-            var  cmd  =  new  JavaScriptCommand();
-            cmd.description  =  "Processing  '"  +  product.name  +  "'";
-            cmd.highlight  =  "codegen";
-            cmd.sourceCode  =  function()  {
-                var  file  =  new  TextFile(product.sourceDirectory+"/../../qbs/modules/RC_Prepare/simpleApp.rc.tmp");
-                var  content  =  file.readAll();
-                file.close();
-
-                content  =  content.replace(/%MainIconPath%/g, product.sourceDirectory+"/MainIcon.ico");
-                content  =  content.replace(/%FILEVERSION%/g, project.softwareVersion.replace(/\./g,","));
-                content  =  content.replace(/%PRODUCTVERSION%/g, project.softwareVersion.replace(/\./g,","));
-                content  =  content.replace(/%FILEDESCRIPTION%/g, product.description);
-                content  =  content.replace(/%FILEVERSION_STR%/g, project.softwareVersion);
-                content  =  content.replace(/%PRODUCTVERSION_STR%/g, project.softwareVersion);
-                content  =  content.replace(/%COMPANY_STR%/g, project.company);
-                content  =  content.replace(/%LEGALCOPYRIGHT_STR%/g, "Copyright (C) "+ (new (Date)).getFullYear()+", "+project.company);
-                content  =  content.replace(/%ORIGINALFILENAME_STR%/g, product.name+".exe");
-                content  =  content.replace(/%PRODUCTNAME_STR%/g, project.productName);
-                content  =  content.replace(/%INTERNALNAME_STR%/g, product.internalName);
-
-                file  =  new  TextFile(output.filePath,  TextFile.WriteOnly);
-                file.truncate();
-                file.write(content);
-                file.close();
-            }
-            return  cmd;
-        }
+    RC_Prepare.outputFileName:  name
+    RC_Prepare.description:     "Calibration for Scontel's ControlUnits modules"
+    RC_Prepare.internalName:    "Calibrator"
+    Group {
+        name: "Resources_tmp"
+        fileTags: "RC_TMPL"
+        prefix: "../../qbs/modules/**/"
+        files:[
+            "*.rc.tmp"
+        ]
     }
 
-    type: ["application"]
 
     cpp.cxxLanguageVersion: "c++17"
-
     cpp.includePaths: [
         "../../Libs/CuPlugins/",
         "../../Libs/StarProtocol/",
