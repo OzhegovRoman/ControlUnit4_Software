@@ -1,14 +1,14 @@
 import qbs
 
 StaticLibrary{
-    name: "LineRegression"
+
+    name: "RaspPiMMap"
 
     Depends { name: "cpp"}
 
-    Depends { name: "Qt.core" }
-
+    condition: !(project.isWindows || project.isAndroid)
     cpp.cxxLanguageVersion: "c++14"
-
+    Depends { name: "Qt.core" }
     Group{
         name: "Source"
         files: [

@@ -1,13 +1,20 @@
 import qbs
 
 StaticLibrary{
-    name: "LineRegression"
+    name: "qCustomPlot"
 
     Depends { name: "cpp"}
 
-    Depends { name: "Qt.core" }
-
     cpp.cxxLanguageVersion: "c++14"
+
+    Depends {
+        name: "Qt";
+        submodules: [
+            "core",
+            "widgets",
+            "printsupport"
+        ]
+    }
 
     Group{
         name: "Source"
