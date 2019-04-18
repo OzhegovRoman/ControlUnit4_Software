@@ -18,7 +18,7 @@ Project {
     property bool buildLibraries:   true
     property bool buildTests:       true
 
-    property bool buildService:     false
+    property bool buildService:     true
     property bool buildSystem:      false
     property bool buildUser:        false
 
@@ -36,7 +36,7 @@ Project {
 
     references: [
         "Libs/Libs.qbs",
-//        "Service/Service.qbs",
+        "Service/Service.qbs",
 //        "System/System.qbs",
 //        "Tests/Tests.qbs",
 //        "User/User.qbs",
