@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>wTempCalibr</class>
+ <widget class="QWidget" name="wTempCalibr">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>352</width>
+    <height>420</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>352</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>202</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>401</width>
+       <height>100000</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>Temperature Eeprom Const</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>P sensor Voltage +</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>T sensor voltage</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>P sensor Voltage -</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="QLineEdit" name="leTempSensorVoltageintercept"/>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLineEdit" name="lePressSensorVoltagePslope"/>
+      </item>
+      <item row="5" column="1">
+       <widget class="QLineEdit" name="lePressSensorVoltageNslope"/>
+      </item>
+      <item row="5" column="2">
+       <widget class="QLineEdit" name="lePressSensorVoltageNintercept"/>
+      </item>
+      <item row="4" column="2">
+       <widget class="QLineEdit" name="lePressSensorVoltagePintercept"/>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLineEdit" name="leTempSensorVoltageslope"/>
+      </item>
+      <item row="7" column="2">
+       <widget class="QLineEdit" name="lePressSensorintercept"/>
+      </item>
+      <item row="7" column="0">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>P sensor</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>intercept</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>T sensor current ADC</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>slope</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="leTempSensorCurrentADCslope"/>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLineEdit" name="leTempSensorCurrentADCintercept"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>T sensor current DAC</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="leTempSensorCurrentDACslope"/>
+      </item>
+      <item row="2" column="2">
+       <widget class="QLineEdit" name="leTempSensorCurrentDACintercept"/>
+      </item>
+      <item row="7" column="1">
+       <widget class="QLineEdit" name="lePressSensorslope"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QTableWidget" name="twTempTable">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>192</height>
+        </size>
+       </property>
+       <column>
+        <property name="text">
+         <string>Voltage</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Temperature</string>
+        </property>
+       </column>
+      </widget>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QPushButton" name="pbLoadFromFile">
+         <property name="text">
+          <string>Load table
+from file...</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>twTempTable</tabstop>
+  <tabstop>leTempSensorCurrentADCslope</tabstop>
+  <tabstop>leTempSensorCurrentADCintercept</tabstop>
+  <tabstop>leTempSensorCurrentDACslope</tabstop>
+  <tabstop>leTempSensorCurrentDACintercept</tabstop>
+  <tabstop>leTempSensorVoltageslope</tabstop>
+  <tabstop>leTempSensorVoltageintercept</tabstop>
+  <tabstop>lePressSensorVoltagePslope</tabstop>
+  <tabstop>lePressSensorVoltagePintercept</tabstop>
+  <tabstop>lePressSensorVoltageNslope</tabstop>
+  <tabstop>lePressSensorVoltageNintercept</tabstop>
+  <tabstop>lePressSensorslope</tabstop>
+  <tabstop>lePressSensorintercept</tabstop>
+  <tabstop>pbLoadFromFile</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

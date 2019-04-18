@@ -1,0 +1,28 @@
+IDI_ICON1 ICON DISCARDABLE "%MainIconPath%"
+
+#include <windows.h>
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION     %FILEVERSION%
+PRODUCTVERSION  %PRODUCTVERSION%
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904E4"
+        BEGIN
+            VALUE "FileDescription",    "%FILEDESCRIPTION%\0"
+            VALUE "FileVersion",        "%FILEVERSION_STR%\0"
+            VALUE "InternalName",       "%INTERNALNAME_STR%\0"
+            VALUE "LegalCopyright",     "%LEGALCOPYRIGHT_STR%\0"
+            VALUE "OriginalFilename",   "%ORIGINALFILENAME_STR%\0"
+            VALUE "ProductName",        "%PRODUCTNAME_STR%\0"
+            VALUE "ProductVersion",     "%PRODUCTVERSION_STR%\0"
+            VALUE "Company",            "%COMPANY_STR%\0"
+        END
+    END
+
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END

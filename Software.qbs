@@ -14,10 +14,8 @@ Project {
     property string QtIFPaths: "c:/Qt/Tools/QtInstallerFramework/3.0/bin/"
     property string installDir: "packages/"+baseInstallPackegeName+"/data"
     // Настройки сборки
-    property bool buildAll:         true
+    property bool buildAll:         false
     property bool buildLibraries:   true
-    property bool buildTests:       true
-
     property bool buildService:     true
     property bool buildSystem:      false
     property bool buildUser:        false
@@ -34,14 +32,16 @@ Project {
 
     property string buildDirectory: "../Build"
 
+    qbsSearchPaths: "qbs"
+
     references: [
+        "Installer/Installer.qbs",
         "Libs/Libs.qbs",
         "Service/Service.qbs",
 //        "System/System.qbs",
 //        "Tests/Tests.qbs",
 //        "User/User.qbs",
 //        "Utils/Utils.qbs",
-//        "Installer/Installer.qbs",
 //        "Android/Android.qbs"
     ]
 }

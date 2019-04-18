@@ -6,8 +6,8 @@
 class AbstractIOInterface
 {
 public:
-    virtual ~AbstractIOInterface() = 0;
-    virtual void sendData(const uint8_t address, const uint8_t command, const uint8_t dataLen, const uint8_t *data);
+    virtual ~AbstractIOInterface() = default;
+    virtual void sendData(const uint8_t address, const uint8_t command, const uint8_t dataLen, const uint8_t *data) = 0;
 };
 #endif // AOINTERFACE_H
 

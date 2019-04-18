@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>Common apps</DisplayName>
+    <Description>Common components for Scontel's control unit.</Description>
+    <Version>1.1.2-5</Version>
+    <ReleaseDate>2019-03-27</ReleaseDate>
+    <ForcedInstallation>true</ForcedInstallation>
+    <Script>installscript.qs</Script>
+</Package>
