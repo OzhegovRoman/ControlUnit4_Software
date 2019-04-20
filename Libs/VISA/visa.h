@@ -46,7 +46,7 @@
 
 /*- VISA Types --------------------------------------------------------------*/
 
-typedef ViObject             ViEvent;
+using ViEvent = ViObject;
 typedef ViEvent      _VI_PTR ViPEvent;
 typedef ViObject             ViFindList;
 typedef ViFindList   _VI_PTR ViPFindList;

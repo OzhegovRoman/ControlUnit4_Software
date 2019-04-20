@@ -2,11 +2,10 @@
 #include <QDebug>
 
 cAgilent34401A::cAgilent34401A() :
-    QObject(),
-    mMode(Mode_U_DC),
-    mRange(DefRange),
-    mResolution(DefResolution),
-    mInited(false)
+    mMode{Mode_U_DC},
+    mRange{DefRange},
+    mResolution{DefResolution},
+    mInited{false}
 {
 
 }
