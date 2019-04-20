@@ -1,6 +1,8 @@
 import qbs
 
 Project {
+
+    name: "StandardSoftware"
     //minimumQbsVersion: "1.9.0"
     property string softwareVersion: "1.1.3"
     property string company: "Scontel"
@@ -13,6 +15,7 @@ Project {
     property string baseInstallPackegeName: "com.scontel.controlunit"
     property string QtIFPaths: "c:/Qt/Tools/QtInstallerFramework/3.0/bin/"
     property string installDir: "packages/"+baseInstallPackegeName+"/data"
+
     // Настройки сборки
     property bool buildAll:         false
     property bool buildLibraries:   true
@@ -35,7 +38,6 @@ Project {
     qbsSearchPaths: "qbs"
 
     references: [
-        "Installer/Installer.qbs",
         "Libs/Libs.qbs",
         "Service/Service.qbs",
         "System/System.qbs",
@@ -101,8 +103,6 @@ Project {
             CU-123 - Исправление ошибки в cu-simpleapp
     1.1.3 - Рефакторинг кода, разделение на открытую и закрытую часть
 
-    //TODO: сделать отдельное правило для всех raspberryPi приложений для правильного деплоя
-    //TODO: проверить код для распберри
-    //TODO: Проверить инсталятор
-
+    TODO: сделать отдельное правило для всех raspberryPi приложений для правильного деплоя
+    TODO: проверить код для распберри
 */
