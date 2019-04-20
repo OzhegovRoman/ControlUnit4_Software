@@ -41,28 +41,6 @@ StaticLibrary {
         ]
     }
 
-//    Group {
-//        name: "StarProtocol"
-//        prefix: "../StarProtocol/"
-//        files: [
-//            "cstarprotocol.cpp",
-//            "cstarprotocol.h",
-//            "cstarprotocolpc.cpp",
-//            "cstarprotocolpc.h",
-//            "star_prc_commands.h",
-//            "star_prc_structs.h",
-//        ]
-//    }
-
-//    Group {
-//        name: "Devices"
-//        prefix: "Devices/**/"
-//        files: [
-//            "*.cpp",
-//            "*.h"
-//        ]
-//    }
-
     Group {
         name: "Drivers"
         prefix: "Drivers/**/"

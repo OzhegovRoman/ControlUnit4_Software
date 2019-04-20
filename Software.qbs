@@ -1,20 +1,12 @@
 import qbs
 
 Project {
-
+    condition: true
     name: "StandardSoftware"
     //minimumQbsVersion: "1.9.0"
     property string softwareVersion: "1.1.3"
     property string company: "Scontel"
     property string productName: "Scontel's ControlUnit software"
-
-    // Installation preferences
-    property bool makeInstaller:    false
-    property bool onlineInstaller:  false
-    property bool offlineInstaller: false
-    property string baseInstallPackegeName: "com.scontel.controlunit"
-    property string QtIFPaths: "c:/Qt/Tools/QtInstallerFramework/3.0/bin/"
-    property string installDir: "packages/"+baseInstallPackegeName+"/data"
 
     // Настройки сборки
     property bool buildAll:         false
@@ -23,19 +15,14 @@ Project {
     property bool buildSystem:      false
     property bool buildUser:        true
 
-    property bool isWindows: qbs.targetOS.contains("windows");
-    property bool isAndroid: qbs.targetPlatform.contains("android")
-
-    //some code for deployment
-    property string ftpLogin: "ozhegov@rplab.ru";
-    property string privateKeyPath: "/home/Roman/.ssh/rplab_sftp";
-    property string ftpRootPath: "public_html/ControlUnit4/";
-    property string rsyncUtility: "e:/DevTools/cwRsync_5.5.0_x86_Free/bin/rsync.exe"
-    property string sshUtility: "e:/DevTools/cwRsync_5.5.0_x86_Free/bin/ssh.exe"
-
     property string buildDirectory: "../Build"
 
     qbsSearchPaths: "qbs"
+
+    property bool isWindows:        true
+    property bool isAndroid:        false
+    property bool isRaspberryPi:    false
+    property bool isLinux:          false
 
     references: [
         "Libs/Libs.qbs",
