@@ -48,7 +48,7 @@ void EditWidget::on_pushButton_clicked(bool checked)
     qDebug()<<checked<<index;
     cCu4SdM0Driver driver;
     driver.setIOInterface(interface);
-    driver.setDevAddress(index);
+    driver.setDevAddress(static_cast<quint8>(index));
     driver.setShortEnable(checked);
 }
 

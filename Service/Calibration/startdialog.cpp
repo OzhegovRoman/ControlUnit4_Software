@@ -15,8 +15,8 @@
 
 StartDialog::StartDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::StartDialog),
-    mInterface(0)
+    ui(new Ui::StartDialog)
+    
 {
     ui->setupUi(this);
 
@@ -89,7 +89,6 @@ void StartDialog::on_buttonBox_accepted()
         // ой беда,
         reject();
         return;
-        break;
     }
 
     // Далее определяем тип подключенного устройства

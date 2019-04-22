@@ -14,7 +14,7 @@ class SspdWidget : public QWidget
 
 public:
     explicit SspdWidget(QWidget *parent = nullptr);
-    ~SspdWidget();
+    ~SspdWidget() override;
 
     void updateWidget();
     void setDriver(cCu4SdM0Driver *driver);
@@ -27,7 +27,7 @@ signals:
     void dataUpdated(CU4SDM0V1_Data_t data);
 private:
     Ui::SspdWidget *ui;
-    cCu4SdM0Driver *mDriver;
+    cCu4SdM0Driver *mDriver{nullptr};
 private slots:
     void updateData(CU4SDM0V1_Data_t data);
     void paramsUpdated(CU4SDM0V1_Param_t params);

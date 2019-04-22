@@ -1,5 +1,4 @@
 #include "cagilent34401a.h"
-#include <QDebug>
 
 cAgilent34401A::cAgilent34401A() :
     mMode{Mode_U_DC},
@@ -48,10 +47,7 @@ bool cAgilent34401A::isInited() const
 
 qreal cAgilent34401A::singleRead()
 {
-    qDebug()<<"initialize agilent";
     if (!isInited()) initialize();
-    qDebug()<<"INITIALIZATION DONE!!!";
-
     QString str;
     switch (mMode) {
     case Mode_I_DC:

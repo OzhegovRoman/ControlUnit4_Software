@@ -13,7 +13,7 @@ class Bootloader: public QObject
     Q_OBJECT
 public:
     explicit Bootloader(QObject *parent = Q_NULLPTR);
-    void program(QString fileName);
+    void program(const QString& fileName);
     QString portName() const;
     void setPortName(const QString &portName);
 
@@ -39,10 +39,10 @@ private:
     void startTransmitte();
     void startReceive();
 
-    bool writeData(QByteArray data);
+    bool writeData(const QByteArray& data);
 
     void clearProgram();
-    void writeProgram(QString fileName);
+    void writeProgram(const QString& fileName);
 };
 
 #endif // BOOTLOADER_H

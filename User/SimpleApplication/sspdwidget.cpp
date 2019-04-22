@@ -3,10 +3,10 @@
 #include <QTime>
 #include <QDebug>
 
-SspdWidget::SspdWidget(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::SspdWidget),
-    mDriver(nullptr)
+SspdWidget::SspdWidget(QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::SspdWidget)
+    
 {
     ui->setupUi(this);
 }

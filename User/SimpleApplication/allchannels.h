@@ -16,7 +16,7 @@ class AllChannels : public QWidget
 
 public:
     explicit AllChannels(QWidget *parent = nullptr);
-    ~AllChannels();
+    ~AllChannels() override;
 
     void openWidget();
     void closeWidget();
@@ -37,7 +37,7 @@ private slots:
 private:
     AllChannelsDataModel *model;
     AllChannelsDataDelegate *delegate;
-    cuIOInterface *mInterface;
+    cuIOInterface *mInterface{nullptr};
 };
 
 #endif // ALLCHANNELS_H

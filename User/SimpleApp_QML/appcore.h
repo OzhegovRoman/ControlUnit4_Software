@@ -131,15 +131,15 @@ public:
 
 private:
     cuTcpSocketIOInterface *mInterface;
-    CU4TDM0V1_Data_t last_TempData;
-    CU4SDM0V1_Data_t last_SspdData;
-    CU4SDM0V1_Param_t last_SspdParams;
+    CU4TDM0V1_Data_t last_TempData{};
+    CU4SDM0V1_Data_t last_SspdData{};
+    CU4SDM0V1_Param_t last_SspdParams{};
     cCu4TdM0Driver *mTempDriver;
     cCu4SdM0Driver *mSspdDriver;
 
 public slots:
     Q_INVOKABLE void coreConnectToDefaultIpAddress();
-    Q_INVOKABLE void coreConnectToIpAddress(QString ipAddress);
+    Q_INVOKABLE void coreConnectToIpAddress(const QString& ipAddress);
     Q_INVOKABLE void getTemperatureDriverData(quint8 address);
     Q_INVOKABLE void connectTemperatureSensor(quint8 address);
     Q_INVOKABLE void disConnectTemperatureSensor(quint8 address);
@@ -165,7 +165,7 @@ static QObject *appCoreProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
     Q_UNUSED(engine)
     Q_UNUSED(scriptEngine)
 
-    AppCore *singletonClass = new AppCore();
+    auto *singletonClass = new AppCore();
     return singletonClass;
 }
 

@@ -17,7 +17,7 @@ Bootloader::Bootloader(QObject *parent):
 
 }
 
-void Bootloader::program(QString fileName)
+void Bootloader::program(const QString& fileName)
 {
     if (mPortName.isEmpty()) {
         emit errorLoader(tr("PortName is not setted"));
@@ -192,7 +192,7 @@ void Bootloader::startReceive()
 #endif
 }
 
-bool Bootloader::writeData(QByteArray data)
+bool Bootloader::writeData(const QByteArray& data)
 {
     startTransmitte();
     delayMs(5);
@@ -226,7 +226,7 @@ void Bootloader::clearProgram()
     }
 }
 
-void Bootloader::writeProgram(QString fileName)
+void Bootloader::writeProgram(const QString& fileName)
 {
     qApp->processEvents();
     emit infoLoader("Start programming device");

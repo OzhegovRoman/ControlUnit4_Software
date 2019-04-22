@@ -9,7 +9,7 @@ class cAgilent34401aGpibInterface : public cAgilent34401A
     Q_OBJECT
 public:
     explicit cAgilent34401aGpibInterface();
-    ~cAgilent34401aGpibInterface();
+    ~cAgilent34401aGpibInterface() override;
 
     quint8 gpibAddress() const;
     void setGpibAddress(const quint8 &gpibAddress);
@@ -18,14 +18,14 @@ public:
     void setTimeOut(const quint8 &timeOut);
 
 protected:
-    quint64 writeAgilent(QString str);
-    qreal readAgilent();
-    bool initialize();
+    quint64 writeAgilent(QString str) override;
+    qreal readAgilent() override;
+    bool initialize() override;
 private:
     quint8 mGpibAddress;
     int dvm;
     quint8 mTimeOut;
-    void gpibError(QString message);
+    void gpibError(const QString& message);
 };
 
 #endif // CAGILENT34401AGPIBINTERFACE_H

@@ -14,7 +14,7 @@ class cAgilent34401aVisaInterface : public cAgilent34401A
     Q_OBJECT
 public:
     explicit cAgilent34401aVisaInterface();
-    ~cAgilent34401aVisaInterface();
+    ~cAgilent34401aVisaInterface() override;
 
     QString visaDeviceName() const;
     void setVisaDeviceName(const QString &visaDeviceName);
@@ -23,13 +23,13 @@ public:
     bool isVisaInited() const;
 
 protected:
-    quint64 writeAgilent(QString str);
-    qreal readAgilent();
-    bool initialize();
+    quint64 writeAgilent(QString str) override;
+    qreal readAgilent() override;
+    bool initialize() override;
 
 private:
     QString mVisaDeviceName;
-    ViSession visaSession;
+    ViSession visaSession{};
     bool mVisaInited;
 };
 

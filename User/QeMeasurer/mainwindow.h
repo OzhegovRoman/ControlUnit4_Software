@@ -28,7 +28,7 @@ namespace Ui {
 class MainWindow;
 }
 
-typedef
+using IOInterface_t =
 #ifdef TCPIP_SOCKET_INTERFACE
      cuTcpSocketIOInterface
 #elif FAKE
@@ -38,7 +38,7 @@ typedef
 #elif RS485
     cuRs485IOInterface
 #endif
-IOInterface_t;
+;
 
 class MainWindow : public QWidget
 {
@@ -46,7 +46,7 @@ class MainWindow : public QWidget
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    ~MainWindow() override;
 
 private slots:
     void on_pbInitialize_clicked();

@@ -13,8 +13,8 @@ class TempWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit TempWidget(QWidget *parent = 0);
-    ~TempWidget();
+    explicit TempWidget(QWidget *parent = nullptr);
+    ~TempWidget() override;
 
     void updateWidget();
     void openWidget();
@@ -27,8 +27,8 @@ private slots:
 
 private:
     Ui::TempWidget *ui;
-    cCu4TdM0Driver *mDriver;
-    bool mClosed;
+    cCu4TdM0Driver *mDriver{nullptr};
+    bool mClosed{true};
 };
 
 #endif // TEMPWIDGET_H

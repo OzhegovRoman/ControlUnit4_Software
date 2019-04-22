@@ -19,7 +19,7 @@ class AbstractDriver : public cuIODeviceImpl
     Q_OBJECT
 public:
     explicit AbstractDriver(QObject *parent = nullptr);
-    ~AbstractDriver();
+    ~AbstractDriver() override;
 
     // Инициализация устройства
     void init();
@@ -64,18 +64,18 @@ signals:
     void eepromConstWrited();
 
 public slots:
-    void sendMsg(quint8 command, quint8 dataLength, quint8* data);
+    void sendMsg(quint8 command, quint8 dataLength, quint8* data) override;
 
 private slots:
     void waitingTimerTimeOut();
 
 protected:
-    bool pMsgReceived(quint8 address, quint8 command, quint8 dataLength, quint8* data);
+    bool pMsgReceived(quint8 address, quint8 command, quint8 dataLength, quint8* data) override;
 
 private:
-    bool mAnswerReceive;
-    bool mTimeOut;
-    int mDriverTimeOut;
+    bool mAnswerReceive {false};
+    bool mTimeOut {false};
+    int mDriverTimeOut {500};
     QTimer *mTimer;
     cuDeviceParam<QString> *mDeviceType;
     cuDeviceParam<QString> *mModificationVersion;
@@ -119,7 +119,7 @@ public:
      * @return
      */
     void getValue() {
-        mDriver->sendMsg(mCommand,0 ,0);
+        mDriver->sendMsg(mCommand, 0 ,nullptr);
     }
 
     /**
@@ -152,9 +152,11 @@ template<typename T>
 class cuDeviceParam_settable : public cuDeviceParam<T>
 {
 public:
-    cuDeviceParam_settable(AbstractDriver *parent = nullptr, quint8 command = 0):
-        cuDeviceParam<T>(parent, command),
-        mUnsettedPreviously(true){}
+    cuDeviceParam_settable(AbstractDriver *parent = nullptr, quint8 command = 0)
+        : cuDeviceParam<T>(parent, command)
+    {
+
+    }
 
     void setValue(const T &value) {
         cuDeviceParam<T>::mDriver->sendMsg(cuDeviceParam<T>::mCommand+1, sizeof(T), (quint8*) &value);
@@ -187,7 +189,7 @@ public:
     }
 private:
     T mLastSettedValue;
-    bool mUnsettedPreviously;
+    bool mUnsettedPreviously {true};
 };
 
 #endif // CUABSTRACTDRIVER_H

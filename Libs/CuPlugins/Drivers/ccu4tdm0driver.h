@@ -64,8 +64,8 @@ private:
     cuDeviceParam_settable<pair_t<float> > *mPressSensorVoltageNCoeff;
     cuDeviceParam_settable<pair_t<float> > *mPressSensorCoeff;
 
-    CU4TDM0V1_Temp_Table_Item_t mTempTable[TEMP_TABLE_SIZE];
-    quint8 offset, count;
+    CU4TDM0V1_Temp_Table_Item_t mTempTable[TEMP_TABLE_SIZE]{};
+    quint8 offset{}, count{};
 };
 
 #endif // CCU4TDM0DRIVER_H

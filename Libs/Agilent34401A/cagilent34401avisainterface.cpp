@@ -2,8 +2,7 @@
 #include <QDebug>
 
 cAgilent34401aVisaInterface::cAgilent34401aVisaInterface():
-    cAgilent34401A(),
-    mVisaInited(false)
+    mVisaInited{false}
 {
     // инитим прямо тут
     QLibrary lib("visa32");
@@ -13,9 +12,7 @@ cAgilent34401aVisaInterface::cAgilent34401aVisaInterface():
 }
 
 cAgilent34401aVisaInterface::~cAgilent34401aVisaInterface()
-{
-
-}
+= default;
 
 QString cAgilent34401aVisaInterface::visaDeviceName() const
 {
@@ -39,8 +36,8 @@ quint64 cAgilent34401aVisaInterface::writeAgilent(QString str)
 
     qDebug()<<"Try to write Agilent";
 
-    typedef ViStatus (*lviWrite) (ViSession, ViBuf, ViUInt32, ViPUInt32);
-    lviWrite write = reinterpret_cast<lviWrite> (lib.resolve("viWrite"));
+    using lviWrite = ViStatus (*)(ViSession, ViBuf, ViUInt32, ViPUInt32);
+    auto write = reinterpret_cast<lviWrite> (lib.resolve("viWrite"));
 
     ViStatus status = write(visaSession,
                               reinterpret_cast<unsigned char*>(str.toLocal8Bit().data()),
@@ -64,7 +61,7 @@ qreal cAgilent34401aVisaInterface::readAgilent()
         return false;
     }
     typedef ViStatus (*lviRead) (ViSession, ViBuf, ViUInt32, ViPUInt32);
-    lviRead read = reinterpret_cast<lviRead> (lib.resolve("viRead"));
+    auto read = reinterpret_cast<lviRead> (lib.resolve("viRead"));
 
     qDebug()<<"Try to read Agilent";
     ViStatus status = read(visaSession, rdBuff, MAX_SCPI_LEN, &retCount);

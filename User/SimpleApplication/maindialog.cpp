@@ -7,14 +7,11 @@
 #include "../qCustomLib/qCustomLib.h"
 //#include <QWindow>
 
-MainDialog::MainDialog(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::MainDialog),
-    mInterface(new cInterface(this)),
-    lastWidgetIndex(-1),
-    mTimerTimeOut(500),
-    mTimer(new QTimer(this)),
-    mInited(false)
+MainDialog::MainDialog(QWidget *parent)
+    : QDialog(parent)
+    , ui(new Ui::MainDialog)
+    , mInterface(new cInterface(this))
+    , mTimer(new QTimer(this))
 {
 
     ui->setupUi(this);
@@ -42,8 +39,8 @@ void MainDialog::on_stackedWidget_currentChanged(int arg1)
         if (lastWidgetIndex == ui->stackedWidget->count()-1)
             aWidget->closeWidget();
         else {
-            TempWidget* tWidget = qobject_cast<TempWidget*>(ui->stackedWidget->widget(lastWidgetIndex));
-            SspdWidget* sWidget = qobject_cast<SspdWidget*>(ui->stackedWidget->widget(lastWidgetIndex));
+            auto* tWidget = qobject_cast<TempWidget*>(ui->stackedWidget->widget(lastWidgetIndex));
+            auto* sWidget = qobject_cast<SspdWidget*>(ui->stackedWidget->widget(lastWidgetIndex));
             if (tWidget) tWidget->closeWidget();
             if (sWidget) sWidget->closeWidget();
         }
@@ -52,8 +49,8 @@ void MainDialog::on_stackedWidget_currentChanged(int arg1)
     if (arg1 == ui->stackedWidget->count() - 1)
         aWidget->openWidget();
     else {
-        TempWidget* tWidget = qobject_cast<TempWidget*>(ui->stackedWidget->widget(arg1));
-        SspdWidget* sWidget = qobject_cast<SspdWidget*>(ui->stackedWidget->widget(arg1));
+        auto* tWidget = qobject_cast<TempWidget*>(ui->stackedWidget->widget(arg1));
+        auto* sWidget = qobject_cast<SspdWidget*>(ui->stackedWidget->widget(arg1));
         if (tWidget) tWidget->openWidget();
         if (sWidget) sWidget->openWidget();
     }
@@ -71,8 +68,8 @@ void MainDialog::timerTimeOut()
         aWidget->updateWidget();
     }
     else {
-        TempWidget* tWidget = qobject_cast<TempWidget*>(ui->stackedWidget->widget(i));
-        SspdWidget* sWidget = qobject_cast<SspdWidget*>(ui->stackedWidget->widget(i));
+        auto* tWidget = qobject_cast<TempWidget*>(ui->stackedWidget->widget(i));
+        auto* sWidget = qobject_cast<SspdWidget*>(ui->stackedWidget->widget(i));
         if (tWidget) tWidget->updateWidget();
         if (sWidget) sWidget->updateWidget();
     }
@@ -94,7 +91,7 @@ bool MainDialog::initialize()
     QString answer;
 
     if (mTcpIpProtocol){
-        cuTcpSocketIOInterface* interface = new cuTcpSocketIOInterface(this);
+        auto* interface = new cuTcpSocketIOInterface(this);
 
         interface->setAddress(convertToHostAddress(mTcpIpAddress));
         interface->setPort(SERVER_TCPIP_PORT);
@@ -103,7 +100,7 @@ bool MainDialog::initialize()
         mInterface = interface;
     }
     else {
-        cuRs485IOInterface* interface = new cuRs485IOInterface(this);
+        auto* interface = new cuRs485IOInterface(this);
         interface->setPortName(mSerialPortName);
 
         QSettings settings("Scontel", "RaspPi Server");
@@ -180,7 +177,7 @@ bool MainDialog::waitingAnswer()
     return !mWaiting;
 }
 
-bool MainDialog::createUI(QString deviceList)
+bool MainDialog::createUI(const QString& deviceList)
 {
     QStringList list = deviceList.split("<br>");
     // составляем список всех устройств, каждый из них инициализируем  и т. д.
@@ -198,7 +195,7 @@ bool MainDialog::createUI(QString deviceList)
                 ui->listWidget->addItem(QString("Sspd Driver\nAddress: %1").arg(add));
                 mSdDrivers[i]->setIOInterface(mInterface);
 
-                SspdWidget* widget = new SspdWidget(this);
+                auto* widget = new SspdWidget(this);
                 widget->setDriver(mSdDrivers[i]);
                 ui->stackedWidget->addWidget(widget);
             }
@@ -210,7 +207,7 @@ bool MainDialog::createUI(QString deviceList)
                 ui->listWidget->addItem(QString("Temperature\nAddress: %1").arg(add));
                 mTdDrivers[i]->setIOInterface(mInterface);
 
-                TempWidget* widget = new TempWidget(this);
+                auto* widget = new TempWidget(this);
                 widget->setDriver(mTdDrivers[i]);
                 ui->stackedWidget->addWidget(widget);
             }

@@ -21,18 +21,18 @@ int AllChannelsDataModel::columnCount(const QModelIndex &parent) const
     return 1;
 }
 
-void AllChannelsDataModel::initialize(QString info)
+void AllChannelsDataModel::initialize(const QString& info)
 {
-    for (QString str : info.split("\r\n")){
+    for (const QString& str : info.split("\r\n")){
         QStringList strL = str.split(": ");
         if (strL.count()>2)
         {
-            deviceInfo_t tmpDeviceInfo;
+            deviceInfo_t tmpDeviceInfo{};
             tmpDeviceInfo.current = 0;
             tmpDeviceInfo.voltage = 0;
             tmpDeviceInfo.temperature = 0;
             tmpDeviceInfo.isShorted = true;
-            for (QString x : strL){
+            for (const QString& x : strL){
                 QStringList strL2 = x.split("=");
                 if (strL2.count() == 2){
                     if (strL2[0] == "address")
@@ -56,8 +56,7 @@ QVariant AllChannelsDataModel::data(const QModelIndex &index, int role) const
             if (!devices[idx].isShorted){
                 if (qAbs(devices[idx].voltage)<0.01)
                     return QBrush(Qt::green);
-                else
-                    return QBrush(Qt::red);
+                return QBrush(Qt::red);
             }
         }
     }
@@ -82,10 +81,9 @@ QVariant AllChannelsDataModel::headerData(int section, Qt::Orientation orientati
     if (orientation == Qt::Vertical){
         if (devices[section].isSspd)
             return QString("SSPD#%1").arg(section);
-        else
-            return ("Temperature");
+        return ("Temperature");
     }
-    else return QAbstractListModel::headerData(section, orientation, role);
+    return QAbstractListModel::headerData(section, orientation, role);
 }
 
 bool AllChannelsDataModel::setData(const QModelIndex &index, const QVariant &value, int role)
@@ -102,5 +100,5 @@ Qt::ItemFlags AllChannelsDataModel::flags(const QModelIndex &index) const
 {
     if (devices[index.row()].isSspd)
         return Qt::ItemIsSelectable |  Qt::ItemIsEditable | Qt::ItemIsEnabled ;
-    else return Qt::NoItemFlags;
+    return Qt::NoItemFlags;
 }

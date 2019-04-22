@@ -14,7 +14,7 @@ class StartDialog : public QDialog
 
 public:
     explicit StartDialog(QWidget *parent = 0);
-    ~StartDialog();
+    ~StartDialog() override;
 
     cuIOInterfaceImpl *interface() const;
 
@@ -27,7 +27,7 @@ private slots:
 
 private:
     Ui::StartDialog *ui;
-    cuIOInterfaceImpl *mInterface;
+    cuIOInterfaceImpl *mInterface{0};
     QString mDeviceType;
 };
 

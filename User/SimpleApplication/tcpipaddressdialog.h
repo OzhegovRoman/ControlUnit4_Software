@@ -14,14 +14,14 @@ class TcpIpAddressDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit TcpIpAddressDialog(QWidget *parent = 0);
-    ~TcpIpAddressDialog();
+    explicit TcpIpAddressDialog(QWidget *parent = nullptr);
+    ~TcpIpAddressDialog() override;
 
     QHostAddress getAddress();
     QString getPortName();
     bool isSerialProtocol();
 
-    void accept();
+    void accept() override;
 
 private slots:
     void on_cbType_activated(int index);

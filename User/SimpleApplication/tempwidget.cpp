@@ -3,9 +3,7 @@
 
 TempWidget::TempWidget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::TempWidget),
-    mDriver(nullptr),
-    mClosed(true)
+    ui(new Ui::TempWidget)
 {
     ui->setupUi(this);
 }
@@ -44,7 +42,7 @@ void TempWidget::dataUpDated(CU4TDM0V1_Data_t data)
 {
     QString tmpstr;
     if (data.Temperature == 0) tmpstr = "Sensor not connected";
-    else tmpstr = QString("%1 K").arg(data.Temperature,4,'f',2);
+    else tmpstr = QString("%1 K").arg(data.Temperature, 4, 'f', 2);
     ui->lbData->setText(QString("<h2>T: %1</h2><h3>P: %2 mbar<br>Temp sensor voltage: %3 V<br>Press sensor Voltage: %4 mV</h3>")
                         .arg(tmpstr)
                         .arg(data.Pressure,5,'f',1)

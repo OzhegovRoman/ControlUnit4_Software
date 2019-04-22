@@ -13,8 +13,8 @@ class wTempCalibr : public QWidget
     Q_OBJECT
 
 public:
-    explicit wTempCalibr(QWidget *parent = 0);
-    ~wTempCalibr();
+    explicit wTempCalibr(QWidget *parent = nullptr);
+    ~wTempCalibr() override;
 
     CU4TDM0V1_EEPROM_Const_t getEepromConst();
     CU4TDM0V1_Temp_Table_Item_t *getTempTable();
@@ -29,7 +29,7 @@ private slots:
 
 private:
     Ui::wTempCalibr *ui;
-    CU4TDM0V1_Temp_Table_Item_t mTempTable[TEMP_TABLE_SIZE];
+    CU4TDM0V1_Temp_Table_Item_t mTempTable[TEMP_TABLE_SIZE]{};
 };
 
 #endif // WTEMPCALIBR_H

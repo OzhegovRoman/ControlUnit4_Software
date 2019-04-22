@@ -3,11 +3,10 @@
 
 #include <QDebug>
 
-cAgilent34401aGpibInterface::cAgilent34401aGpibInterface():
-    cAgilent34401A(),
-    mGpibAddress(0),
-    dvm(0),
-    mTimeOut(T1s)
+cAgilent34401aGpibInterface::cAgilent34401aGpibInterface()
+    : mGpibAddress{0}
+    , dvm {0}
+    , mTimeOut {T1s}
 {
 
 }
@@ -23,7 +22,7 @@ quint64 cAgilent34401aGpibInterface::writeAgilent(QString str)
     if (ThreadIbsta() & ERR) {
         gpibError("ibwrt error");
     }
-    return ThreadIbcnt();
+    return static_cast<quint64>(ThreadIbcnt());
 }
 
 qreal cAgilent34401aGpibInterface::readAgilent()
@@ -33,7 +32,7 @@ qreal cAgilent34401aGpibInterface::readAgilent()
     QString dataBuffer;
     dataBuffer.append(QByteArray(buffer, ThreadIbcnt()));
     if (!dataBuffer.contains("\n")) return 0;
-    qreal data = dataBuffer.toFloat();
+    auto data = static_cast<qreal>(dataBuffer.toFloat());
     emit dataReaded(data);
     return data;
 }
@@ -76,7 +75,7 @@ void cAgilent34401aGpibInterface::setTimeOut(const quint8 &timeOut)
 }
 
 
-void cAgilent34401aGpibInterface::gpibError(QString message)
+void cAgilent34401aGpibInterface::gpibError(const QString& message)
 {
     QString resultStr;
     int ibsta = ThreadIbsta();

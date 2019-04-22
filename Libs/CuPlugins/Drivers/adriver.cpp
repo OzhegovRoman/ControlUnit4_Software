@@ -6,9 +6,6 @@ using namespace cmd;
 
 AbstractDriver::AbstractDriver(QObject *parent):
     cuIODeviceImpl(parent),
-    mAnswerReceive(false),
-    mTimeOut(false),
-    mDriverTimeOut(500),
     mTimer(new QTimer(this)),
     mDeviceType(new cuDeviceParam<QString>(this, G_GetDeviceType)),
     mModificationVersion(new cuDeviceParam<QString>(this, G_GetModVersion)),
@@ -85,8 +82,7 @@ bool AbstractDriver::getDeviceInfo()
     mDeviceDescription->getValue();
     if (!waitingAnswer()) return false;
     mUDID->getValue();
-    if (!waitingAnswer()) return false;
-    else return true;
+    return (waitingAnswer());
 }
 
 void AbstractDriver::sendMsg(quint8 command, quint8 dataLength, quint8 *data)

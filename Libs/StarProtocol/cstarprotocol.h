@@ -2,7 +2,7 @@
 #define CSTARPROTOCOL_H
 
 //SingleTon
-#include "stdint.h"
+#include <cstdint>
 #include "star_prc_commands.h"
 
 #define FakeSymbolShift 	(3)

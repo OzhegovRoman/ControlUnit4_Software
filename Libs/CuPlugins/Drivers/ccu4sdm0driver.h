@@ -33,7 +33,7 @@ public:
     cuDeviceParam_settable<bool> *PIDEnableStatus() const;
 
 protected:
-    bool pMsgReceived(quint8 address, quint8 command, quint8 dataLength, quint8* data);
+    bool pMsgReceived(quint8 address, quint8 command, quint8 dataLength, quint8* data) override;
 
 signals:
     void dataUpdated(CU4SDM0V1_Data_t);

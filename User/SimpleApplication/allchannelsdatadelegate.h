@@ -18,18 +18,18 @@ public:
 
     // QAbstractItemDelegate interface
 public:
-    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-    void setEditorData(QWidget *editor, const QModelIndex &index) const;
-    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
-    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     void setModel(AllChannelsDataModel *value);
 
     void setInterface(cuIOInterface *value);
 
 private:
-    AllChannelsDataModel *model;
+    AllChannelsDataModel *model{};
     void finishEditing(QWidget *editor, QAbstractItemDelegate::EndEditHint hint = NoHint);
-    cuIOInterface *interface;
+    cuIOInterface *interface{};
 
 };
 

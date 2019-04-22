@@ -8,8 +8,7 @@ AllChannels::AllChannels(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::AllChannels),
     model(new AllChannelsDataModel(this)),
-    delegate(new AllChannelsDataDelegate(this)),
-    mInterface(nullptr)
+    delegate(new AllChannelsDataDelegate(this))
 {
     ui->setupUi(this);
 }

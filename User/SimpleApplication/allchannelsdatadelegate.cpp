@@ -12,7 +12,7 @@ QWidget *AllChannelsDataDelegate::createEditor(QWidget *parent, const QStyleOpti
 {
     Q_UNUSED(option);
     qDebug()<<"create Editor";
-    EditWidget *widget = new EditWidget(parent);
+    auto *widget = new EditWidget(parent);
     widget->setCurrent(model->devices[index.row()].current*1e6);
     qDebug()<<model->devices[index.row()].current;
     widget->setChecked(model->devices[index.row()].isShorted);

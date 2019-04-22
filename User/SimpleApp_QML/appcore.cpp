@@ -79,7 +79,7 @@ void AppCore::coreConnectToDefaultIpAddress()
     coreConnectToIpAddress(tmpStr);
 }
 
-void AppCore::coreConnectToIpAddress(QString ipAddress)
+void AppCore::coreConnectToIpAddress(const QString& ipAddress)
 {
     mInterface->setAddress(convertToHostAddress(ipAddress));
     mInterface->setPort(SERVER_TCPIP_PORT);

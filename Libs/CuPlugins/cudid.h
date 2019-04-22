@@ -7,7 +7,7 @@
 class cUDID
 {
 public:
-    cUDID(){}
+    cUDID()= default;
     cUDID(const quint8 *newUDID)
     {
         setUDID(newUDID);
@@ -30,7 +30,7 @@ public:
     }
 
 private:
-    quint8 mUDID[12];
+    quint8 mUDID[12]{};
 };
 
 #endif // CUDID_H

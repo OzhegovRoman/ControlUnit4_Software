@@ -8,7 +8,7 @@
 #include "Interfaces/cutcpsocketiointerface.h"
 #include "Server/servercommands.h"
 
-typedef cuTcpSocketIOInterface cInterface;
+using cInterface = cuTcpSocketIOInterface;
 
 #include "tempwidget.h"
 #include "sspdwidget.h"
@@ -26,7 +26,7 @@ class MainDialog : public QDialog
 
 public:
     explicit MainDialog(QWidget *parent = nullptr);
-    ~MainDialog();
+    ~MainDialog() override;
 
     void setAddress(const QHostAddress &address);
 
@@ -50,21 +50,21 @@ private:
     QVector<cCu4TdM0Driver*> mTdDrivers;
     QVector<cCu4SdM0Driver*> mSdDrivers;
     cuIOInterface *mInterface;
-    bool mWaiting;
-    int lastWidgetIndex;
-    int mTimerTimeOut;
+    bool mWaiting{};
+    int lastWidgetIndex{-1};
+    int mTimerTimeOut{500};
     QTimer *mTimer;
     QHostAddress mAddress;
     QElapsedTimer mElapsedTimer;
-    bool mInited;
+    bool mInited{false};
 
-    bool mTcpIpProtocol;
+    bool mTcpIpProtocol{};
     QString mTcpIpAddress;
     QString mSerialPortName;
-    AllChannels* aWidget;
+    AllChannels* aWidget{};
 
     bool waitingAnswer();
-    bool createUI(QString deviceList);
+    bool createUI(const QString& deviceList);
 };
 
 #endif // MAINDIALOG_H

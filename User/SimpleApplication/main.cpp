@@ -90,5 +90,5 @@ int main(int argc, char *argv[])
     }
     w2.show();
     if (!w2.initialize()) return 1;
-    else return a.exec();
+    return a.exec();
 }

@@ -13,8 +13,8 @@ class wSspdDriver : public QWidget
     Q_OBJECT
 
 public:
-    explicit wSspdDriver(QWidget *parent = 0);
-    ~wSspdDriver();
+    explicit wSspdDriver(QWidget *parent = nullptr);
+    ~wSspdDriver() override;
 
     CU4SDM0V1_EEPROM_Const_t getEepromConst();
 

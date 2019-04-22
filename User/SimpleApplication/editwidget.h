@@ -14,7 +14,7 @@ class EditWidget : public QWidget
 
 public:
     explicit EditWidget(QWidget *parent = nullptr);
-    ~EditWidget();
+    ~EditWidget() override;
 
     void setCurrent(double value);
     double getCurrent();
@@ -31,8 +31,8 @@ private slots:
 
 private:
     Ui::EditWidget *ui;
-    cuIOInterface *interface;
-    int index;
+    cuIOInterface *interface{};
+    int index{};
 
 };
 
