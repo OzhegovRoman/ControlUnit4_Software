@@ -50,7 +50,7 @@ public:
     QList<deviceInfo> devList() const;
 
 private:
-    bool mTcpIpProtocolEnabled;
+    bool mTcpIpProtocolEnabled {};
     QString mPortName;
     QString mTcpIpAddress;
     QList<deviceInfo> mDevList;

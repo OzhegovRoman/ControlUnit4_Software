@@ -18,9 +18,9 @@ private:
     cStarProtocolPC(cStarProtocolPC const&) = delete;
     cStarProtocolPC& operator= (cStarProtocolPC const&) = delete;
 
-    uint32_t mCrc32_table[256];
-    uint32_t mCrc32r_table[256];
-    uint32_t mCrc32_value;
+    uint32_t mCrc32_table[256]{};
+    uint32_t mCrc32r_table[256]{};
+    uint32_t mCrc32_value{0};
 
 };
 

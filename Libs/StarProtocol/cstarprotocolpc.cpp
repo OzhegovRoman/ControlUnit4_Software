@@ -51,9 +51,7 @@ uint32_t cStarProtocolPC::crc32Stm32Function(uint8_t *bfr, uint8_t len, bool cle
     return mCrc32_value;
 }
 
-cStarProtocolPC::cStarProtocolPC():
-    cAbstractStarProtocol(),
-    mCrc32_value(0)
+cStarProtocolPC::cStarProtocolPC()
 {
     int i, j;
 

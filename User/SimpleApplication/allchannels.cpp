@@ -57,7 +57,7 @@ void AllChannels::updateWidget()
     emit model->dataChanged(model->index(0), model->index(model->devices.count()));
 }
 
-void AllChannels::initialize(QString deviceInfo)
+void AllChannels::initialize(const QString& deviceInfo)
 {
     model->initialize(deviceInfo);
     ui->tableView->setModel(model);

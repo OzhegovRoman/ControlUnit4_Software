@@ -3,8 +3,8 @@
 cAbstractStarProtocol::cAbstractStarProtocol()
     : mBuffer {}
     , mStarHead {}
-    , mStopBufferPosition(0)
 {
+
 }
 
 StarHead_t cAbstractStarProtocol::headPacket() const

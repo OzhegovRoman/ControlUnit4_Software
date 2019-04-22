@@ -183,7 +183,7 @@ bool cCu4TdM0Driver::pMsgReceived(quint8 address, quint8 command, quint8 dataLen
     } break;
     case TD_GetTempSensorCurrentAdcCoeff: {
         if (dataLength == sizeof(pair_t<float>)) {
-            pair_t<float> tmp;
+            pair_t<float> tmp{};
             memcpy(&tmp, data, sizeof(pair_t<float>));
             mTempSensorCurrentAdcCoeff->setCurrentValue(tmp);
             CU4TDM0V1_EEPROM_Const_t eeprom = mEepromConst->getCurrentValue();
@@ -194,7 +194,7 @@ bool cCu4TdM0Driver::pMsgReceived(quint8 address, quint8 command, quint8 dataLen
     } break;
     case TD_GetTempSensorCurrentDacCoeff: {
         if (dataLength == sizeof(pair_t<float>)) {
-            pair_t<float> tmp;
+            pair_t<float> tmp{};
             memcpy(&tmp, data, sizeof(pair_t<float>));
             mTempSensorCurrentDacCoeff->setCurrentValue(tmp);
             CU4TDM0V1_EEPROM_Const_t eeprom = mEepromConst->getCurrentValue();
@@ -205,7 +205,7 @@ bool cCu4TdM0Driver::pMsgReceived(quint8 address, quint8 command, quint8 dataLen
     } break;
     case TD_GetTempSensorVoltageCoeff: {
         if (dataLength == sizeof(pair_t<float>)) {
-            pair_t<float> tmp;
+            pair_t<float> tmp{};
             memcpy(&tmp, data, sizeof(pair_t<float>));
             mTempSensorVoltageCoeff->setCurrentValue(tmp);
             CU4TDM0V1_EEPROM_Const_t eeprom = mEepromConst->getCurrentValue();
@@ -216,7 +216,7 @@ bool cCu4TdM0Driver::pMsgReceived(quint8 address, quint8 command, quint8 dataLen
     } break;
     case TD_GetPressSensorVoltagePCoeff: {
         if (dataLength == sizeof(pair_t<float>)) {
-            pair_t<float> tmp;
+            pair_t<float> tmp{};
             memcpy(&tmp, data, sizeof(pair_t<float>));
             mPressSensorVoltagePCoeff->setCurrentValue(tmp);
             CU4TDM0V1_EEPROM_Const_t eeprom = mEepromConst->getCurrentValue();
@@ -227,7 +227,7 @@ bool cCu4TdM0Driver::pMsgReceived(quint8 address, quint8 command, quint8 dataLen
     } break;
     case TD_GetPressSensorVoltageNCoeff: {
         if (dataLength == sizeof(pair_t<float>)) {
-            pair_t<float> tmp;
+            pair_t<float> tmp{};
             memcpy(&tmp, data, sizeof(pair_t<float>));
             mPressSensorVoltageNCoeff->setCurrentValue(tmp);
             CU4TDM0V1_EEPROM_Const_t eeprom = mEepromConst->getCurrentValue();
@@ -238,7 +238,7 @@ bool cCu4TdM0Driver::pMsgReceived(quint8 address, quint8 command, quint8 dataLen
     } break;
     case TD_GetPressSensorCoeff: {
         if (dataLength == sizeof(pair_t<float>)) {
-            pair_t<float> tmp;
+            pair_t<float> tmp{};
             memcpy(&tmp, data, sizeof(pair_t<float>));
             mPressSensorCoeff->setCurrentValue(tmp);
             CU4TDM0V1_EEPROM_Const_t eeprom = mEepromConst->getCurrentValue();
@@ -258,7 +258,7 @@ bool cCu4TdM0Driver::pMsgReceived(quint8 address, quint8 command, quint8 dataLen
         break;
     case TD_GetTempTableValues: {
         if (dataLength == sizeof(CU4TDM0V1_Temp_Table_Item_t)*count) {
-            CU4TDM0V1_Temp_Table_Item_t* tmp = (CU4TDM0V1_Temp_Table_Item_t*) data;
+            auto* tmp = (CU4TDM0V1_Temp_Table_Item_t*) data;
             for (int i = 0; i < count; ++i)
                 mTempTable[offset+i] = *(tmp+i);
         }

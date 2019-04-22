@@ -13,15 +13,12 @@
 
 using namespace cmd;
 
-cuServer::cuServer(QObject *parent):
-    cuIODeviceImpl(parent),
-    mTcpServer(new QTcpServer(this)),
-    mDataReadyMapper(new QSignalMapper(this)),
-    mDestroySocketMapper(new QSignalMapper(this)),
-    mWaitingForAnswer(false),
-    mServerTimeOut(100),
-    mTimer(new QTimer(this)),
-    mLastSocket(nullptr)
+cuServer::cuServer(QObject *parent)
+    : cuIODeviceImpl(parent)
+    , mTcpServer(new QTcpServer(this))
+    , mDataReadyMapper(new QSignalMapper(this))
+    , mDestroySocketMapper(new QSignalMapper(this))
+    , mTimer(new QTimer(this))
 {
     connect(mTcpServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
 

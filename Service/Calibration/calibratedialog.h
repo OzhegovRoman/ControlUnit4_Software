@@ -23,9 +23,9 @@ class CalibrateDialog : public QDialog
 
 public:
     explicit CalibrateDialog(QWidget *parent = nullptr);
-    ~CalibrateDialog();
+    ~CalibrateDialog() override;
 
-    int exec();
+    int exec() override;
 
     AbstractDriver *driver() const;
     void setDriver(AbstractDriver *driver);
@@ -42,7 +42,7 @@ private slots:
 private:
     Ui::CalibrateDialog *ui;
     tDriverType mDriverType;
-    AbstractDriver *mDriver;
+    AbstractDriver *mDriver{nullptr};
     CU4SDM0V1_EEPROM_Const_t lastCU4SDEepromConst;
     CU4TDM0V1_EEPROM_Const_t lastCU4TDEepromConst;
     cAgilent34401aVisaInterface *agilent;

@@ -66,7 +66,7 @@ void MainWindow::contextMenuRequest(QPoint pos)
 
     if (ui->wMeasurerPlot->graphCount() == 0) return;
 
-    QMenu *menu = new QMenu(this);
+    auto *menu = new QMenu(this);
     menu->setAttribute(Qt::WA_DeleteOnClose);
 
     menu->addAction("Clear", this, SLOT(deleteMeasureData()));
@@ -189,7 +189,7 @@ void MainWindow::updateData()
 void MainWindow::updateCountsGraph()
 {
     bool ok;
-    double counts = static_cast<double>(mDriver->counts()->getValueSequence(&ok, 5));
+    auto counts = static_cast<double>(mDriver->counts()->getValueSequence(&ok, 5));
     if (!ok) {
         qDebug()<<"can't read counts data";
         mTimer->start();

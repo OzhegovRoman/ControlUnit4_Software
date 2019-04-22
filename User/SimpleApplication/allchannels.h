@@ -22,7 +22,7 @@ public:
     void closeWidget();
     void updateWidget();
 
-    void initialize(QString deviceInfo);
+    void initialize(const QString& deviceInfo);
 
     void setInterface(cuIOInterface *interface);
 

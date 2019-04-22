@@ -1,9 +1,7 @@
 #include "cuiodeviceimpl.h"
 
-cuIODeviceImpl::cuIODeviceImpl(QObject *parent):
-    cuIODevice(parent),
-    mIOInterface(nullptr),
-    mDevAddress(0)
+cuIODeviceImpl::cuIODeviceImpl(QObject *parent)
+    : cuIODevice(parent)
 {
 
 }

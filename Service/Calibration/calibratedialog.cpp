@@ -10,11 +10,10 @@
 
 //TODO: расширить на другие приборы и другие модули
 
-CalibrateDialog::CalibrateDialog(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::CalibrateDialog),
-    mDriver(nullptr),
-    agilent(new cAgilent34401aVisaInterface())
+CalibrateDialog::CalibrateDialog(QWidget *parent)
+    : QDialog(parent)
+    , ui(new Ui::CalibrateDialog)
+    , agilent(new cAgilent34401aVisaInterface())
 {
     ui->setupUi(this);
     connect(this, SIGNAL(rejected()), this, SLOT(stopCalibration()));

@@ -28,7 +28,7 @@ class cuServer: public cuIODeviceImpl
     Q_OBJECT
 public:
     explicit cuServer(QObject *parent = nullptr);
-    ~cuServer();
+    ~cuServer() override;
     void initialize();
 
     void initializeDeviceList();
@@ -39,7 +39,7 @@ public:
     void setServerTimeOut(int serverTimeOut);
 
 protected:
-    bool pMsgReceived(quint8 address, quint8 command, quint8 dataLength, quint8 *data);
+    bool pMsgReceived(quint8 address, quint8 command, quint8 dataLength, quint8 *data) override;
 
 private slots:
     void newConnection();
@@ -61,10 +61,10 @@ private:
     QTcpServer * mTcpServer;
     QSignalMapper *mDataReadyMapper, *mDestroySocketMapper;
     QList<SocketData> mSocketsData;
-    bool mWaitingForAnswer;
-    int mServerTimeOut;
+    bool mWaitingForAnswer{false};
+    int mServerTimeOut{100};
     QTimer *mTimer;
-    QTcpSocket *mLastSocket;
+    QTcpSocket *mLastSocket{nullptr};
     QList<deviceInfo> mAvailableDevices;
     bool isSCPICommand;
 

@@ -16,7 +16,7 @@ public:
      * @brief cuIOInterfaceImpl
      * @param parent
      */
-    explicit cuIOInterfaceImpl(QObject *parent = 0);
+    explicit cuIOInterfaceImpl(QObject *parent = nullptr);
     /**
      * @brief initialize
      * @return

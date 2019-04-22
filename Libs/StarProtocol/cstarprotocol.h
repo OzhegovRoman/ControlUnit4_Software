@@ -52,7 +52,7 @@ protected:
 private:
     uint8_t mBuffer[MaxBufferSize];
     StarHead_t mStarHead;
-    uint8_t mStopBufferPosition;
+    uint8_t mStopBufferPosition{0};
     void codeByte(uint8_t byte);
     uint8_t nextPosition(uint8_t position);
     void addByteToBuffer(uint8_t byte);

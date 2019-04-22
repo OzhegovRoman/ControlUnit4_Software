@@ -10,20 +10,20 @@ class cuIODeviceImpl : public cuIODevice
 public:
     explicit cuIODeviceImpl(QObject *parent = nullptr);
 
-    cuIOInterface *iOInterface() const;
-    void setIOInterface(cuIOInterface *iOInterface);
+    cuIOInterface *iOInterface() const override;
+    void setIOInterface(cuIOInterface *iOInterface) override;
 
-    quint8 devAddress() const;
-    void setDevAddress(const quint8 &devAddress);
+    quint8 devAddress() const override;
+    void setDevAddress(const quint8 &devAddress) override;
 
 public slots:
-    void sendMsg(quint8 command, quint8 dataLength, quint8* data);
-    void msgReceived(quint8 address, quint8 command, quint8 dataLength, quint8* data);
+    void sendMsg(quint8 command, quint8 dataLength, quint8* data) override;
+    void msgReceived(quint8 address, quint8 command, quint8 dataLength, quint8* data) override;
 protected:
     virtual bool pMsgReceived(quint8 address, quint8 command, quint8 dataLength, quint8* data) = 0;
 private:
-    cuIOInterface *mIOInterface;
-    quint8 mDevAddress;
+    cuIOInterface *mIOInterface{nullptr};
+    quint8 mDevAddress{0};
 
 };
 

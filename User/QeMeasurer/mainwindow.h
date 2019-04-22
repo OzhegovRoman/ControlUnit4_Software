@@ -76,8 +76,8 @@ private:
     cCu4SdM0Driver *mDriver;
     IOInterface_t *mInterface;
     QTimer *mTimer;
-    int mMode;
-    double mCurrentValue;
+    int mMode{};
+    double mCurrentValue{};
 };
 
 #endif // MAINWINDOW_H

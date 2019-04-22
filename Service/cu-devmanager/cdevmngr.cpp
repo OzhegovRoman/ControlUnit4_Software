@@ -8,9 +8,10 @@
 #include "Interfaces/cutcpsocketiointerface.h"
 #include "../qCustomLib/qCustomLib.h"
 
-cDevMngr::cDevMngr():
-    mPortName(QString("ttyS0"))
+cDevMngr::cDevMngr()
+    : mPortName(QString("ttyS0"))
 {
+
 }
 
 cDevMngr::Commands cDevMngr::processCommand(QString command)
@@ -27,35 +28,35 @@ cDevMngr::Commands cDevMngr::processCommand(QString command)
         tmpCmd = cmd_Help;
 
     //// Временно удалю эту часть, поскольку она приводит к более сложной логике программы
-//    if (command.contains("interface ")){
-//        QStringList tmpList = command.split(" ");
-//        if (tmpList[1] == "serial" || tmpList[1] == "tcpip"){
-//            tmpCmd = cmd_SetInterface;
-//            setTcpIpProtocolEnabled(tmpList[1] == "tcpip");
-//        }
-//        if (tmpList[1] == "?")
-//            tmpCmd = cmd_GetInterface;
-//    }
+    //    if (command.contains("interface ")){
+    //        QStringList tmpList = command.split(" ");
+    //        if (tmpList[1] == "serial" || tmpList[1] == "tcpip"){
+    //            tmpCmd = cmd_SetInterface;
+    //            setTcpIpProtocolEnabled(tmpList[1] == "tcpip");
+    //        }
+    //        if (tmpList[1] == "?")
+    //            tmpCmd = cmd_GetInterface;
+    //    }
 
-//    if (command.contains("port ")){
-//        QStringList tmpList = command.split(" ");
-//        if (tmpList[1] == "?")
-//            tmpCmd =  cmd_GetComPort;
-//        else {
-//            setPortName(command.split(" ")[1]);
-//            tmpCmd = cmd_SetComPort;
-//        }
-//    }
+    //    if (command.contains("port ")){
+    //        QStringList tmpList = command.split(" ");
+    //        if (tmpList[1] == "?")
+    //            tmpCmd =  cmd_GetComPort;
+    //        else {
+    //            setPortName(command.split(" ")[1]);
+    //            tmpCmd = cmd_SetComPort;
+    //        }
+    //    }
 
-//    if (command.contains("tcpip ")){
-//        QStringList tmpList = command.split(" ");
-//        if (tmpList[1] == "?")
-//            tmpCmd =  cmd_GetTcpIpAddress;
-//        else {
-//            setTcpIpAddress(command.split(" ")[1]);
-//            tmpCmd = cmd_SetTcpIpAddress;
-//        }
-//    }
+    //    if (command.contains("tcpip ")){
+    //        QStringList tmpList = command.split(" ");
+    //        if (tmpList[1] == "?")
+    //            tmpCmd =  cmd_GetTcpIpAddress;
+    //        else {
+    //            setTcpIpAddress(command.split(" ")[1]);
+    //            tmpCmd = cmd_SetTcpIpAddress;
+    //        }
+    //    }
 
     if (command == "devlist ?"){
         if (isTcpIpProtocol())
@@ -130,7 +131,7 @@ bool cDevMngr::addDevice(int address)
         cuTcpSocketIOInterface mInterface;
         mInterface.setAddress(convertToHostAddress(tcpIpAddress()));
         mInterface.setPort(SERVER_TCPIP_PORT);
-        quint8 ad = static_cast<quint8>(address);
+        auto ad = static_cast<quint8>(address);
         mInterface.sendMsg(SERVER_ADDRESS, CMD_SERVER_ADD_DEVICE, 1, &ad);
         QElapsedTimer mTimer;
         mTimer.start();
@@ -139,33 +140,32 @@ bool cDevMngr::addDevice(int address)
         }
         return true;
     }
-    else {
-        cuRs485IOInterface mInterface;
-        mInterface.setPortName(portName());
-        AbstractDriver driver;
-        driver.setIOInterface(&mInterface);
-        driver.setDevAddress(static_cast<quint8>(address));
 
-        deviceInfo newDevice;
-        newDevice.devAddress = static_cast<quint8>(address);
-        bool ok = false;
-        newDevice.devType = driver.getDeviceType()->getValueSequence(&ok, 5);
-        if (ok)
-            newDevice.devUDID = driver.getUDID()->getValueSequence(&ok, 5);
-        if (ok)
-            newDevice.devModVersion = driver.getModificationVersion()->getValueSequence(&ok, 5);
-        if (ok)
-            newDevice.devHwVersion = driver.getHardwareVersion()->getValueSequence(&ok, 5);
-        if (ok)
-            newDevice.devFwVersion = driver.getFirmwareVersion()->getValueSequence(&ok, 5);
-        if (ok)
-            newDevice.devDescription = driver.getDeviceDescription()->getValueSequence(&ok, 5);
-        if (ok)
-            mDevList.append(newDevice);
+    cuRs485IOInterface mInterface;
+    mInterface.setPortName(portName());
+    AbstractDriver driver;
+    driver.setIOInterface(&mInterface);
+    driver.setDevAddress(static_cast<quint8>(address));
 
-        sortDevList();
-        return ok;
-    }
+    deviceInfo newDevice;
+    newDevice.devAddress = static_cast<quint8>(address);
+    bool ok = false;
+    newDevice.devType = driver.getDeviceType()->getValueSequence(&ok, 5);
+    if (ok)
+        newDevice.devUDID = driver.getUDID()->getValueSequence(&ok, 5);
+    if (ok)
+        newDevice.devModVersion = driver.getModificationVersion()->getValueSequence(&ok, 5);
+    if (ok)
+        newDevice.devHwVersion = driver.getHardwareVersion()->getValueSequence(&ok, 5);
+    if (ok)
+        newDevice.devFwVersion = driver.getFirmwareVersion()->getValueSequence(&ok, 5);
+    if (ok)
+        newDevice.devDescription = driver.getDeviceDescription()->getValueSequence(&ok, 5);
+    if (ok)
+        mDevList.append(newDevice);
+
+    sortDevList();
+    return ok;
 }
 
 bool cDevMngr::deleteDevice(int address)
@@ -271,7 +271,7 @@ QList<deviceInfo> cDevMngr::devList() const
 void cDevMngr::sortDevList()
 {
     qSort(mDevList.begin(), mDevList.end(),
-         [](const deviceInfo & a, const deviceInfo &b)
+          [](const deviceInfo & a, const deviceInfo &b)
     {
         return a.devAddress < b.devAddress;
     });
