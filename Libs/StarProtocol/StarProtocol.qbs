@@ -1,7 +1,9 @@
 import qbs
 
 StaticLibrary{
+
     name: "StarProtocol"
+
     Depends { name: "cpp"}
     Depends { name: "Qt.core" }
 

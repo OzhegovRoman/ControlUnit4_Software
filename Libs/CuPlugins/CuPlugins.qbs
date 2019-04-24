@@ -23,7 +23,7 @@ StaticLibrary {
 
     Depends {
         name: "RaspPiMMap"
-        condition: !(project.isWindows || project.isAndroid)
+        condition: project.isRaspberryPi
     }
 
     Group {
@@ -35,7 +35,7 @@ StaticLibrary {
     }
 
     Properties{
-        condition: !(project.isWindows  || project.isAndroid)
+        condition: project.isRaspberryPi
         cpp.defines:  [
             "RASPBERRY_PI"
         ]
