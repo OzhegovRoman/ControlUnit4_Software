@@ -81,11 +81,4 @@ CppApplication{
         qbs.install: true
         qbs.installDir: "/home/pi/Software"
     }
-
-    Group {
-        condition: project.isWindows
-        fileTagsFilter: "application"
-        qbs.install: true
-        qbs.installDir: project.installDir
-    }
 }

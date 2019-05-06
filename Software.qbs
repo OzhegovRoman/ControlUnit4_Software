@@ -15,8 +15,6 @@ Project {
     property bool buildSystem:      false
     property bool buildUser:        true
 
-    property string buildDirectory: "../Build"
-
     qbsSearchPaths: "qbs"
 
     property bool isWindows:        true

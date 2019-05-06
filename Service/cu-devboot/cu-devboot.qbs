@@ -57,13 +57,6 @@ QtApplication {
     cpp.defines: commonDefines;
 
     Group {
-        condition: project.isWindows
-        fileTagsFilter: "application"
-        qbs.install: true
-        qbs.installDir: project.installDir
-    }
-
-    Group {
         condition: qbs.architecture.contains("arm")
         fileTagsFilter: "application"
         qbs.install: true

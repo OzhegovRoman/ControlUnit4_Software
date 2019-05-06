@@ -91,13 +91,6 @@ CppApplication{
         ]
     }
 
-    Group {
-        condition: project.isWindows
-        fileTagsFilter: "application"
-        qbs.install: true
-        qbs.installDir: project.installDir
-    }
-
     // деплой проекта для raspberryPi
     Group {
         condition: !(project.isWindows || project.isAndroid)

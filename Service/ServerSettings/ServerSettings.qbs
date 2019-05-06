@@ -49,11 +49,4 @@ QtApplication {
             "*.ui"
         ]
     }
-
-    Group {
-        condition: project.isWindows
-        fileTagsFilter: "application"
-        qbs.install: true
-        qbs.installDir: project.installDir
-    }
 }
