@@ -10,6 +10,7 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QJsonArray>
+#include <QNetworkProxy>
 
 using namespace cmd;
 
@@ -20,6 +21,8 @@ cuServer::cuServer(QObject *parent)
     , mDestroySocketMapper(new QSignalMapper(this))
     , mTimer(new QTimer(this))
 {
+    mTcpServer->setProxy(QNetworkProxy::NoProxy);
+
     connect(mTcpServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
 
     connect(mDataReadyMapper, SIGNAL(mapped(QObject*)), this, SLOT(dataReady(QObject*)));
@@ -39,8 +42,9 @@ cuServer::~cuServer()
 
 void cuServer::initialize()
 {
-    if (!mTcpServer->isListening())
+    if (!mTcpServer->isListening()){
         mTcpServer->listen(QHostAddress::Any, SERVER_TCPIP_PORT);
+    }
 }
 
 void cuServer::initializeDeviceList()
