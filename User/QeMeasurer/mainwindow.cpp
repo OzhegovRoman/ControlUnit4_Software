@@ -397,8 +397,15 @@ void MainWindow::on_pbStart_clicked()
 
     enableControlsAtMeasure(false);
 
+    mCurrentValue = ui->sbStart->value();
+
     // включаем закоротку
-    mDriver->setShortEnable(true);
+
+    int trycount = 5;
+    while (trycount -- ){
+        mDriver->setShortEnable(true);
+        if (mDriver->waitingAnswer()) break;
+    }
 
     // устанавливаем начальное значение
     switch (ui->cbType->currentIndex()) {
@@ -421,7 +428,11 @@ void MainWindow::on_pbStart_clicked()
         qApp->processEvents();
 
     // раскорачиваем и далее уже как обычно.
-    mDriver->setShortEnable(false);
+    trycount = 5;
+    while (trycount -- ){
+        mDriver->setShortEnable(false);
+        if (mDriver->waitingAnswer()) break;
+    }
 
     // настроим постоянную времени
     CU4SDM0V1_Param_t params = mDriver->deviceParams()->getValueSequence();
@@ -431,8 +442,6 @@ void MainWindow::on_pbStart_clicked()
     status.Data |= CU4SDM0V1_STATUS_COUNTER_WORKED;
     mDriver->deviceStatus()->setValue(status);
     mDriver->waitingAnswer();
-
-    mCurrentValue = ui->sbStart->value();
 
     disconnect(mTimer, nullptr, nullptr, nullptr);
 
