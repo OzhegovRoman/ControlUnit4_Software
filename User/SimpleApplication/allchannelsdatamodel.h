@@ -11,6 +11,7 @@ struct deviceInfo_t {
     double temperature;
     double current;
     double voltage;
+    unsigned int triggerCount;
 };
 
 

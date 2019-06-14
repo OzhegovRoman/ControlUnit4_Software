@@ -34,6 +34,8 @@ signals:
 private slots:
    void on_pbSetUpdateTime_clicked();
 
+   void on_pushButton_clicked();
+
 private:
     AllChannelsDataModel *model;
     AllChannelsDataDelegate *delegate;

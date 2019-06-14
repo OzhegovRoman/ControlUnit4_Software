@@ -65,8 +65,10 @@ bool cCu4TdM0Driver::receiveTempTable()
         sendMsg(TD_GetTempTableValues, sizeof(uint8_t) * 2, buffer);
         if (!waitingAnswer())
             errorCount++;
-        else
+        else{
             offset += count;
+            errorCount = 0;
+        }
         if (errorCount > 5)
             return false;
     }
