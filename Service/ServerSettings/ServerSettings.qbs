@@ -8,7 +8,7 @@ QtApplication {
     condition: project.isWindows
     name: "cu-serverconf"
     consoleApplication: false
-    cpp.cxxLanguageVersion: "c++17"
+    cpp.cxxLanguageVersion: "c++14"
 
     // preparation RC_File
     Depends {name: "RC_Prepare"}

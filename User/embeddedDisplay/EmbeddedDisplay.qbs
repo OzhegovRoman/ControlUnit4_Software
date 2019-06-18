@@ -32,7 +32,7 @@ CppApplication{
         ]
     }
 
-    cpp.cxxLanguageVersion: "c++11"
+    cpp.cxxLanguageVersion: "c++14"
     cpp.driverFlags: [
         "-fPIE",
         "-pie"

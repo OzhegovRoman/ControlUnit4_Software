@@ -21,7 +21,7 @@ CppApplication{
         ]
     }
 
-    cpp.cxxLanguageVersion: "c++17"
+    cpp.cxxLanguageVersion: "c++14"
     cpp.includePaths: [
         "../../Libs/CuPlugins/",
         "../../Libs/StarProtocol/",

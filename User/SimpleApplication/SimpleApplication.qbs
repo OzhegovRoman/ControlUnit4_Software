@@ -45,7 +45,7 @@ CppApplication{
         ]
     }
 
-    cpp.cxxLanguageVersion: "c++11"
+    cpp.cxxLanguageVersion: "c++14"
 
     cpp.defines: [
         "VERSION=\""+project.softwareVersion+"\""

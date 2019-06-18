@@ -23,7 +23,7 @@ QtApplication {
         ]
     }
 
-    cpp.cxxLanguageVersion: "c++11"
+    cpp.cxxLanguageVersion: "c++14"
 
     Group {
         name: "Source"
