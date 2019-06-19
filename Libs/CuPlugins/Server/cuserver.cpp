@@ -22,12 +22,12 @@ cuServer::cuServer(QObject *parent)
     , mTimer(new QTimer(this))
 {
     mTcpServer->setProxy(QNetworkProxy::NoProxy);
-
+    
     connect(mTcpServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
-
+    
     connect(mDataReadyMapper, SIGNAL(mapped(QObject*)), this, SLOT(dataReady(QObject*)));
     connect(mDestroySocketMapper, SIGNAL(mapped(QObject*)), this, SLOT(destroySocket(QObject*)));
-
+    
     mTimer->setSingleShot(true);
     connect(mTimer, SIGNAL(timeout()), this, SLOT(timeOut()));
 }
@@ -53,7 +53,7 @@ void cuServer::initializeDeviceList()
     // Проверка предустановленных устройств:
     // пытаемся подключить все устройства и проверить идентификационные данные
     checkDevicesInformation();
-
+    
     qSort(mAvailableDevices.begin(), mAvailableDevices.end(), cuServer::sortInfo);
 }
 
@@ -66,7 +66,7 @@ bool cuServer::pMsgReceived(quint8 address, quint8 command, quint8 dataLength, q
 {
     //Обработчик ответов по внутреннему интерфейсу
     //    qDebug()<<"pMsgReceived: "<<QTime::currentTime().toString("hh:mm:ss.zzz");
-
+    
     switch (command){
     // для ряда команд НИЧЕГО НЕ ДЕЛАЕМ
     // в качестве таких команд оставлены - получение идентификационных данных и описание устройства
@@ -91,13 +91,13 @@ void cuServer::newConnection()
 {
     qDebug()<<"New Connection. Total connections:"<<(mSocketsData.size()+1);
     if (!mTcpServer->hasPendingConnections()) return;
-
+    
     QTcpSocket *socket = mTcpServer->nextPendingConnection();
     mSocketsData.append(QPair<QTcpSocket *, QByteArray>(socket, QByteArray()));
-
+    
     mDataReadyMapper->setMapping(socket, socket);
     mDestroySocketMapper->setMapping(socket, socket);
-
+    
     connect(socket, SIGNAL(readyRead()), mDataReadyMapper, SLOT(map()));
     connect(socket, SIGNAL(disconnected()), mDestroySocketMapper, SLOT(map()));
 }
@@ -106,7 +106,7 @@ void cuServer::dataReady(QObject *sender)
 {
     QTcpSocket *socket = qobject_cast<QTcpSocket*>(sender);
     if (!socket) return;
-
+    
     for (int i = 0; i<mSocketsData.count(); ++i ){
         if (mSocketsData[i].first == socket){
             mSocketsData[i].second.append(socket->readAll());
@@ -120,7 +120,7 @@ void cuServer::destroySocket(QObject *sender)
 {
     QTcpSocket *socket = qobject_cast<QTcpSocket*>(sender);
     if (!socket) return;
-
+    
     foreach (SocketData data, mSocketsData) {
         if (data.first == socket){
             mSocketsData.removeOne(data);
@@ -128,7 +128,7 @@ void cuServer::destroySocket(QObject *sender)
         }
     }
     qDebug()<<"Destroy Socket. Total connections:"<<(mSocketsData.size());
-
+    
 }
 
 void cuServer::timeOut()
@@ -151,7 +151,7 @@ void cuServer::systemRequest(QString str, QString params)
         sendString("ERROR\r\n");
         return;
     }
-
+    
     if (strList[1] == "DEVL?"){
         QString tmpStr;
         tmpStr.clear();
@@ -166,38 +166,38 @@ void cuServer::systemRequest(QString str, QString params)
         sendString(tmpStr);
         return;
     }
-
+    
     if (strList.size()!=3){
         sendString("ERROR\r\n");
         return;
     }
-
+    
     if (strList[2] == "SAVE"){
         sendString("OK\r\n");
         saveDeviceInformation();
         return;
     }
-
+    
     if (strList[2] == "FIND"){
         sendString("Please waiting! This operation way take several minutes!!!/r/n");
         globalDeviceSearch();
         sendString(QString("Was founded %1 devices/r/n").arg(mAvailableDevices.count()));
         return;
     }
-
+    
     if (strList[2].indexOf("ADD") == 0){
         quint8 address = static_cast<quint8>(params.toInt());
         sendString(addDevice(address)? "OK\r\n" : "ERROR\r\n");
         return;
     }
-
+    
     sendString("UNKNOWN COMMAND\r\n");
 }
 
 void cuServer::generalRequest(QString str, QString params)
 {
     Q_UNUSED(params);
-
+    
     /** формат строки
      * GENeral:DEVice<N>:INIT - инициализация устройства
      * GENeral:DEVice<N>:PARKing - парковка устройства перед его отключением
@@ -218,28 +218,28 @@ void cuServer::generalRequest(QString str, QString params)
         sendString("ERROR\r\n");
         return;
     }
-
+    
     bool ok;
-
+    
     quint8 address = static_cast<quint8>(strList[1].remove(0,3).toInt(&ok));
-
+    
     if (!ok){
         sendString("ERROR\r\n");
         return;
     }
-
+    
     deviceInfo* dInfo = currentDevice(address);
     if (!dInfo){
         sendString("Error: wrong address\r\n");
         return;
     }
-
+    
     AbstractDriver driver;
-
+    
     driver.setIOInterface(iOInterface());
     driver.setDevAddress(address);
-
-
+    
+    
     if (strList[2] == "INIT"){
         driver.init();
         if (driver.waitingAnswer()) sendString("OK\r\n");
@@ -307,7 +307,7 @@ void cuServer::generalRequest(QString str, QString params)
         else sendString("Error: Timeout\r\n");
         return;
     }
-
+    
     sendString("UNKNOWN COMMAND\r\n");
 }
 
@@ -361,33 +361,33 @@ void cuServer::sspdRequest(QString str, QString params)
      * SSPD:DEVice<N>:CoMParatorCoeff? - получение коэффициентов
      * SSPD:DEVice<N>:CoMParatorCoeff <Value|JSON> - установка коэффициентов
      */
-
+    
     QStringList strList = str.split(':');
     if (strList[1].indexOf("DEV")!=0){
         sendString("ERROR\r\n");
         return;
     }
-
+    
     bool ok;
-
+    
     quint8 address = static_cast<quint8>(strList[1].remove(0,3).toInt(&ok));
-
+    
     if (!ok){
         sendString("ERROR\r\n");
         return;
     }
-
+    
     deviceInfo* dInfo = currentDevice(address);
     if (!dInfo){
         sendString("Error: wrong address\r\n");
         return;
     }
-
+    
     cCu4SdM0Driver driver;
-
+    
     driver.setIOInterface(iOInterface());
     driver.setDevAddress(address);
-
+    
     if (strList[2]=="DATA?"){
         CU4SDM0V1_Data_t data = driver.deviceData()->getValueSequence(&ok);
         if (ok){
@@ -447,7 +447,7 @@ void cuServer::sspdRequest(QString str, QString params)
         else sendString("ERROR\r\n");
         return;
     }
-
+    
     if (strList[2] == "SHOR"){
         quint8 data = static_cast<quint8>(params.toInt(&ok));
         if (ok) {
@@ -464,7 +464,7 @@ void cuServer::sspdRequest(QString str, QString params)
         else sendString("Error: Timeout\r\n");
         return;
     }
-
+    
     if (strList[2] == "AMPE"){
         quint8 data = static_cast<quint8>(params.toInt(&ok));
         if (ok) {
@@ -481,7 +481,7 @@ void cuServer::sspdRequest(QString str, QString params)
         else sendString("Error: Timeout\r\n");
         return;
     }
-
+    
     if (strList[2] == "RFKC"){
         quint8 data = static_cast<quint8>(params.toInt(&ok));
         if (ok) {
@@ -498,7 +498,7 @@ void cuServer::sspdRequest(QString str, QString params)
         else sendString("Error: Timeout\r\n");
         return;
     }
-
+    
     if (strList[2] == "CLE"){
         quint8 data = static_cast<quint8>(params.toInt(&ok));
         if (ok) {
@@ -515,7 +515,7 @@ void cuServer::sspdRequest(QString str, QString params)
         else sendString("Error: Timeout\r\n");
         return;
     }
-
+    
     if (strList[2] == "COUE"){
         quint8 data = static_cast<quint8>(params.toInt(&ok));
         if (ok) {
@@ -532,8 +532,8 @@ void cuServer::sspdRequest(QString str, QString params)
         else sendString("Error: Timeout\r\n");
         return;
     }
-
-
+    
+    
     if (strList[2] == "ARE"){
         quint8 data = static_cast<quint8>(params.toInt(&ok));
         if (ok) {
@@ -550,7 +550,7 @@ void cuServer::sspdRequest(QString str, QString params)
         else sendString("Error: Timeout\r\n");
         return;
     }
-
+    
     if (strList[2] == "PARA?"){
         CU4SDM0V1_Param_t data = driver.deviceParams()->getValueSequence(&ok);
         if (ok){
@@ -688,7 +688,7 @@ void cuServer::sspdRequest(QString str, QString params)
         QJsonDocument jsonDoc(QJsonDocument::fromJson(params.toUtf8()));
         QJsonObject jsonObj = jsonDoc.object();
         CU4SDM0V1_EEPROM_Const_t data;
-
+        
         QJsonArray value = jsonObj["Current_ADC"].toArray();
         if (value.size()!=2) {
             sendString("Error at Current_ADC value");
@@ -696,7 +696,7 @@ void cuServer::sspdRequest(QString str, QString params)
         }
         data.Current_ADC.first  = static_cast<float>(value[0].toDouble());
         data.Current_ADC.second = static_cast<float>(value[1].toDouble());
-
+        
         value = jsonObj["Voltage_ADC"].toArray();
         if (value.size()!=2) {
             sendString("Error at Voltage_ADC value");
@@ -704,7 +704,7 @@ void cuServer::sspdRequest(QString str, QString params)
         }
         data.Voltage_ADC.first  = static_cast<float>(value[0].toDouble());
         data.Voltage_ADC.second = static_cast<float>(value[1].toDouble());
-
+        
         value = jsonObj["Current_DAC"].toArray();
         if (value.size()!=2) {
             sendString("Error at Current_DAC value");
@@ -712,7 +712,7 @@ void cuServer::sspdRequest(QString str, QString params)
         }
         data.Current_DAC.first  = static_cast<float>(value[0].toDouble());
         data.Current_DAC.second = static_cast<float>(value[1].toDouble());
-
+        
         value = jsonObj["Cmp_Ref_DAC"].toArray();
         if (value.size()!=2) {
             sendString("Error at Cmp_Ref_DAC value");
@@ -720,7 +720,7 @@ void cuServer::sspdRequest(QString str, QString params)
         }
         data.Cmp_Ref_DAC.first  = static_cast<float>(value[0].toDouble());
         data.Cmp_Ref_DAC.second = static_cast<float>(value[1].toDouble());
-
+        
         driver.eepromConst()->setValue(data);
         if (driver.waitingAnswer()) sendString("OK\r\n");
         else sendString("Error: Timeout\r\n");
@@ -843,33 +843,33 @@ void cuServer::temperatureRequest(QString str, QString params)
      * TEMperatureDriver:DEVice<N>:TEMperatureTable? - получение температурной таблицы
      * TEMperatureDriver:DEVice<N>:TEMperatureTable <Value|JSON> - установка температурной таблицы
      */
-
+    
     QStringList strList = str.split(':');
     if (strList[1].indexOf("DEV")!=0){
         sendString("ERROR\r\n");
         return;
     }
-
+    
     bool ok;
-
+    
     quint8 address = static_cast<quint8>(strList[1].remove(0,3).toInt(&ok));
-
+    
     if (!ok){
         sendString("ERROR\r\n");
         return;
     }
-
+    
     deviceInfo* dInfo = currentDevice(address);
     if (!dInfo){
         sendString("Error: wrong address\r\n");
         return;
     }
-
+    
     cCu4TdM0Driver driver;
-
+    
     driver.setIOInterface(iOInterface());
     driver.setDevAddress(address);
-
+    
     if (strList[2] == "DATA?"){
         CU4TDM0V1_Data_t data = driver.deviceData()->getValueSequence(&ok);
         if (ok){
@@ -950,7 +950,7 @@ void cuServer::temperatureRequest(QString str, QString params)
         else sendString("ERROR\r\n");
         return;
     }
-
+    
     if (strList[2] == "EEPR?"){
         CU4TDM0V1_EEPROM_Const_t data = driver.eepromConst()->getValueSequence(&ok);
         if (ok){
@@ -959,27 +959,27 @@ void cuServer::temperatureRequest(QString str, QString params)
             value.append(static_cast<double>(data.pressSensorCoeffs.first));
             value.append(static_cast<double>(data.pressSensorCoeffs.second));
             jsonObj["Pressure"] = value;
-
+            
             value[0] = static_cast<double>(data.tempSensorCurrentAdc.first);
             value[1] = static_cast<double>(data.tempSensorCurrentAdc.second);
             jsonObj["Current_ADC"] = value;
-
+            
             value[0] = static_cast<double>(static_cast<double>(data.tempSensorCurrentDac.first));
             value[1] = static_cast<double>(static_cast<double>(data.tempSensorCurrentDac.second));
             jsonObj["Current_DAC"] = value;
-
+            
             value[0] = static_cast<double>(data.tempSensorVoltage.first);
             value[1] = static_cast<double>(data.tempSensorVoltage.second);
             jsonObj["Voltage_ADC"] = value;
-
+            
             value[0] = static_cast<double>(data.pressSensorVoltageP.first);
             value[1] = static_cast<double>(data.pressSensorVoltageP.second);
             jsonObj["Press_VoltageP_ADC"] = value;
-
+            
             value[0] = static_cast<double>(data.pressSensorVoltageN.first);
             value[1] = static_cast<double>(data.pressSensorVoltageN.second);
             jsonObj["Press_VoltageN_ADC"] = value;
-
+            
             QJsonDocument jsonDoc(jsonObj);
             sendString(QString("%1\r\n").arg(QString(jsonDoc.toJson())));
         }
@@ -990,7 +990,7 @@ void cuServer::temperatureRequest(QString str, QString params)
         QJsonDocument jsonDoc(QJsonDocument::fromJson(params.toUtf8()));
         QJsonObject jsonObj = jsonDoc.object();
         CU4TDM0V1_EEPROM_Const_t data;
-
+        
         QJsonArray value = jsonObj["Pressure"].toArray();
         if (value.size()!=2) {
             sendString("Error at Pressure value");
@@ -998,7 +998,7 @@ void cuServer::temperatureRequest(QString str, QString params)
         }
         data.pressSensorCoeffs.first  = static_cast<float>(value[0].toDouble());
         data.pressSensorCoeffs.second = static_cast<float>(value[1].toDouble());
-
+        
         value = jsonObj["Current_ADC"].toArray();
         if (value.size()!=2) {
             sendString("Error at Current_ADC value");
@@ -1006,7 +1006,7 @@ void cuServer::temperatureRequest(QString str, QString params)
         }
         data.tempSensorCurrentAdc.first  = static_cast<float>(value[0].toDouble());
         data.tempSensorCurrentAdc.second = static_cast<float>(value[1].toDouble());
-
+        
         value = jsonObj["Current_DAC"].toArray();
         if (value.size()!=2) {
             sendString("Error at Current_DAC value");
@@ -1014,7 +1014,7 @@ void cuServer::temperatureRequest(QString str, QString params)
         }
         data.tempSensorCurrentDac.first  = static_cast<float>(value[0].toDouble());
         data.tempSensorCurrentDac.second = static_cast<float>(value[1].toDouble());
-
+        
         value = jsonObj["Voltage_ADC"].toArray();
         if (value.size()!=2) {
             sendString("Error at Voltage_ADC value");
@@ -1022,7 +1022,7 @@ void cuServer::temperatureRequest(QString str, QString params)
         }
         data.tempSensorVoltage.first    = static_cast<float>(value[0].toDouble());
         data.tempSensorVoltage.second   = static_cast<float>(value[1].toDouble());
-
+        
         value = jsonObj["Press_VoltageP_ADC"].toArray();
         if (value.size()!=2) {
             sendString("Error at Press_VoltageP_ADC value");
@@ -1030,7 +1030,7 @@ void cuServer::temperatureRequest(QString str, QString params)
         }
         data.pressSensorVoltageP.first  = static_cast<float>(value[0].toDouble());
         data.pressSensorVoltageP.second = static_cast<float>(value[1].toDouble());
-
+        
         value = jsonObj["Press_VoltageN_ADC"].toArray();
         if (value.size()!=2) {
             sendString("Error at Press_VoltageN_ADC value");
@@ -1038,13 +1038,13 @@ void cuServer::temperatureRequest(QString str, QString params)
         }
         data.pressSensorVoltageN.first  = static_cast<float>(value[0].toDouble());
         data.pressSensorVoltageN.second = static_cast<float>(value[1].toDouble());
-
+        
         driver.eepromConst()->setValue(data);
         if (driver.waitingAnswer()) sendString("OK\r\n");
         else sendString("Error: Timeout\r\n");
         return;
     }
-
+    
     if (strList[2] == "CADC?"){
         pair_t<float> data = driver.tempSensorCurrentAdcCoeff()->getValueSequence(&ok);
         if (ok){
@@ -1219,7 +1219,7 @@ void cuServer::serverRequest(const QByteArray &packet)
     //    qDebug()<<"Server request";
     quint8 command = static_cast<quint8>(packet[1]);
     const char* data = packet.data() + 3;
-
+    
     switch (command) {
     // полный список всех доступных устройств
     case CMD_SERVER_GET_DEVICE_LIST:
@@ -1299,7 +1299,7 @@ void cuServer::deviceRequest(deviceInfo *info, QByteArray &packet)
                    info->devDescription.length(),
                    (quint8*) info->devDescription.toLocal8Bit().data());
         break;
-
+        
     default:
         // А вот тут отправляем данные по внутреннему интерфейсу
         mWaitingForAnswer = true;
@@ -1307,7 +1307,7 @@ void cuServer::deviceRequest(deviceInfo *info, QByteArray &packet)
         iOInterface()->sendMsg(address, command, dataLength, data);
         break;
     }
-
+    
 }
 
 // Отсылаем данные по TcpIp
@@ -1378,7 +1378,7 @@ bool cuServer::addDevice(quint8 address)
 {
     qDebug()<<"add device:"<< address;
     while (mWaitingForAnswer) qApp->processEvents();
-
+    
     // проверяем есть ли в availableDevices
     // удаляем устройства с таким же адресом
     int i = 0;
@@ -1388,15 +1388,15 @@ bool cuServer::addDevice(quint8 address)
         }
         else ++i;
     }
-
+    
     AbstractDriver driver;
-
+    
     driver.setIOInterface(iOInterface());
     driver.setDevAddress(address);
-
+    
     deviceInfo newDevice;
     newDevice.devAddress = address;
-
+    
     bool ok = false;
     QString tmp;
     i = 0;
@@ -1406,35 +1406,35 @@ bool cuServer::addDevice(quint8 address)
     //        newDevice.devType = driver.getDeviceType()->getValueSequence(&ok);
     if (!ok) return false;
     newDevice.devType = tmp;
-
+    
     ok = false; i = 0;
     while ((!ok) && (i++<MAX_DEVICE_TRY_COUNT))
         newDevice.devUDID = driver.getUDID()->getValueSequence(&ok);
     if (!ok) return false;
-
+    
     ok = false; i = 0;
     while ((!ok) && (i++<MAX_DEVICE_TRY_COUNT))
         newDevice.devModVersion = driver.getModificationVersion()->getValueSequence(&ok);
     if (!ok) return false;
-
+    
     ok = false; i = 0;
     while ((!ok) && (i++<MAX_DEVICE_TRY_COUNT))
         newDevice.devHwVersion = driver.getHardwareVersion()->getValueSequence(&ok);
     if (!ok) return false;
-
+    
     ok = false; i = 0;
     while ((!ok) && (i++<MAX_DEVICE_TRY_COUNT))
         newDevice.devFwVersion = driver.getFirmwareVersion()->getValueSequence(&ok);
     if (!ok) return false;
-
+    
     ok = false; i = 0;
     while ((!ok) && (i++<MAX_DEVICE_TRY_COUNT))
         newDevice.devDescription = driver.getDeviceDescription()->getValueSequence(&ok);
     if (!ok) return false;
-
+    
     qDebug()<<"success";
     mAvailableDevices.append(newDevice);
-
+    
     qSort(mAvailableDevices.begin(), mAvailableDevices.end(), cuServer::sortInfo);
     return true;
 }
@@ -1500,19 +1500,21 @@ bool cuServer::isDeviceInformationCorrect(deviceInfo info)
     AbstractDriver driver;
     driver.setIOInterface(iOInterface());
     driver.setDevAddress(info.devAddress);
-
-    cUDID UDID;
-    int i = 0;
-    bool ok = false;
-    while ((!ok) && (i++<MAX_DEVICE_TRY_COUNT))
-        UDID = driver.getUDID()->getValueSequence(&ok);
-    if (!ok) return false;
-
-    // Проверяем Id устройства,
-    // Более ничего не проверяем, считаем что UDID уникален и 2 устройства с одинаковым UDID не может быть
-    // как следствие UDID точно соответствует его Type и т.д.
-    if (info.devUDID.toString() == UDID.toString()) return true;
-
+    
+    for (int i=0; i<2; i++){
+        cUDID UDID;
+        bool ok;
+        UDID = driver.getUDID()->getValueSequence(&ok, 10); // крайне важная операция будем пробовать аж до 10 раз
+        if (!ok) return false;
+        
+        // Проверяем Id устройства,
+        // Более ничего не проверяем, считаем что UDID уникален и 2 устройства с одинаковым UDID не может быть
+        // как следствие UDID точно соответствует его Type и т.д.
+        
+        if (info.devUDID.toString() == UDID.toString()) return true;
+        //если UDID не совпал, то на всякий случай проверяем его еще раз. Об этом говорит загаловок 
+    }
+    
     return false;
 }
 
@@ -1545,19 +1547,19 @@ void cuServer::sendSocketsDataToDevices()
     // Берем номер сокета в нашем списке, который подготовил данные для пересылки устройствам
     foreach (SocketData data, mSocketsData){
         if (!data.second.isEmpty()){
-
+            
             mLastSocket = data.first;
             int idx = mSocketsData.indexOf(data);
-
+            
             if (isDataReady(data.second)){
                 /// проверка на несоответствие протоколу SCPI
                 /// основная тонкость заключается в том, что в SCPI используется только текстовая информация
                 /// а в обычном пакете данных первый символ - не соответствует текстовому символу, на этом и производим сверку протоколов
                 /// делаем расшифровку команд
-
+                
                 QByteArray ba = mSocketsData[idx].second;
                 mSocketsData[idx].second.remove(0, data.second[2] + 3);
-
+                
                 // смотрим адрес устройства
                 if (((quint8)data.second[0]) == SERVER_ADDRESS){
                     // это запрос к серверу
@@ -1579,9 +1581,9 @@ void cuServer::sendSocketsDataToDevices()
                 //копируем данные и вычищаем их из mSocketsData
                 QString str = mSocketsData[idx].second;
                 mSocketsData[idx].second.clear();
-
+                
                 //проверка на соответствие протоколу SCPI
-
+                
                 QStringList strCommands = str.split(';');
                 foreach (QString cmd, strCommands){
                     //разбиваем команду по пробелам
@@ -1598,7 +1600,7 @@ void cuServer::sendSocketsDataToDevices()
                     tmpList.removeFirst();
                     params = tmpList.join(" ");
                     qDebug()<<"params: "<<params;
-
+                    
                     if (cmd == "*IDN?"){
                         sendString("Scontel ControlUnit,00001,0.01.02\r\n");
                         continue;
