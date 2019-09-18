@@ -56,6 +56,12 @@ int main(int argc, char *argv[])
                                  QCoreApplication::translate("main", "URL for repo. Default url: [http://rplab.ru/~ozhegov/ControlUnit4/Bin/Firmware/]"),
                                  QCoreApplication::translate("main","http://url"));
     parser.addOption(urlOption);
+
+    QCommandLineOption hotPlugOption(QStringList()<<"H"<<"hot",
+                                     QCoreApplication::translate("main", "Hot plug option. In this case device must be connected to ControlUnit when program will be processed. "
+                                                                         "This option include force option (-f)"));
+    parser.addOption(hotPlugOption);
+
     parser.process(a);
 
     cDevBoot devBoot;
@@ -78,7 +84,8 @@ int main(int argc, char *argv[])
     if (parser.isSet(urlOption))
         devBoot.setUrl(parser.value(urlOption));
 
-    devBoot.setForce(parser.isSet(forceOption));
+    devBoot.setForce(parser.isSet(forceOption) || parser.isSet(hotPlugOption));
+    devBoot.setHotPlug(parser.isSet(hotPlugOption));
 
     if (parser.isSet(typeOption))
         devBoot.setDevType(parser.value(typeOption));

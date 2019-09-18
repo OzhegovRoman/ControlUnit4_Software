@@ -22,9 +22,13 @@ public:
     bool initializeLoader();
     void startApplication();
 
+    bool isHotPlugFlagSetted() const;
+    void setHotPlugFlag(bool hotPlugFlag);
+
 signals:
     void loaderProgressChanged(int);
     void loaderFinished();
+    void restart();
     void infoLoader(QString);
     void errorLoader(QString);
 
@@ -32,6 +36,7 @@ private:
     QString mPortName;
     QSerialPort *mSerialPort;
     int mProgress;
+    bool mHotPlugFlag;
     void rebootDevice();
     bool openSerialPort();
     void delayMs(int value);
@@ -42,7 +47,7 @@ private:
     bool writeData(const QByteArray& data);
 
     void clearProgram();
-    void writeProgram(const QString& fileName);
+    bool writeProgram(const QString& fileName);
 };
 
 #endif // BOOTLOADER_H

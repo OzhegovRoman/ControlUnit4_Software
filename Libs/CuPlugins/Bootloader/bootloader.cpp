@@ -12,7 +12,8 @@
 
 Bootloader::Bootloader(QObject *parent):
     QObject(parent),
-    mSerialPort(new QSerialPort(this))
+    mSerialPort(new QSerialPort(this)),
+    mHotPlugFlag(false)
 {
 
 }
@@ -32,8 +33,8 @@ void Bootloader::program(const QString& fileName)
         return;
     }
 
-    emit infoLoader("Reboot devices");
-    rebootDevice();
+    if (!mHotPlugFlag)
+        rebootDevice();
 
     delayMs(10);
 
@@ -44,10 +45,14 @@ void Bootloader::program(const QString& fileName)
         return;
     }
 
-    emit infoLoader(QString("Bootloader: %1").arg(getBootloaderInfo()));
+    emit infoLoader(QString("Info: %1").arg(getBootloaderInfo()));
 
-    clearProgram();
-    writeProgram(fileName);
+    bool completeFlag = false;
+
+    while (!completeFlag){
+        clearProgram();
+        completeFlag = writeProgram(fileName);
+    }
 
     startApplication();
     mSerialPort->close();
@@ -66,12 +71,11 @@ void Bootloader::setPortName(const QString &portName)
 
 QString Bootloader::getBootloaderInfo()
 {
-    emit infoLoader("getBootloaderInfo");
+    emit infoLoader("Getting bootloader info");
     qApp->processEvents();
 
     writeData("G");
 
-    emit infoLoader("getBootloaderInfo");
     if (!mSerialPort->waitForReadyRead(2000)){
         emit errorLoader(tr("No any answer from device"));
         emit loaderFinished();
@@ -80,7 +84,6 @@ QString Bootloader::getBootloaderInfo()
 
     delayMs(100);
 
-    emit infoLoader("pass");
     QByteArray ba = mSerialPort->read(128);
     if (!ba.size()) {
         emit errorLoader(tr("Wrong answer from Bootloader"));
@@ -105,25 +108,31 @@ void Bootloader::rebootDevice()
 bool Bootloader::initializeLoader()
 {
     emit infoLoader("Initialization Bootloader");
+    if (mHotPlugFlag)
+        emit infoLoader("Please connect device to the ControlUnit");
+
     qApp->processEvents();
 
-    writeData("Init");
+    while (true) {
+        writeData("Init");
 
-    if (!mSerialPort->waitForReadyRead(2000)){
-        emit errorLoader(tr("No any answer from device"));
-        emit loaderFinished();
-        return false;
+        if (!(mSerialPort->waitForReadyRead(2000) || mHotPlugFlag)){
+            emit errorLoader(tr("No any answer from device"));
+            emit loaderFinished();
+            return false;
+        }
+
+        QByteArray ba = mSerialPort->read(2);
+
+        if ((ba.size() == 2) && (QString(ba).indexOf("Ok") == 0))
+                return true;
+
+        if (!mHotPlugFlag) {
+            emit errorLoader(tr("Wrong answer from Bootloader"));
+            emit loaderFinished();
+            return false;
+        }
     }
-
-    char buffer[10];
-    int numread =  mSerialPort->read(buffer, 2);
-    if (!((numread == 2) && (QString(buffer).indexOf("Ok") == 0))) {
-        emit errorLoader(tr("Wrong answer from Bootloader"));
-        emit loaderFinished();
-        return false;
-    }
-
-    return true;
 }
 
 bool Bootloader::openSerialPort()
@@ -161,10 +170,20 @@ void Bootloader::startApplication()
     char buffer[10];
     int numread =  mSerialPort->read(buffer, 2);
     if (!((numread == 2) && (QString(buffer).indexOf("Ok") == 0))) {
-        emit errorLoader(tr("Wrong answer from Bootloaser"));
+        emit errorLoader(tr("Wrong answer from Bootloader"));
         emit loaderFinished();
         return;
     }
+}
+
+bool Bootloader::isHotPlugFlagSetted() const
+{
+    return mHotPlugFlag;
+}
+
+void Bootloader::setHotPlugFlag(bool hotPlugFlag)
+{
+    mHotPlugFlag = hotPlugFlag;
 }
 
 void Bootloader::delayMs(int value)
@@ -205,28 +224,45 @@ bool Bootloader::writeData(const QByteArray& data)
 
 void Bootloader::clearProgram()
 {
-    emit infoLoader("Delete Old Program");
+
+    // сбрасываем адрес начала чтения
+    emit infoLoader("Reset pointer to the program memory");
+    qApp->processEvents();
+
+    while (true){
+        writeData("C");
+        if (mSerialPort->waitForReadyRead(100)){
+            QByteArray ba = mSerialPort->read(2);
+            if ((ba.size() == 2) && (QString(ba).indexOf("Ok") == 0))
+                //сбросили
+                break;
+        }
+    }
+
+    emit infoLoader("Delete Old Program (it may takes up to 5 seconds)");
     qApp->processEvents();
 
     writeData("D");
 
     if (!mSerialPort->waitForReadyRead(5000)){
-        emit errorLoader(tr("No any answer from Bootloader"));
+        emit errorLoader(tr(""));
+        emit errorLoader(tr("Error! No any answer from Bootloader"));
         emit loaderFinished();
         return;
     }
 
-    char buffer[10];
-    int numread =  mSerialPort->read(buffer, 2);
-    qDebug()<<buffer;
-    if (!((numread == 2) && (QString(buffer).indexOf("Ok") == 0))) {
-        emit errorLoader(tr("Wrong answer from Bootloaser"));
+    QByteArray ba;
+    ba =  mSerialPort->read(2);
+    emit infoLoader(QString(ba));
+    if (!((ba.size() == 2) && (QString(ba).indexOf("Ok") == 0))) {
+        emit errorLoader("");
+        emit errorLoader(tr("Error! Wrong answer from Bootloaser"));
         emit loaderFinished();
         return;
     }
 }
 
-void Bootloader::writeProgram(const QString& fileName)
+bool Bootloader::writeProgram(const QString& fileName)
 {
     qApp->processEvents();
     emit infoLoader("Start programming device");
@@ -235,45 +271,67 @@ void Bootloader::writeProgram(const QString& fileName)
     if (!file.open(QIODevice::ReadOnly)) {
         emit errorLoader(tr("Can't open *.bin file"));
         emit loaderFinished();
-        return;
+        return false;
     }
     uint8_t Count = 128;
 
     uint32_t fileSize = file.size();
     uint32_t pos = 0;
-    qDebug()<<"Progress:"<<pos<<"/"<<fileSize;
     char buffer[Count+5];
+
+    bool nextFlag = true;
+    bool fatalError = false;
 
     while (!file.atEnd()) {
         qApp->processEvents();
         Count = 128;
         memset(buffer, 0xFF, Count+5);
         buffer[0] = 'P';
-        file.read(&buffer[1],128);
+        if (nextFlag)
+            file.read(&buffer[1],128);
         uint32_t data = cStarProtocolPC::instance().crc32stm32((uint8_t*)buffer + 1, Count, true);
         memcpy(buffer+Count+1, &data, 4);
 
         writeData(QByteArray(buffer, Count+5));
 
         if (!mSerialPort->waitForReadyRead(5000)){
-            emit errorLoader(tr("No any answer from device"));
-            emit loaderFinished();
-            file.close();
-            return;
+            fatalError = true;
+            break;
         }
 
         delayMs(5);
-
-        Count = 2;
-        int numread =  mSerialPort->read(buffer, Count);
-        if (!((numread == 2) && (QString(buffer).indexOf("Ok") == 0))) {
-            emit errorLoader(tr("Wrong answer from Bootloader"));
-            emit loaderFinished();
-            file.close();
-            return;
+        QByteArray ba = mSerialPort->read(2);
+        if (ba.size() != 2) { //что-то пошло не так надо перезапустить процесс
+            fatalError = true;
+            break;
         }
-        pos += 128;
-        emit loaderProgressChanged((pos*100.0)/fileSize);
+
+        if (QString(ba).indexOf("Er") == 0) { //ошибка пакета? пересылаем вновь
+            emit infoLoader("Packet error, try send packet again");
+            nextFlag = false;
+            continue;
+        }
+
+        if (QString(ba).indexOf("Ok") == 0) { //ошибка пакета? пересылаем вновь
+            pos += 128;
+            emit loaderProgressChanged((pos*100.0)/fileSize);
+            nextFlag = true;
+            continue;
+        }
+
+        fatalError = true;
+        break;
     }
+
+    if (fatalError){
+        file.close();
+        emit errorLoader("");
+        emit errorLoader(tr("Fatal error. Bootloader will be start again"));
+        emit infoLoader(tr("Restart bootloader"));
+        emit restart();
+        return false;
+    }
+
     emit loaderProgressChanged(100);
+    return true;
 }

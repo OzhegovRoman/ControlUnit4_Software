@@ -60,6 +60,7 @@ QtApplication {
         condition: qbs.architecture.contains("arm")
         fileTagsFilter: "application"
         qbs.install: true
-        qbs.installDir: "/home/pi/Software"
+        qbs.installPrefix: "/home/pi"
+        qbs.installDir: "Software"
     }
 }

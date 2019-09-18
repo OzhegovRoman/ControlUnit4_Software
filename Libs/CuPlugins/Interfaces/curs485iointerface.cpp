@@ -8,7 +8,7 @@
 
 cuRs485IOInterface::cuRs485IOInterface(QObject *parent):
     cuIOInterfaceImpl(parent),
-    mSerialPort(NULL),
+    mSerialPort(nullptr),
     mPortName(QString())
 {
 
@@ -16,7 +16,7 @@ cuRs485IOInterface::cuRs485IOInterface(QObject *parent):
 
 cuRs485IOInterface::~cuRs485IOInterface()
 {
-    if (mSerialPort != NULL){
+    if (mSerialPort != nullptr){
         if (mSerialPort->isOpen()) mSerialPort->close();
         delete mSerialPort;
     }
@@ -53,12 +53,12 @@ bool cuRs485IOInterface::pSendMsg(quint8 address, quint8 command, quint8 dataLen
 {
     setTransmitterEnable();
     // если вдруг не инициализировано устройство, то его надо проинициализировать
-    if (mSerialPort == NULL)
+    if (mSerialPort == nullptr)
         if (!initialize()) return false;
 
     // кодируем дату
     cStarProtocolPC& starProtocol = cStarProtocolPC::instance();
-    starProtocol.codeData(address, command, dataLength, (char*) data);
+    starProtocol.codeData(address, command, dataLength, reinterpret_cast<char*>(data));
 
     // аккуратно отсылаем данные в SerialPort
     QByteArray ba = QByteArray((const char*)starProtocol.buffer(),MaxBufferSize);
@@ -77,15 +77,15 @@ bool cuRs485IOInterface::pInitialize()
 {
     cStarProtocolPC::instance().clearBuffer();
 
-    qDebug()<<"Initialize port";
     if (mPortName.isEmpty()) return false; //имя порта не установлено
 
     QList<QSerialPortInfo> serialPortsList = QSerialPortInfo::availablePorts();
-    foreach (QSerialPortInfo serialPortInfo, serialPortsList) {
-        qDebug()<<serialPortInfo.portName()<<serialPortInfo.description();
-    }
+//    qDebug()<<"Available serial ports:";
+//    foreach (QSerialPortInfo serialPortInfo, serialPortsList) {
+//        qDebug()<<serialPortInfo.portName()<<serialPortInfo.description();
+//    }
 
-    if (mSerialPort == NULL) {
+    if (mSerialPort == nullptr) {
         mSerialPort = new QSerialPort(mPortName);
         mSerialPort->setBaudRate(UART_BAUD_RATE);
         mSerialPort->setDataBits(QSerialPort::Data8);

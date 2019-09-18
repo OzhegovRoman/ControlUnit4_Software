@@ -61,6 +61,7 @@ CppApplication{
         condition: !project.isWindows
         fileTagsFilter: "application"
         qbs.install: true
-        qbs.installDir: "/home/pi/Software"
+        qbs.installPrefix: "/home/pi"
+        qbs.installDir: "Software"
     }
 }

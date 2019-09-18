@@ -9,7 +9,7 @@ class cDevBoot : public QObject
 {
     Q_OBJECT
 public:
-    explicit cDevBoot(QObject *parent = 0);
+    explicit cDevBoot(QObject *parent = nullptr);
     QString getPortName() const;
     void setPortName(const QString &portName);
 
@@ -36,11 +36,15 @@ public:
 
     void startProcess();
 
+    bool isHotPlug() const;
+    void setHotPlug(bool hotPlug);
+
 private:
     QString mPortName;
     int mAddress;
     bool mLoadFromURL;
     bool mForce;
+    bool mHotPlug;
     QString mFileName;
     QString mUrl;
     QString mDevType;

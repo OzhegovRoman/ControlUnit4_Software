@@ -6,6 +6,8 @@ CppApplication {
     name: "cu-simpleapp_qml"
     consoleApplication: false
 
+    condition: project.isWindows
+
     Depends { name: "Qt.core" }
     Depends { name: "Qt.quick" }
     Depends { name: "CuPlugins" }

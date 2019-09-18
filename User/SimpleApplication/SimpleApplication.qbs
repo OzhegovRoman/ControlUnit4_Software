@@ -4,7 +4,7 @@ import qbs.Process
 
 CppApplication{
     name: "cu-simpleapp"
-    consoleApplication: !project.isWindows
+    consoleApplication: false
 
     // preparation RC_File
     Depends {name: "RC_Prepare"}
@@ -96,6 +96,7 @@ CppApplication{
         condition: !(project.isWindows || project.isAndroid)
         fileTagsFilter: "application"
         qbs.install: true
-        qbs.installDir: "/home/pi/Software"
+        qbs.installPrefix: "/home/pi"
+        qbs.installDir: "Software"
     }
 }

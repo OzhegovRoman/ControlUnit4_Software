@@ -21,6 +21,7 @@ cDevBoot::cDevBoot(QObject *parent) :
     mAddress(0),
     mLoadFromURL(false),
     mForce(false),
+    mHotPlug(false),
     mFileName(QString("%1/fw.bin").arg("/home/pi")),
     mUrl(QString("http://rplab.ru/~ozhegov/ControlUnit4/Bin/Firmware/")),
     mDevType(QString()),
@@ -122,6 +123,16 @@ void cDevBoot::startProcess()
     bootloaderStart();
 }
 
+bool cDevBoot::isHotPlug() const
+{
+    return mHotPlug;
+}
+
+void cDevBoot::setHotPlug(bool hotPlug)
+{
+    mHotPlug = hotPlug;
+}
+
 QStringList cDevBoot::getFileList(QUrl url)
 {
     QNetworkAccessManager manager;
@@ -148,7 +159,7 @@ QStringList cDevBoot::getFileList(QUrl url)
 
 void cDevBoot::downloadFile(QUrl url)
 {
-    qDebug()<<"downloadFile";
+    qDebug()<<"Download File:"<<url;
     QNetworkAccessManager manager;
     manager.setProxy(QNetworkProxy::NoProxy);
 
@@ -162,6 +173,8 @@ void cDevBoot::downloadFile(QUrl url)
         saveFile.write(data);
     }
     saveFile.close();
+
+    qDebug()<<"Download comlete";
 
 }
 
@@ -179,7 +192,7 @@ bool cDevBoot::compareVersion(const QString &str1, const QString &str2)
 
 void cDevBoot::prepareVersionTypeMaps()
 {
-    qDebug()<<"prepareVersionTypeMaps";
+    qDebug()<<"Getting available version-type list from url:"<<mUrl;
     // Строим карту всевозможных версий-типов
     QStringList list = getFileList(mUrl);
     foreach (QString tmpStr, list){
@@ -202,22 +215,28 @@ void cDevBoot::prepareVersionTypeMaps()
 void cDevBoot::enumerateDevice()
 {
     //автоопределение типа устросйтва
+    qDebug()<<"Enumerate Devices";
     AbstractDriver aDriver;
     cuRs485IOInterface ioInterface;
     ioInterface.setPortName(mPortName);
     aDriver.setIOInterface(&ioInterface);
     aDriver.setDevAddress(mAddress);
     bool ok;
-    QString tmpType = aDriver.getDeviceType()->getValueSequence(&ok, 5);
-    if (!ok){
-        qDebug()<<"Fatal error!!! Can't connect to device!!!";
-        exit(1);
+    QString tmpType;
+
+    if (!mHotPlug) {
+        tmpType = aDriver.getDeviceType()->getValueSequence(&ok, 5);
+        if (!ok){
+            qDebug()<<"Fatal error!!! Can't connect to device!!!";
+            exit(1);
+        }
     }
+
     if (!mDevType.isEmpty()){
         if (mDevType!=tmpType){
-            qDebug()<<"WARNING!!! Device type with option -d not equal to current device type";
+            qDebug()<<"WARNING!!! Device type with option -t not equal to current device type";
             if (!mForce){
-                qDebug()<<"For force update device plese use options -f";
+                qDebug()<<"For force update device please use options -f";
                 exit(2);
             }
         }
@@ -228,7 +247,6 @@ void cDevBoot::enumerateDevice()
 bool cDevBoot::isDeviceTypeCorrect()
 {
     if (!mDevType.isEmpty()){
-        qDebug()<<"devType"<<mDevType;
         return mTypeVersion.keys().contains(mDevType);
     }
     return false;
@@ -284,7 +302,6 @@ void cDevBoot::prepareOptions()
         qDebug()<<"WARNING! Wrong type of device";
         exit(3);
     }
-
     if (!isFirmwareVersionCorrect()){
         exit(4);
     }
@@ -293,14 +310,17 @@ void cDevBoot::prepareOptions()
         exit(5);
     }
 
-
     if (mFirmwareVersion.isEmpty()){
         // выбираем последнюю доступную версию нашего файла.
         qSort(mTypeVersion[mDevType].begin(), mTypeVersion[mDevType].end(), cDevBoot::compareVersion);
         mFirmwareVersion = mTypeVersion[mDevType][0];
     }
-    qDebug()<<"mDevType"<<mDevType;
-    qDebug()<<"fwVersion"<<mFirmwareVersion;
+
+    qDebug()<<"";
+    qDebug()<<"Device info:";
+    qDebug()<<"type:"<<mDevType;
+    qDebug()<<"firmware version:"<<mFirmwareVersion;
+    qDebug()<<"";
 
     downloadFile(QString("%1%2/%3_code.bin")
                  .arg(mUrl)
@@ -310,24 +330,25 @@ void cDevBoot::prepareOptions()
 
 void cDevBoot::disableAllDEvices()
 {
-    qDebug()<<"Disable all other devices";
-    {
-        AbstractDriver aDriver;
-        cuRs485IOInterface ioInterface;
-        ioInterface.setPortName(mPortName);
-        aDriver.setIOInterface(&ioInterface);
-        for (int j = 0; j < 2; ++j){ // Делаем на всякий случай 2 разика
-            for (int i = 0; i < 32; ++i){
-                if (i!=mAddress){
-                    aDriver.setDevAddress(i);
-                    aDriver.listeningOff();
-                    fprintf(stderr, QString("\rprogress %1%%").arg((j*31+i)*100/62).toLatin1().data());
-                }
+    qDebug()<<"";
+    qDebug()<<"Disable all other devices:";
+    AbstractDriver aDriver;
+    cuRs485IOInterface ioInterface;
+    ioInterface.setPortName(mPortName);
+    aDriver.setIOInterface(&ioInterface);
+    for (int j = 0; j < 2; ++j){ // Делаем на всякий случай 2 разика
+        for (quint8 i = 0; i < 32; ++i){
+            if (i != mAddress){
+                aDriver.setDevAddress(i);
+                aDriver.listeningOff();
+                fprintf(stderr, QString("\rProgress: %1%%").arg((j*31+i)*100/62).toLatin1().data());
+                QThread::msleep(50);
             }
-            QThread::msleep(100);
         }
-        qDebug()<<"";
     }
+    qDebug()<<"";
+    qDebug()<<"Complete";
+    qDebug()<<"";
 }
 
 void cDevBoot::bootloaderStart()
@@ -335,16 +356,17 @@ void cDevBoot::bootloaderStart()
     qDebug()<<"Start Bootloader";
     Bootloader *mBootloader = new Bootloader(this);
     mBootloader->setPortName(mPortName);
-    connect(mBootloader, SIGNAL(loaderProgressChanged(int)), SLOT(bootloaderProgressChanged(int)));
-    connect(mBootloader, SIGNAL(loaderFinished()), SLOT(bootloaderFinished()));
-    connect(mBootloader, SIGNAL(infoLoader(QString)), SLOT(bootloaderInfo(QString)));
-    connect(mBootloader, SIGNAL(errorLoader(QString)), SLOT(bootloaderInfo(QString)));
+    mBootloader->setHotPlugFlag(mHotPlug);
+    connect(mBootloader, SIGNAL(loaderProgressChanged(int)),    SLOT(bootloaderProgressChanged(int)));
+    connect(mBootloader, SIGNAL(loaderFinished()),              SLOT(bootloaderFinished()));
+    connect(mBootloader, SIGNAL(infoLoader(QString)),           SLOT(bootloaderInfo(QString)));
+    connect(mBootloader, SIGNAL(errorLoader(QString)),          SLOT(bootloaderInfo(QString)));
     mBootloader->program(mFileName);
 }
 
 void cDevBoot::rebootAllDevices()
 {
-    qDebug()<<"Reboot";
+    qDebug()<<"Reboot all devices";
 #ifdef RASPBERRY_PI
     mmapGpio rpiGpio;
     rpiGpio.writePinLow(25);
@@ -359,7 +381,7 @@ void cDevBoot::bootloaderProgressChanged(int progress)
     static int tp = 0;
     if (tp != progress){
         tp = progress;
-        fprintf(stderr, QString("\rprogress %1%%").arg(progress).toLatin1().data());
+        fprintf(stderr, QString("\rProgress: %1%%").arg(progress).toLatin1().data());
         if (tp == 100)
             qDebug()<<"";
     }
@@ -367,18 +389,22 @@ void cDevBoot::bootloaderProgressChanged(int progress)
 
 void cDevBoot::bootloaderFinished()
 {
-    qDebug()<<"Done";
+    qDebug()<<"Complete";
     rebootAllDevices();
 
     if (mLoadFromURL){
         QFile::remove(mFileName);
     }
+
+    qDebug()<<"Done & Exit";
+
     exit(0);
 }
 
 void cDevBoot::bootloaderInfo(QString str)
 {
-    qDebug()<<str;
+    fprintf(stderr, str.toLatin1().data());
+    qDebug()<<"";
 }
 
 
