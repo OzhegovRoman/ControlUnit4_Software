@@ -89,6 +89,8 @@ void AppCore::coreConnectToIpAddress(const QString& ipAddress)
     QString answer = mInterface->tcpIpQuery("SYST:DEVL?\r\n", 1000, &ok);
     if (ok){
         mCoreMessage = answer;
+        QSettings settings("Scontel", "cu-simpleapp");
+        settings.setValue("TcpIpAddress", ipAddress);
         emit connectionApply();
     }
     else{

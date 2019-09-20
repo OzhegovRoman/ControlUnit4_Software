@@ -5,9 +5,9 @@ import AppCore 1.0
 
 SspdForm {
 
-    property double dataPixelPart: (Qt.platform.os =="windows") ? 0.4 : 0.45
-    property int buttonMargin: (Qt.platform.os =="windows") ? 0 : 2
-    property int pixelSize: (Qt.platform.os =="windows") ? 24 : (parent.width*dataPixelPart - 64 - 2*buttonMargin)/4
+    property double dataPixelPart:  0.4
+    property int buttonMargin:      (Qt.platform.os =="windows") ? 0    : dp(2)
+    property int pixelSize:         (Qt.platform.os =="windows") ? 24   : dp(24)
 
 
     property double sspdCurrent:            0
@@ -33,7 +33,7 @@ SspdForm {
         sspdAmplifierTurnedOn   = AppCore.sspdAmplifierTurnedOn     ? 1 : 0;
         sspdAutoResetTurnedOn   = AppCore.sspdAutoResetTurnedOn     ? 1 : 0;
         sspdComparatorTurnedOn  = AppCore.sspdComparatorTurnedOn    ? 1 : 0;
-        sspdCounterTurnedOn     = AppCore.sspdCounterTurnedOn       ? 1 : 0;
+        console.log(sspdComparatorTurnedOn);
         for (var i = 0; i<settingsModel.rowCount(); i++){
             switch (settingsModel.get(i)["name"]){
             case "current":
@@ -52,7 +52,7 @@ SspdForm {
                 settingsModel.setProperty(i, "value", sspdComparatorTurnedOn);
                 break;
             case "counter":
-                if (sspdCounterTurnedOn === true)
+                if (sspdComparatorTurnedOn === 1)
                     settingsModel.setProperty(i, "value", sspdCounts);
                 else
                     settingsModel.setProperty(i, "value", 0);
@@ -152,7 +152,7 @@ SspdForm {
     listView {
         model: settingsModel
         delegate: Item {
-            height: (pixelSize*1.5<30) ? 30 : pixelSize*1.5
+            height: (pixelSize*1.5<30) ? 40 : pixelSize*1.5
             width: parent.width
 
 
@@ -161,8 +161,9 @@ SspdForm {
                 font.pixelSize: pixelSize
                 anchors.verticalCenter: parent.verticalCenter
             }
+
             Item {
-                height: 30
+                height: dp(30)
                 anchors.right: parent.right
                 width: parent.width * dataPixelPart
                 anchors.verticalCenter: parent.verticalCenter
@@ -171,7 +172,7 @@ SspdForm {
 
                 RoundButton {
                     id: plusButton
-                    radius: 16
+                    radius: dp(16)
                     anchors.right: parent.right
                     anchors.leftMargin: 0
                     anchors.verticalCenter: parent.verticalCenter
@@ -287,9 +288,3 @@ SspdForm {
         }
     }
 }
-
-
-/*##^## Designer {
-    D{i:0;autoSize:true;height:480;width:640}
-}
- ##^##*/

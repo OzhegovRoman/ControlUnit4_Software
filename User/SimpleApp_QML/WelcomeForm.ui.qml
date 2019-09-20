@@ -14,16 +14,22 @@ Item {
         text: qsTr("Please wait while the connecttion with ControlUnit is established...")
         horizontalAlignment: Text.AlignHCenter
         anchors.bottom: busyIndicator.top
-        anchors.bottomMargin: parent.height * 0.04
+        anchors.bottomMargin: dp(24)
         anchors.horizontalCenter: parent.horizontalCenter
-        font.pixelSize: parent.height * 0.04
+        font.pixelSize: dp(24)
     }
 
     BusyIndicator {
         id: busyIndicator
         anchors.verticalCenter: parent.verticalCenter
         anchors.horizontalCenter: parent.horizontalCenter
-        height: parent.height * 0.2
-        width: parent.height * 0.2
+        height: dp(120)
+        width: dp(120)
     }
 }
+
+/*##^##
+Designer {
+    D{i:0;autoSize:true;height:480;width:640}
+}
+##^##*/

@@ -27,7 +27,7 @@ class AppCore: public QObject
     Q_PROPERTY(bool sspdShorted READ getSspdShorted WRITE setSspdShorted)
     Q_PROPERTY(bool sspdAmplifierTurnedOn READ getSspdAmplifierTurnedOn WRITE setSspdAmplifierTurnedOn)
     Q_PROPERTY(bool sspdComparatorTurnedOn READ getSspdComparatorTurnedOn WRITE setSspdComparatorTurnedOn)
-//    Q_PROPERTY(bool sspdCounterTurnedOn READ getSspdCounterTurnedOn WRITE setSspdCounterTurnedOn) // WRITE
+//    Q_PROPERTY(bool sspdCounterTurnedOn READ getSspdCounterTurnedOn) // WRITE
     Q_PROPERTY(bool sspdAutoResetTurnedOn READ getSspdAutoResetTurnedOn WRITE setSspdAutoResetTurnedOn)
 
     Q_PROPERTY(float sspdCmpRefLevel READ getSspdCmpRefLevel WRITE setSspdCmpRefLevel)
@@ -98,6 +98,11 @@ public:
         return last_SspdData.Status.stComparatorOn;
     }
     void setSspdComparatorTurnedOn(const bool &value);
+
+//    bool getSspdCounterTurnedOn() const
+//    {
+//        return last_SspdData.Status.stCounterOn;
+//    }
 
     bool getSspdAutoResetTurnedOn() const
     {

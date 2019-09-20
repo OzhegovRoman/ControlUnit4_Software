@@ -14,7 +14,7 @@ ApplicationWindow {
 
     // Conversion independent of the density of pixels to physical pixels the device
     readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x * (dpi/160); }
+    function dp(x){ return (dpi < 120) ? x : x * (dpi/120); }
     function startUp(){
         console.log(dpi);
         AppCore.coreConnectToDefaultIpAddress();

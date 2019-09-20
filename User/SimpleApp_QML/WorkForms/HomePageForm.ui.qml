@@ -13,7 +13,6 @@ Item {
         horizontalAlignment: Text.AlignHCenter
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
-        font.pixelSize: parent.height * 0.04
+        font.pixelSize: dp(24)
     }
 }
-

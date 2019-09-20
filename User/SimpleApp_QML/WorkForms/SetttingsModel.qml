@@ -51,6 +51,13 @@ ListModel {
                    type: "switch",
                    group: "Signal"
                })
+//        append({
+//                   name: "counter_on",
+//                   itemText: "Counter",
+//                   value: sspdCounterTurnedOn,
+//                   type: "switch",
+//                   group: "Counter"
+//               })
         append({
                    name: "counter",
                    itemText: "Counts",

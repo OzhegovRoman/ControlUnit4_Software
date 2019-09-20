@@ -6,7 +6,7 @@ Item {
     anchors.fill: parent
 
     property color headerColor: "#d73c3c"
-    property int headerSize: 48
+    property int headerSize: dp(48)
     property alias menuButton: menuButton
     property alias workPageLoader: workPageLoader
     property alias title: title
@@ -23,8 +23,7 @@ Item {
         Text {
             id: title
             color: "white"
-            //text: qsTr("Temperature (Address: 0)")
-            font.pixelSize: 24
+            font.pixelSize: dp(24)
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
             anchors.horizontalCenter: parent.horizontalCenter
@@ -57,3 +56,9 @@ Item {
         anchors.left: parent.left
     }
 }
+
+/*##^##
+Designer {
+    D{i:0;autoSize:true;height:480;width:640}
+}
+##^##*/

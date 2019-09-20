@@ -27,11 +27,11 @@ WorkForm {
 
     menuBackIcon.value: drawer.position
 
-    headerSize: 48
+    headerSize: dp(48)
 
     Drawer {
         id: drawer
-        dragMargin: 60
+        dragMargin: dp(60)
         y: headerSize
         width: 0.6 * parent.width
         height: parent.height  - headerSize
@@ -40,21 +40,21 @@ WorkForm {
         ListView {
             anchors.fill: parent
             delegate: Item {
-                height: 1.4* headerSize
+                height: 1.4 * headerSize
                 anchors.left: parent.left
                 anchors.right: parent.right
                 Rectangle {
                     anchors.fill: parent
-                    anchors.margins: 5
+                    anchors.margins: dp(5)
                     color: "whitesmoke"
                     Text {
                         id: typeText
                         text: type
                         anchors.top: parent.top
-                        anchors.topMargin: 5
+                        anchors.topMargin: dp(5)
                         anchors.left: parent.left
                         anchors.right: parent.right
-                        font.pixelSize: 20
+                        font.pixelSize: dp(20)
                         renderType: Text.NativeRendering
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
@@ -62,10 +62,10 @@ WorkForm {
                     Text {
                         text: "Address: " + address
                         anchors.top: typeText.bottom
-                        anchors.topMargin: 5
+                        anchors.topMargin: dp(5)
                         anchors.left: parent.left
                         anchors.right: parent.right
-                        font.pixelSize: 12
+                        font.pixelSize: dp(12)
                         renderType: Text.NativeRendering
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter

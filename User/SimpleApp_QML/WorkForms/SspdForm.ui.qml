@@ -14,27 +14,35 @@ Item {
 
         ListView {
             id: listView
-            anchors.rightMargin: 20
-            anchors.leftMargin: 20
-            anchors.bottomMargin: 10
-            anchors.topMargin: 10
+            anchors.rightMargin: dp(5)
+            anchors.leftMargin: dp(5)
+            anchors.bottomMargin: dp(10)
+            anchors.topMargin: dp(10)
             anchors.fill: parent
-            spacing: 2
+            spacing: dp(2)
 
             section.property: "group"
+            section.criteria: ViewSection.FullString
+
             section.delegate: Rectangle {
                 width: listView.width
-                height: pixelSize*1.5
+                height: childrenRect.height;//pixelSize //* 1.5
                 color: "transparent"
                 Text {
                     anchors.top: parent.top
                     anchors.horizontalCenter: parent.horizontalCenter
-                    renderType: Text.NativeRendering
+                    //renderType: Text.NativeRendering
                     font.bold: true
                     text: section
-                    font.pixelSize: pixelSize
+                    font.pixelSize: pixelSize*1.2
                 }
             }
         }
     }
 }
+
+/*##^##
+Designer {
+    D{i:0;autoSize:true;height:480;width:640}
+}
+##^##*/

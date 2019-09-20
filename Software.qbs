@@ -4,7 +4,7 @@ Project {
     condition: true
     name: "StandardSoftware"
     //minimumQbsVersion: "1.9.0"
-    property string softwareVersion: "1.1.3"
+    property string softwareVersion: "1.1.6"
     property string company: "Scontel"
     property string productName: "Scontel's ControlUnit software"
 
@@ -88,6 +88,14 @@ Project {
             CU-123 - Исправление ошибки в cu-simpleapp
     1.1.3 - Рефакторинг кода, разделение на открытую и закрытую часть
 
+    1.1.5 - сделаны исправления утилиты cu-devboot
+            CU-130
+            CU-131
+
+    1.1.6 - переходим на Qt 5.13.1
+            сделаны изменения изменения в утилите simleapp_QML
+            CU-121
+            CU-139
     TODO: сделать отдельное правило для всех raspberryPi приложений для правильного деплоя
     TODO: проверить код для распберри
 */
