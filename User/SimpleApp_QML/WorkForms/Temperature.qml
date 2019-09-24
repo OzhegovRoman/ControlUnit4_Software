@@ -6,6 +6,11 @@ TemperatureForm {
 
     property int lDriverAddress;
 
+    smallTextSize: dp(18)
+    largeTextSize: dp(40)
+    mediumTextSize: dp(24)
+    marginSize: dp(10)
+
     function connectSensor(){
         lDriverAddress = currentDriverAddress;
         AppCore.connectTemperatureSensor(currentDriverAddress);

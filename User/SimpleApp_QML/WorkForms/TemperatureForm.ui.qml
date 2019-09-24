@@ -10,22 +10,32 @@ Item {
     property alias pressureText: pressureText
     property alias tempSensorVoltageText: tempSensorVoltageText
     property alias pressSensorVoltageText: pressSensorVoltageText
+    property alias smallTextSize: smallTextSize
+    property alias mediumTextSize: mediumTextSize
+    property alias largeTextSize: largeTextSize
+    property alias marginSize: marginSize
+
+    property int smallTextSize: 18
+    property int largeTextSize: 40
+    property int mediumTextSize: 24
+    property int marginSize: 10
 
     Button {
         id: button
         text: (uiTemperatureForm.state === "full") ? qsTr("Less") : qsTr("More")
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
+        font.pixelSize: mediumTextSize
         onClicked: parent.state = parent.state == "short" ? "full" : "short"
     }
 
     Text {
         id: temperatureText
         text: qsTr("T: ---- K")
-        font.pixelSize: 40
+        font.pixelSize: largeTextSize
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: button.top
-        anchors.bottomMargin: 10
+        anchors.bottomMargin: marginSize
     }
 
     Rectangle {
@@ -34,7 +44,7 @@ Item {
         visible: uiTemperatureForm.state === "full"
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: button.bottom
-        anchors.topMargin: 10
+        anchors.topMargin: marginSize
 
         width: childrenRect.width
 
@@ -43,19 +53,19 @@ Item {
             Text {
                 id: pressureText
                 text: qsTr("P: --- mbar")
-                font.pixelSize: 18
+                font.pixelSize: smallTextSize
             }
 
             Text {
                 id: tempSensorVoltageText
                 text: qsTr("Temp sensor voltage: ----- V")
-                font.pixelSize: 18
+                font.pixelSize: smallTextSize
             }
 
             Text {
                 id: pressSensorVoltageText
                 text: qsTr("Press sensor Voltage: --- V")
-                font.pixelSize: 18
+                font.pixelSize: smallTextSize
             }
         }
     }
@@ -69,4 +79,10 @@ Item {
         }
     ]
 }
+
+/*##^##
+Designer {
+    D{i:0;autoSize:true;height:480;width:640}
+}
+##^##*/
 
