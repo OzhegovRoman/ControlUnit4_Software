@@ -81,6 +81,8 @@ void AppCore::coreConnectToDefaultIpAddress()
 
 void AppCore::coreConnectToIpAddress(const QString& ipAddress)
 {
+    mLastIpAddress = ipAddress;
+
     mInterface->setAddress(convertToHostAddress(ipAddress));
     mInterface->setPort(SERVER_TCPIP_PORT);
 
@@ -102,6 +104,23 @@ void AppCore::coreConnectToIpAddress(const QString& ipAddress)
 void AppCore::connectToDevice()
 {
 
+}
+
+static bool mReconnectEnableFlag;
+
+bool AppCore::getReconnectEnableFlag() const
+{
+    return mReconnectEnableFlag;
+}
+
+void AppCore::setReconnectEnableFlag(bool reconnectDisableFlag)
+{
+    mReconnectEnableFlag = reconnectDisableFlag;
+}
+
+QString AppCore::getLastIpAddress() const
+{
+    return mLastIpAddress;
 }
 
 void AppCore::getTemperatureDriverData(quint8 address)

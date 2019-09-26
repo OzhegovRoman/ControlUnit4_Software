@@ -34,6 +34,10 @@ CppApplication {
         "../../Libs/StarProtocol"
     ]
 
+    cpp.defines: [
+        "VERSION=\""+project.softwareVersion+"\""
+    ]
+
     Group {
         name: "Source"
         files: [

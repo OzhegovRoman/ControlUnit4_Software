@@ -13,6 +13,8 @@ class AppCore: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString coreMessage READ coreMessage)
+    Q_PROPERTY(QString lastIpAddress READ getLastIpAddress)
+    Q_PROPERTY(bool reconnectEnable READ getReconnectEnableFlag)
     Q_PROPERTY(float temperature READ getTemperature)
     Q_PROPERTY(float pressure READ getPressure)
     Q_PROPERTY(float tempSensorVoltage READ getTempSensorVoltage)
@@ -134,6 +136,11 @@ public:
     }
     void setSspdAutoResetTimeOut(const float &value);
 
+    QString getLastIpAddress() const;
+
+    bool getReconnectEnableFlag() const;
+    void setReconnectEnableFlag(bool reconnectDisableFlag);
+
 private:
     cuTcpSocketIOInterface *mInterface;
     CU4TDM0V1_Data_t last_TempData{};
@@ -162,7 +169,7 @@ signals:
     void sspdDataUpdated();
 private:
     QString mCoreMessage;
-
+    QString mLastIpAddress;
 };
 
 static QObject *appCoreProvider(QQmlEngine *engine, QJSEngine *scriptEngine)

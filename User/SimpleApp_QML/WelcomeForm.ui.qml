@@ -6,7 +6,8 @@ Item {
     id: uiWelcomeForm
     anchors.fill: parent
 
-    //clip: true
+    property int fontSize: 24
+
     Text {
         id: text1
         width: parent.width * 0.6
@@ -14,22 +15,16 @@ Item {
         text: qsTr("Please wait while the connecttion with ControlUnit is established...")
         horizontalAlignment: Text.AlignHCenter
         anchors.bottom: busyIndicator.top
-        anchors.bottomMargin: dp(24)
+        anchors.bottomMargin: fontSize * 0.5
         anchors.horizontalCenter: parent.horizontalCenter
-        font.pixelSize: dp(24)
+        font.pixelSize: fontSize
     }
 
     BusyIndicator {
         id: busyIndicator
         anchors.verticalCenter: parent.verticalCenter
         anchors.horizontalCenter: parent.horizontalCenter
-        height: dp(120)
-        width: dp(120)
+        height: parent.height * 0.4
+        width: parent.width * 0.4
     }
 }
-
-/*##^##
-Designer {
-    D{i:0;autoSize:true;height:480;width:640}
-}
-##^##*/

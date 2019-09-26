@@ -25,6 +25,11 @@ ApplicationWindow {
         AppCore.coreConnectToIpAddress(address);
     }
 
+    function reconnect(){
+        console.log("reconnected")
+        mainProcess.state = "tcpIpConnectScreen"
+    }
+
     property string lastTcpIpAddress: "127.0.0.1"
 
     Connections {
@@ -32,9 +37,10 @@ ApplicationWindow {
         onConnectionReject: {
             mainProcess.state = "tcpIpConnectScreen"
             lastTcpIpAddress = AppCore.coreMessage
-            console.log("lastTcpIpAddress: "+AppCore.coreMessage);
+            console.log("Connection reject. lastTcpIpAddress: "+AppCore.coreMessage);
         }
         onConnectionApply: function() {
+            lastTcpIpAddress = AppCore.lastIpAddress;
             console.log(AppCore.coreMessage);
             var tmpStr = AppCore.coreMessage;
             tmpStr = tmpStr.replace(/\r?\n|\r/g,"");
@@ -52,10 +58,17 @@ ApplicationWindow {
                 var address;
                 address = tmp.match(/address=[0-9]{1,2}:/g)[0].replace(/address=/,"").replace(":","");
                 devModel.append({
-                                    "type": type,
-                                    "address": address
+                                    "type":     type,
+                                    "address":  address
                                 });
             }
+            //хрен знает но без вывода почему то не работает
+            console.log("reconnectEnable: "+AppCore.reconnectEnable);
+            if (AppCore.reconnectEnable)
+                devModel.append({
+                                    "type":     "Reconnect",
+                                    "address" : "-1"
+                                });
             mainProcess.state = "workScreen"
         }
     }
@@ -84,6 +97,7 @@ ApplicationWindow {
                 name: "tcpIpConnectScreen"
                 PropertyChanges {
                     target: pageLoader;
+                    restoreEntryValues: false
                     source: "TcpIpConnect.qml"
                 }
             },

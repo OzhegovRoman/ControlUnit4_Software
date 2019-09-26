@@ -6,7 +6,8 @@ Item {
     anchors.fill: parent
 
     property color headerColor: "#d73c3c"
-    property int headerSize: dp(48)
+    property int headerSize: 48
+    property int titleTextSize: 24
     property alias menuButton: menuButton
     property alias workPageLoader: workPageLoader
     property alias title: title
@@ -23,7 +24,7 @@ Item {
         Text {
             id: title
             color: "white"
-            font.pixelSize: dp(24)
+            font.pixelSize: titleTextSize
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
             anchors.horizontalCenter: parent.horizontalCenter

@@ -6,7 +6,7 @@ Item {
     height: dp(24)
 
     property real value: 0 //from 0 to 1
-    rotation: root.state == "menu" ? value*180 : -value*180
+    rotation: root.state == "menu" ? value * 180 : -value * 180
 
 
     Rectangle {
@@ -22,8 +22,8 @@ Item {
     Rectangle {
         id: bar2
         x: dp(2 + value)
-        y: dp(10 + 2*value)
-        width: dp(20 - 3*value)
+        y: dp(10 + 2 * value)
+        width: dp(20 - 3 * value)
         height: dp(2)
         antialiasing: true
     }
@@ -34,7 +34,7 @@ Item {
         y: dp(15 + value)
         width: dp(20 - 7*value)
         height: dp(2)
-        rotation: -45*value
+        rotation: -45 * value
         antialiasing: true
     }
 
@@ -50,7 +50,7 @@ Item {
     ]
 
     onValueChanged: {
-            if(value == 1) root.state = "back"
+            if (value == 1) root.state = "back"
             else if(value == 0) root.state = "menu"
         }
 }

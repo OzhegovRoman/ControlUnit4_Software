@@ -1,11 +1,22 @@
 import QtQuick 2.4
 
+import TcpIpValidator 1.0
+
 TcpIpConnectForm {
-    function connect(){
-        // проверяем строку на правильность ввода
-        if (tcpIpAddressText.acceptableInput){
-            connectionToIpAddress(tcpIpAddressText.text);
+
+    normalTextSize: dp(24)
+    smallTextSize: dp(18)
+
+    TcpIpValidator{
+        id: tcpIpValidator
+        onValidateChanged: {
+            tcpIpAddressText.color = validate ? "black" : "red";
+            buttonConnect.enabled = validate;
         }
+    }
+
+    function connect(){
+        connectionToIpAddress(tcpIpAddressText.text);
     }
 
     buttonConnect {
@@ -15,12 +26,10 @@ TcpIpConnectForm {
     tcpIpAddressText {
         text: lastTcpIpAddress
         inputMethodHints: Qt.ImhNoPredictiveText
-        onAccepted: connect()
         onTextChanged: {
-            if (tcpIpAddressText.acceptableInput)
-                tcpIpAddressText.color = "black"
-            else
-                tcpIpAddressText.color = "red"
+            tcpIpValidator.textToValidate = tcpIpAddressText.text
         }
+
+        onAccepted: connect()
     }
 }

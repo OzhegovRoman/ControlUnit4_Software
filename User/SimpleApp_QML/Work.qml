@@ -2,12 +2,19 @@ import QtQuick 2.4
 import QtQuick.Controls 2.4
 
 WorkForm {
-
+    id: workForm
+    signal reconnected
     property bool isOpened: false
+    property bool reconnectFlag: false
     property int currentDriverAddress: -1
+
+    headerSize: dp(48)
+    titleTextSize: dp(24)
+
 
     Component.onCompleted: {
         console.log("WorkForm Completed");
+        workForm.reconnected.connect(reconnect)
     }
 
     menuButton {
@@ -26,8 +33,6 @@ WorkForm {
     }
 
     menuBackIcon.value: drawer.position
-
-    headerSize: dp(48)
 
     Drawer {
         id: drawer
@@ -60,6 +65,7 @@ WorkForm {
                         verticalAlignment: Text.AlignVCenter
                     }
                     Text {
+                        visible: type != "Reconnect"
                         text: "Address: " + address
                         anchors.top: typeText.bottom
                         anchors.topMargin: dp(5)
@@ -84,12 +90,14 @@ WorkForm {
                                 workPageLoader.setSource("WorkForms/Sspd.qml");
                                 title.text = qsTr("SSPD Driver ("+address+")");
                             }
-
+                            else
+                            if (type === "Reconnect"){
+                                reconnectFlag = true;
+                            }
                             else {
                                 workPageLoader.setSource("WorkForms/HomePage.qml");
                                 title.text = "";
                             }
-
                             drawer.close();
                         }
                     }
@@ -108,6 +116,8 @@ WorkForm {
             console.log("drawer onClosed");
             menuBackIcon.state = "menu";
             isOpened = false;
+            if (reconnectFlag)
+                reconnected();
         }
     }
 
