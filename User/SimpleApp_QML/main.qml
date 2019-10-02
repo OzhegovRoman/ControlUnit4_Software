@@ -64,11 +64,6 @@ ApplicationWindow {
             }
             //хрен знает но без вывода почему то не работает
             console.log("reconnectEnable: "+AppCore.reconnectEnable);
-            if (AppCore.reconnectEnable)
-                devModel.append({
-                                    "type":     "Reconnect",
-                                    "address" : "-1"
-                                });
             mainProcess.state = "workScreen"
         }
     }

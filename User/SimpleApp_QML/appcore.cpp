@@ -17,8 +17,10 @@ AppCore::AppCore(QObject *parent) :
 
 void AppCore::setSspdCurrent(const float &value)
 {
+    qDebug()<<value;
     last_SspdData.Current = value;
     mSspdDriver->current()->setValueSequence(value, nullptr, 5);
+    qDebug()<<"setSspdCurrent Done";
 }
 
 void AppCore::setSspdShorted(const bool &value)

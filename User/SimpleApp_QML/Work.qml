@@ -1,5 +1,6 @@
 import QtQuick 2.4
 import QtQuick.Controls 2.4
+import QtQuick.Layouts 1.3
 
 WorkForm {
     id: workForm
@@ -11,24 +12,29 @@ WorkForm {
     headerSize: dp(48)
     titleTextSize: dp(24)
 
-
     Component.onCompleted: {
-        console.log("WorkForm Completed");
         workForm.reconnected.connect(reconnect)
     }
 
     menuButton {
         onClicked: {
-            console.log("isOpened: "+ isOpened);
-            console.log("drawer.opened: "+ drawer.opened);
             if (isOpened){
-                console.log("drawer close()");
                 drawer.close();
             }
             else {
-                console.log("drawer open()");
                 drawer.open();
             }
+        }
+    }
+
+    logoutButton {
+        onClicked: {
+            if (isOpened){
+                reconnectFlag = true
+                drawer.close();
+            }
+            else
+                reconnected();
         }
     }
 
@@ -36,84 +42,93 @@ WorkForm {
 
     Drawer {
         id: drawer
-        dragMargin: dp(60)
+        dragMargin: 0.1 * parent.width
         y: headerSize
         width: 0.6 * parent.width
         height: parent.height  - headerSize
         clip: true
 
-        ListView {
-            anchors.fill: parent
-            delegate: Item {
-                height: 1.4 * headerSize
-                anchors.left: parent.left
-                anchors.right: parent.right
-                Rectangle {
-                    anchors.fill: parent
-                    anchors.margins: dp(5)
+        Component{
+            id: devListDelegate
+            Item{
+                id: devListItem
+                height: headerSize*1.4
+                width: parent.width
+                Rectangle{
+                    id: button
+                    anchors{
+                        fill: parent
+                        margins: headerSize * 0.1
+                    }
                     color: "whitesmoke"
-                    Text {
-                        id: typeText
-                        text: type
-                        anchors.top: parent.top
-                        anchors.topMargin: dp(5)
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        font.pixelSize: dp(20)
-                        renderType: Text.NativeRendering
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
+                }
+                Text {
+                    visible: type != "Reconnect"
+                    id: typeText
+                    text: type
+                    anchors {
+                        top: button.top
+                        horizontalCenter: button.horizontalCenter
+                        topMargin: titleTextSize * 0.3
                     }
-                    Text {
-                        visible: type != "Reconnect"
-                        text: "Address: " + address
-                        anchors.top: typeText.bottom
-                        anchors.topMargin: dp(5)
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        font.pixelSize: dp(12)
-                        renderType: Text.NativeRendering
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
+                    font.pixelSize: titleTextSize * 20/24
+                }
+                Text {
+                    visible: type != "Reconnect"
+                    text: "Address: " + address
+                    anchors {
+                        top: typeText.bottom
+                        topMargin: titleTextSize * 0.1
+                        horizontalCenter: button.horizontalCenter
                     }
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            if (type === "Temperature") {
-                                currentDriverAddress = address;
-                                workPageLoader.setSource("WorkForms/Temperature.qml");
-                                title.text = qsTr("Temperature ("+address+")");
-                            }
-                            else
+                    font.pixelSize: titleTextSize * 0.5
+                }
+                Text {
+                    visible: type === "Reconnect"
+                    text: type
+                    font.pixelSize: titleTextSize * 20/24
+                    anchors {
+                        horizontalCenter:   devListItem.horizontalCenter
+                        verticalCenter:     devListItem.verticalCenter
+                    }
+                }
+                MouseArea {
+                    anchors.fill: devListItem
+                    onClicked: {
+                        if (type === "Temperature") {
+                            currentDriverAddress = address;
+                            workPageLoader.setSource("WorkForms/Temperature.qml");
+                            title.text = qsTr("Temperature ("+address+")");
+                        }
+                        else
                             if (type === "SSPD Driver"){
                                 currentDriverAddress = address;
                                 workPageLoader.setSource("WorkForms/Sspd.qml");
                                 title.text = qsTr("SSPD Driver ("+address+")");
                             }
-                            else
-                            if (type === "Reconnect"){
-                                reconnectFlag = true;
-                            }
                             else {
                                 workPageLoader.setSource("WorkForms/HomePage.qml");
                                 title.text = "";
                             }
-                            drawer.close();
-                        }
+                        drawer.close();
                     }
-
                 }
+
             }
+        }
+
+        ListView {
+            id: deviceListView
+            anchors.fill: parent
             model: devModel
+            delegate: devListDelegate
         }
 
         onOpened: {
-            console.log("drawer onOpened");
             menuBackIcon.state = "back";
             isOpened = true;
         }
         onClosed: {
-            console.log("drawer onClosed");
             menuBackIcon.state = "menu";
             isOpened = false;
             if (reconnectFlag)

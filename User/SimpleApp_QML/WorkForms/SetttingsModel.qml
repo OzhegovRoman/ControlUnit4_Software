@@ -9,6 +9,7 @@ ListModel {
                    itemText: "Current (uA)",
                    value: sspdCurrent,
                    type: "changable",
+                   text: "0.0",
                    fixed: 1,
                    group: "Bias",
                    step: 0.1
@@ -18,6 +19,7 @@ ListModel {
                    itemText: "Voltage (mV)",
                    value: sspdVoltage,
                    type: "unchangable",
+                   text: "0.00",
                    fixed: 2,
                    group: "Bias"
                })
@@ -26,6 +28,7 @@ ListModel {
                    itemText: "Shorted",
                    value: sspdShorted ? 1: 0,
                    type: "switch",
+                   text: "",
                    group: "Bias"
                })
         append({
@@ -33,6 +36,7 @@ ListModel {
                    itemText: "Amplifier",
                    value: sspdAmplifierTurnedOn,
                    type: "switch",
+                   text: "",
                    group: "Signal"
                })
         append({
@@ -40,6 +44,7 @@ ListModel {
                    itemText: "Comparator (mV)",
                    value: sspdCmpRefLevel,
                    type: "changable",
+                   text: "0",
                    fixed: 0,
                    group: "Signal",
                    step: 10
@@ -49,6 +54,7 @@ ListModel {
                    itemText: "Comparator",
                    value: sspdComparatorTurnedOn,
                    type: "switch",
+                   text: "",
                    group: "Signal"
                })
         append({
@@ -56,6 +62,7 @@ ListModel {
                    itemText: "Counts",
                    value: sspdCounts,
                    type: "unchangable",
+                   text: "0",
                    fixed: 0,
                    group: "Counter"
                })
@@ -64,6 +71,7 @@ ListModel {
                    itemText: "TimeOut (sec)",
                    value: sspdCounterTimeConst,
                    type: "changable",
+                   text: "0.00",
                    fixed: 2,
                    group: "Counter",
                    step: 0.1
@@ -73,6 +81,7 @@ ListModel {
                    itemText: "Autoreset",
                    value: sspdAutoResetTurnedOn,
                    type: "switch",
+                   text: "",
                    group: "Autoreset"
                })
         append({
@@ -80,6 +89,7 @@ ListModel {
                    itemText: "Threshold (V)",
                    value: sspdAutoResetThreshold,
                    type: "changable",
+                   text: "0.00",
                    fixed: 2,
                    group: "Autoreset",
                    step: 0.1
@@ -90,6 +100,7 @@ ListModel {
                    itemText: "TimeOut (sec)",
                    value: sspdAutoResetTimeOut,
                    type: "changable",
+                   text: "0.00",
                    fixed: 2,
                    group: "Autoreset",
                    step: 0.1

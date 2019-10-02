@@ -125,8 +125,77 @@ int main(int argc, char *argv[])
         FakeSspdDevice *device1 = new FakeSspdDevice();
         device1->installFakeInterface(mInterface);
         device1->setAddress(1);
-        device0->setLightOn(false);
+        device1->setLightOn(false);
         info = device1->deviceInfo();
+
+        info->setModificationVersion("1");
+        info->setHardwareVersion("2");
+        info->setFirmwareVersion("0.1.2");
+
+        for (quint8 i = 0; i< 12; i++)
+            tmpUDID[i] = 0x01*i+1;
+        info->setDeviceUID(tmpUDID);
+
+        FakeSspdDevice *device2 = new FakeSspdDevice();
+        device2->installFakeInterface(mInterface);
+        device2->setAddress(2);
+        device2->setLightOn(false);
+        info = device2->deviceInfo();
+
+        info->setModificationVersion("1");
+        info->setHardwareVersion("2");
+        info->setFirmwareVersion("0.1.2");
+
+        for (quint8 i = 0; i< 12; i++)
+            tmpUDID[i] = 0x01*i+1;
+        info->setDeviceUID(tmpUDID);
+
+        FakeSspdDevice *device3 = new FakeSspdDevice();
+        device3->installFakeInterface(mInterface);
+        device3->setAddress(3);
+        device3->setLightOn(false);
+        info = device3->deviceInfo();
+
+        info->setModificationVersion("1");
+        info->setHardwareVersion("2");
+        info->setFirmwareVersion("0.1.2");
+
+        for (quint8 i = 0; i< 12; i++)
+            tmpUDID[i] = 0x01*i+1;
+        info->setDeviceUID(tmpUDID);
+
+        FakeSspdDevice *device4 = new FakeSspdDevice();
+        device4->installFakeInterface(mInterface);
+        device4->setAddress(4);
+        device4->setLightOn(false);
+        info = device4->deviceInfo();
+
+        info->setModificationVersion("1");
+        info->setHardwareVersion("2");
+        info->setFirmwareVersion("0.1.2");
+
+        for (quint8 i = 0; i< 12; i++)
+            tmpUDID[i] = 0x01*i+1;
+        info->setDeviceUID(tmpUDID);
+        FakeSspdDevice *device5 = new FakeSspdDevice();
+        device5->installFakeInterface(mInterface);
+        device5->setAddress(5);
+        device5->setLightOn(false);
+        info = device5->deviceInfo();
+
+        info->setModificationVersion("1");
+        info->setHardwareVersion("2");
+        info->setFirmwareVersion("0.1.2");
+
+        for (quint8 i = 0; i< 12; i++)
+            tmpUDID[i] = 0x01*i+1;
+        info->setDeviceUID(tmpUDID);
+
+        FakeSspdDevice *device6 = new FakeSspdDevice();
+        device6->installFakeInterface(mInterface);
+        device6->setAddress(6);
+        device6->setLightOn(false);
+        info = device6->deviceInfo();
 
         info->setModificationVersion("1");
         info->setHardwareVersion("2");

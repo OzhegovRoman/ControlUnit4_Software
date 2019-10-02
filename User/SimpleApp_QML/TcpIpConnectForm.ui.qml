@@ -7,8 +7,8 @@ Item {
     id: uiTcpIpConnectForm
     anchors.fill: parent
 
-    property alias tcpIpAddressText: tcpIpAddressText
     property alias buttonConnect: buttonConnect
+    property alias tcpIpAddressText: tcpIpAddressText
 
     property int normalTextSize: 24
     property int smallTextSize: 18
@@ -22,6 +22,7 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         placeholderText: qsTr("000.000.000.000")
         horizontalAlignment: Text.AlignHCenter
+        inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhPreferNumbers
     }
 
     Text {
@@ -43,3 +44,10 @@ Item {
         anchors.horizontalCenter: tcpIpAddressText.horizontalCenter
     }
 }
+
+/*##^##
+Designer {
+    D{i:0;autoSize:true;height:480;width:640}
+}
+##^##*/
+

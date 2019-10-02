@@ -33,7 +33,6 @@ SspdForm {
         sspdAmplifierTurnedOn   = AppCore.sspdAmplifierTurnedOn     ? 1 : 0;
         sspdAutoResetTurnedOn   = AppCore.sspdAutoResetTurnedOn     ? 1 : 0;
         sspdComparatorTurnedOn  = AppCore.sspdComparatorTurnedOn    ? 1 : 0;
-        console.log(sspdComparatorTurnedOn);
         for (var i = 0; i<settingsModel.rowCount(); i++){
             switch (settingsModel.get(i)["name"]){
             case "current":
@@ -46,6 +45,7 @@ SspdForm {
                 settingsModel.setProperty(i, "value", sspdShorted);
                 break;
             case "amplifier":
+                console.log("amplifier "+sspdAmplifierTurnedOn);
                 settingsModel.setProperty(i, "value", sspdAmplifierTurnedOn);
                 break;
             case "cmp_on":
@@ -61,7 +61,12 @@ SspdForm {
                 settingsModel.setProperty(i, "value", sspdAutoResetTurnedOn);
                 break;
             }
+
+            if ((settingsModel.get(i)["type"] === "changable") || (settingsModel.get(i)["type"] === "unchangable")){
+                settingsModel.setProperty(i, "text", parseFloat(settingsModel.get(i)["value"]).toFixed(settingsModel.get(i)["fixed"]));
+            }
         }
+        listView.forceLayout();
     }
 
     function updateSspdParams(){
@@ -149,8 +154,8 @@ SspdForm {
     SetttingsModel {
         id: settingsModel
     }
+
     listView {
-        model: settingsModel
         delegate: Item {
             height: (pixelSize*1.5<30) ? 40 : pixelSize*1.5
             width: parent.width
@@ -159,6 +164,7 @@ SspdForm {
             Text {
                 text: model.itemText
                 font.pixelSize: pixelSize
+                anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
             }
 
@@ -185,12 +191,23 @@ SspdForm {
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.verticalCenter: parent.verticalCenter
                     }
+                    onCanceled: {
+                        console.log("+Button canceled");
+                        clickTimer.stop();
+                        console.log(listView.model.name);
+                        console.log(textInput.text);
+                        setData(listView.model.name, textInput.text);
+                        console.log("start timer");
+                        timer.start();
+                    }
                     onPressed: {
+                        console.log("+Button pressed");
                         direction = 1
                         startClickTimer();
                         modelIndex = model.index;
                     }
-                    onReleased:{
+                    onReleased: {
+                        console.log("+Button released");
                         clickTimer.stop();
                         setData(model.name, textInput.text);
                         timer.start();
@@ -239,11 +256,13 @@ SspdForm {
                         source: "../png/delete.png"
                     }
                     onPressed: {
+                        console.log("-Button pressed");
                         direction = -1
                         startClickTimer();
                         modelIndex = model.index;
                     }
                     onReleased:{
+                        console.log("-Button released");
                         clickTimer.stop();
                         setData(model.name, textInput.text);
                         timer.start();
@@ -288,3 +307,9 @@ SspdForm {
         }
     }
 }
+
+/*##^##
+Designer {
+    D{i:0;autoSize:true;height:480;width:640}
+}
+##^##*/

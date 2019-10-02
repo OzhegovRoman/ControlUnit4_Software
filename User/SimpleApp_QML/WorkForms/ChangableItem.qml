@@ -4,11 +4,15 @@ import QtQuick.Controls 2.4
 ChangableItemForm {
     signal changed;
     signal blocked;
+
     property double value: 0
     property int fixed: 0
     property double step: 0.1
     property int timerCounts: 0
     property int direction: 1
+
+    height: dp(24)
+
     function startTimer(){
         blocked();
         clickTimer.interval = 1000;
@@ -41,7 +45,7 @@ ChangableItemForm {
         changed();
     }
     textInput.onFocusChanged: function(){
-        if (textInput.focus == true){
+        if (textInput.focus === true){
             blocked();
             console.log("blocked");
         }
@@ -65,3 +69,9 @@ ChangableItemForm {
     }
 }
 
+
+/*##^##
+Designer {
+    D{i:0;autoSize:true;height:480;width:640}
+}
+##^##*/

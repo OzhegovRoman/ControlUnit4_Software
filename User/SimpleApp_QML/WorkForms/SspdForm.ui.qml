@@ -6,6 +6,9 @@ Item {
     anchors.fill: parent
 
     property alias listView: listView
+    property double dataPart: 0.4
+
+    signal m_toggled
 
     ScrollView {
         id: scrollView
@@ -14,26 +17,31 @@ Item {
 
         ListView {
             id: listView
-            anchors.rightMargin: parent.width * 0.05
-            anchors.leftMargin: parent.width * 0.05
-            anchors.bottomMargin: parent.height * 0.02
-            anchors.topMargin: parent.height * 0.02
-            anchors.fill: parent
+            model: settingsModel
+
+            anchors {
+                rightMargin: parent.width * 0.02
+                leftMargin: parent.width * 0.02
+                bottomMargin: parent.height * 0.01
+                topMargin: parent.height * 0.01
+                fill: parent
+            }
             spacing: pixelSize * 0.2
 
-            section.property: "group"
-            section.criteria: ViewSection.FullString
-
-            section.delegate: Rectangle {
-                width: listView.width
-                height: childrenRect.height
-                color: "transparent"
-                Text {
-                    anchors.top: parent.top
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    font.bold: true
-                    text: section
-                    font.pixelSize: pixelSize * 1.2
+            section {
+                property: "group"
+                criteria: ViewSection.FullString
+                delegate: Rectangle {
+                    width: listView.width
+                    height: childrenRect.height
+                    color: "transparent"
+                    Text {
+                        anchors.top: parent.top
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.bold: true
+                        text: section
+                        font.pixelSize: pixelSize * 1.2
+                    }
                 }
             }
         }

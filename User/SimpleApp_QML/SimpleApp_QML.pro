@@ -14,12 +14,35 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 RESOURCES += qml.qrc
 
+defineReplace(droidVersionCode) {
+        segments = $$split(1, ".")
+        for (segment, segments): vCode = "$$first(vCode)$$format_number($$segment, width=3 zeropad)"
+        contains(ANDROID_TARGET_ARCH, arm64-v8a): \
+            suffix = 1
+        contains(ANDROID_TARGET_ARCH, armeabi-v7a): \
+            suffix = 0
+        # add more cases as needed
+        return($$first(vCode)$$first(suffix))
+}
+
+VERSION = 1.1.6
+
+ANDROID_VERSION_NAME = $$VERSION
+
+ANDROID_VERSION_CODE = $$droidVersionCode($$ANDROID_VERSION_NAME)
+
+
+DEFINES += \
+     VERSION=\\\"1.1.6\\\"
+
 HEADERS += \
-    appcore.h
+    appcore.h \
+    tcpipvalidator.h
 
 SOURCES += \
         main.cpp \
-        appcore.cpp
+        appcore.cpp \
+        tcpipvalidator.cpp
 win32:{
     CONFIG(debug, debug|release){
         LIBS += \

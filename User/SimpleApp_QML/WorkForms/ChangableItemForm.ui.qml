@@ -9,13 +9,13 @@ Item {
     property alias plusButton: plusButton
     property alias minusButton: minusButton
     property alias textInput: textInput
-    height: dp(24) //30
+    height: 24
 
     visible: type == "changable"
 
     RoundButton {
         id: plusButton
-        radius: dp(12)
+        radius: parent.height * 0.5
         anchors.right: parent.right
         anchors.leftMargin: 0
         anchors.verticalCenter: parent.verticalCenter
@@ -38,7 +38,7 @@ Item {
         anchors.rightMargin: 0
         anchors.left: minusButton.right
         anchors.leftMargin: 0
-        font.pixelSize: dp(24)
+        font.pixelSize: parent.height
         horizontalAlignment: Text.AlignHCenter
         validator: RegExpValidator {
             regExp: /[-+]?[0-9]*\.?[0-9]*/
@@ -47,7 +47,7 @@ Item {
 
     RoundButton {
         id: minusButton
-        radius: dp(12)
+        radius: parent.height * 0.5
         anchors.left: parent.left
         anchors.leftMargin: 0
         anchors.verticalCenter: parent.verticalCenter

@@ -25,11 +25,10 @@ TcpIpConnectForm {
 
     tcpIpAddressText {
         text: lastTcpIpAddress
-        inputMethodHints: Qt.ImhNoPredictiveText
+        //inputMethodHints: Qt.ImhNoPredictiveText
         onTextChanged: {
             tcpIpValidator.textToValidate = tcpIpAddressText.text
         }
-
         onAccepted: connect()
     }
 }
