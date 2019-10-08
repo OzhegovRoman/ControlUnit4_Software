@@ -37,11 +37,13 @@ DEFINES += \
 
 HEADERS += \
     appcore.h \
+    sspddatamodel.h \
     tcpipvalidator.h
 
 SOURCES += \
         main.cpp \
         appcore.cpp \
+        sspddatamodel.cpp \
         tcpipvalidator.cpp
 win32:{
     CONFIG(debug, debug|release){

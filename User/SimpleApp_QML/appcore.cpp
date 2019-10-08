@@ -1,77 +1,40 @@
 #include "appcore.h"
-#include <QDebug>
-#include <QGuiApplication>
-#include "QElapsedTimer"
 #include <QSettings>
+#include <QGuiApplication>
+#include <QThread>
+#include <QDebug>
+#include <QElapsedTimer>
+#include "devicelist.h"
+#include "temperaturedata.h"
+#include <QRandomGenerator>
+#include "sspddata.h"
+#include "Interfaces/cutcpsocketiointerface.h"
 #include "../qCustomLib/qCustomLib.h"
 #include "Server/servercommands.h"
 
-AppCore::AppCore(QObject *parent) :
-    QObject(parent),
-    mInterface(new cuTcpSocketIOInterface(this)),
-    mTempDriver(new cCu4TdM0Driver(this)),
-    mSspdDriver(new cCu4SdM0Driver(this))
+AppCore::AppCore(QObject *parent)
+    : QObject(parent)
+    , mLastIpAddress("127.0.0.1")
+    , mDevList(nullptr)
+    , mTempData(nullptr)
+    , mSspdData(nullptr)
+    , mInterface(new cuTcpSocketIOInterface(this))
+    , mTempDriver(new cCu4TdM0Driver(this))
+    , mSspdDriver(new cCu4SdM0Driver(this))
 {
 
 }
 
-void AppCore::setSspdCurrent(const float &value)
+static bool sReconnectEnableFlag;
+
+bool AppCore::reconnectEnable()
 {
-    qDebug()<<value;
-    last_SspdData.Current = value;
-    mSspdDriver->current()->setValueSequence(value, nullptr, 5);
-    qDebug()<<"setSspdCurrent Done";
+    return sReconnectEnableFlag;
 }
 
-void AppCore::setSspdShorted(const bool &value)
+void AppCore::setReconnectEnable(bool reconnectEnable)
 {
-    last_SspdData.Status.stShorted = value;
-    mSspdDriver->setShortEnable(value);
-}
-
-void AppCore::setSspdAmplifierTurnedOn(const bool &value)
-{
-    last_SspdData.Status.stAmplifierOn = value;
-    mSspdDriver->setAmpEnable(value);
-}
-
-void AppCore::setSspdComparatorTurnedOn(const bool &value)
-{
-    last_SspdData.Status.stComparatorOn =
-            last_SspdData.Status.stRfKeyToCmp =
-            last_SspdData.Status.stCounterOn = value;
-    mSspdDriver->deviceStatus()->setValueSequence(last_SspdData.Status, nullptr, 5);
-
-}
-
-void AppCore::setSspdAutoResetTurnedOn(const bool &value)
-{
-    last_SspdData.Status.stAutoResetOn = value; // сделать сразе же установку в устройство
-    mSspdDriver->setAutoResetEnable(value);
-}
-
-void AppCore::setSspdCmpRefLevel(const float &value)
-{
-    last_SspdParams.Cmp_Ref_Level = value;
-    mSspdDriver->cmpReferenceLevel()->setValueSequence(value, nullptr, 5);
-}
-
-void AppCore::setSspdCounterTimeConst(const float &value)
-{
-    last_SspdParams.Time_Const = value;
-    mSspdDriver->timeConst()->setValueSequence(value, nullptr, 5);
-}
-
-void AppCore::setSspdAutoResetThreshold(const float &value)
-{
-    last_SspdParams.AutoResetThreshold = value;
-    mSspdDriver->autoResetThreshold()->setValueSequence(value, nullptr, 5);
-}
-
-void AppCore::setSspdAutoResetTimeOut(const float &value)
-{
-    last_SspdParams.AutoResetTimeOut = value;
-    mSspdDriver->autoResetTimeOut()->setValueSequence(value, nullptr, 5);
+    sReconnectEnableFlag = reconnectEnable;
 }
 
 void AppCore::coreConnectToDefaultIpAddress()
@@ -83,46 +46,52 @@ void AppCore::coreConnectToDefaultIpAddress()
 
 void AppCore::coreConnectToIpAddress(const QString& ipAddress)
 {
-    mLastIpAddress = ipAddress;
+    qDebug()<<"Core: connectToIpAddress"<<ipAddress;
+    if (mLastIpAddress != ipAddress){
+        mLastIpAddress = ipAddress;
+        emit lastIpAddressChanged();
+    }
 
+    //подготовка интерфейса передачи данных
     mInterface->setAddress(convertToHostAddress(ipAddress));
     mInterface->setPort(SERVER_TCPIP_PORT);
 
-    bool ok;
+    bool ok = true;
     qApp->processEvents();
+    //Получение списка доступных устройств
     QString answer = mInterface->tcpIpQuery("SYST:DEVL?\r\n", 1000, &ok);
     if (ok){
-        mCoreMessage = answer;
         QSettings settings("Scontel", "cu-simpleapp");
         settings.setValue("TcpIpAddress", ipAddress);
-        emit connectionApply();
+
+        //записываем список устройств
+        if (!mDevList)
+            emit connectionReject();
+        else {
+            mDevList->removeAll();
+            //ToDo: Разбор списка устройств
+            answer.replace(QRegExp("\r?\n|\r"), "");
+            QStringList strL = answer.split(";<br>");
+            for (QString tmpStr : strL){
+                QString driverType = "undefined";
+                if (tmpStr.indexOf("CU4SD")> -1) driverType = "SSPD Driver";
+                if (tmpStr.indexOf("CU4TD")> -1) driverType = "Temperature";
+                int driverAddress = -1;
+                QRegExp reg("address=[0-9]{1,2}:");
+
+                int pos = reg.indexIn(tmpStr);
+                if (pos>-1)
+                    driverAddress = reg.cap().replace(QRegExp("address="), "").replace(":","").toInt();
+
+                if (driverType != "undefined" && driverAddress>-1)
+                    mDevList->appendItem(DeviceItem{driverType, driverAddress});
+            }
+            emit connectionApply();
+        }
     }
-    else{
-        mCoreMessage = ipAddress;
+    else {
         emit connectionReject();
     }
-}
-
-void AppCore::connectToDevice()
-{
-
-}
-
-static bool mReconnectEnableFlag;
-
-bool AppCore::getReconnectEnableFlag() const
-{
-    return mReconnectEnableFlag;
-}
-
-void AppCore::setReconnectEnableFlag(bool reconnectDisableFlag)
-{
-    mReconnectEnableFlag = reconnectDisableFlag;
-}
-
-QString AppCore::getLastIpAddress() const
-{
-    return mLastIpAddress;
 }
 
 void AppCore::getTemperatureDriverData(quint8 address)
@@ -130,42 +99,127 @@ void AppCore::getTemperatureDriverData(quint8 address)
     mTempDriver->setDevAddress(address);
     mTempDriver->setIOInterface(mInterface);
 
-    last_TempData = mTempDriver->deviceData()->getValueSequence(nullptr, 5);
-    emit temperatureDataDone();
+    //Получаем данные и отсылаем их назад
+    bool ok = false;
+    CU4TDM0V1_Data_t data = mTempDriver->deviceData()->getValueSequence(&ok, 5);
+    if (!mTempData || !ok)
+        return;
+    mTempData->setTemperature(static_cast<double>(data.Temperature));
+    mTempData->setTemperatureSensorVoltage(static_cast<double>(data.TempSensorVoltage));
+    mTempData->setPressure(static_cast<double>(data.Pressure));
+    mTempData->setPressureSensorVoltage(static_cast<double>(data.PressSensorVoltageP - data.PressSensorVoltageN));
+    mTempData->setConnected(data.CommutatorOn);
 }
 
-void AppCore::connectTemperatureSensor(quint8 address)
+void AppCore::connectTemperatureSensor(quint8 address, bool state)
 {
     mTempDriver->setDevAddress(address);
     mTempDriver->setIOInterface(mInterface);
-    mTempDriver->commutatorOn()->setValueSequence(true, nullptr, 5);
+    //connect - disconnect
+    bool ok;
+    mTempDriver->commutatorOn()->setValueSequence(state, &ok, 5);
+    if (!mTempData || !ok)
+        return;
+    mTempData->setConnected(state);
 }
 
-void AppCore::disConnectTemperatureSensor(quint8 address)
-{
-    mTempDriver->setDevAddress(address);
-    mTempDriver->setIOInterface(mInterface);
-    mTempDriver->commutatorOn()->setValueSequence(false, nullptr, 5);
-}
-
-void AppCore::initializeSspdDriver(quint8 address)
-{
-    qDebug()<<"initializeSspdDriver";
-    mSspdDriver->setDevAddress(address);
-    mSspdDriver->setIOInterface(mInterface);
-    qDebug()<<"getDeviceData";
-    last_SspdData = mSspdDriver->deviceData()->getValueSequence(nullptr, 5);
-    qDebug()<<"getDeviceParams";
-    last_SspdParams = mSspdDriver->deviceParams()->getValueSequence(nullptr, 5);
-    qDebug()<<"emit signal";
-    emit sspdDriverInitialized();
-}
-
-void AppCore::getSspdData(quint8 address)
+void AppCore::getSspdDriverData(quint8 address)
 {
     mSspdDriver->setDevAddress(address);
+    setCurrentAddress(address);
     mSspdDriver->setIOInterface(mInterface);
-    last_SspdData = mSspdDriver->deviceData()->getValueSequence(nullptr, 5);
-    emit sspdDataUpdated();
+    //реализация получения новых данных
+    bool ok = false;
+    CU4SDM0V1_Data_t sspdData = mSspdDriver->deviceData()->getValueSequence(&ok, 5);
+
+    if (!mSspdData || !ok)
+        return;
+
+    mSspdData->setData(mSspdData->getIndexByName("current"), static_cast<double>(sspdData.Current) * 1e6);
+    mSspdData->setData(mSspdData->getIndexByName("voltage"), static_cast<double>(sspdData.Voltage) * 1e3);
+    mSspdData->setData(mSspdData->getIndexByName("short"), static_cast<bool>(sspdData.Status.stShorted));
+    mSspdData->setData(mSspdData->getIndexByName("amplifier"), static_cast<bool>(sspdData.Status.stAmplifierOn));
+    mSspdData->setData(mSspdData->getIndexByName("cmp_on"),static_cast<bool>(sspdData.Status.stComparatorOn &&
+                                                                             sspdData.Status.stRfKeyToCmp &&
+                                                                             sspdData.Status.stCounterOn));
+    mSspdData->setData(mSspdData->getIndexByName("counter"), static_cast<double>(sspdData.Counts));
+    mSspdData->setData(mSspdData->getIndexByName("autoreset_on"),static_cast<bool>(sspdData.Status.stAutoResetOn));
 }
+
+void AppCore::getSspdDriverParameters(quint8 address)
+{
+    mSspdDriver->setDevAddress(address);
+    setCurrentAddress(address);
+    mSspdDriver->setIOInterface(mInterface);
+    //реализация получения новых данных
+    bool ok = false;
+    CU4SDM0V1_Param_t sspdParams = mSspdDriver->deviceParams()->getValueSequence(&ok, 5);
+
+    if (!mSspdData || !ok)
+        return;
+
+    mSspdData->setData(mSspdData->getIndexByName("cmp"), static_cast<double>(sspdParams.Cmp_Ref_Level) * 1000.0);
+    mSspdData->setData(mSspdData->getIndexByName("counter_timeOut"), static_cast<double>(sspdParams.Time_Const));
+    mSspdData->setData(mSspdData->getIndexByName("threshold"), static_cast<double>(sspdParams.AutoResetThreshold));
+    mSspdData->setData(mSspdData->getIndexByName("timeOut"), static_cast<double>(sspdParams.AutoResetTimeOut));
+}
+
+void AppCore::setNewData(int dataListIndex, double value)
+{
+    qDebug()<<"setNewData";
+    //TODO: установка значений в модули
+}
+
+int AppCore::getCurrentAddress() const
+{
+    return mCurrentAddress;
+}
+
+void AppCore::setCurrentAddress(int currentAddress)
+{
+    mCurrentAddress = currentAddress;
+}
+
+SspdData *AppCore::getSspdData() const
+{
+    return mSspdData;
+}
+
+void AppCore::setSspdData(SspdData *sspdData)
+{
+    if (mSspdData)
+        mSspdData->disconnect(this);
+
+    mSspdData = sspdData;
+
+    if (mSspdData)
+        connect(mSspdData, SIGNAL(newDataSetted(int, double)),
+                this, SLOT(setNewData(int, double)));
+}
+
+TemperatureData *AppCore::getTempData() const
+{
+    return mTempData;
+}
+
+void AppCore::setTempData(TemperatureData *tempData)
+{
+    mTempData = tempData;
+}
+
+DeviceList *AppCore::devList() const
+{
+    return mDevList;
+}
+
+void AppCore::setDevList(DeviceList *devList)
+{
+    mDevList = devList;
+}
+
+QString AppCore::lastIpAddress() const
+{
+    return mLastIpAddress;
+}
+
 

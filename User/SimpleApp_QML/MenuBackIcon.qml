@@ -2,40 +2,69 @@ import QtQuick 2.0
 
 Item {
     id: root
-    width: dp(24)
-    height: dp(24)
 
+    width: 24
+    height: 24
+    
     property real value: 0 //from 0 to 1
-    rotation: root.state == "menu" ? value * 180 : -value * 180
+    
+    property color color: "black"
+    property color lineColor: "white"
+    property color borderColor: "green"
 
-
-    Rectangle {
-        id: bar1
-        x: dp(2 + 7.5*value)
-        y: dp(5 + 3*value)
-        width: dp(20 - 7*value)
-        height: dp(2)
-        rotation: 45*value
-        antialiasing: true
-    }
+    signal clicked();
 
     Rectangle {
-        id: bar2
-        x: dp(2 + value)
-        y: dp(10 + 2 * value)
-        width: dp(20 - 3 * value)
-        height: dp(2)
-        antialiasing: true
-    }
+        property real size: (parent.width<parent.height) ? parent.width : parent.height
+        width: size
+        height: size
+        anchors.centerIn: parent
+        color: parent.color
+        border.color: parent.borderColor
 
-    Rectangle {
-        id: bar3
-        x: dp(2 + 7.5*value)
-        y: dp(15 + value)
-        width: dp(20 - 7*value)
-        height: dp(2)
-        rotation: -45 * value
-        antialiasing: true
+        Item {
+            rotation: root.state == "menu" ? value * 180 : -value * 180
+            anchors{
+                fill: parent
+                margins: 0.2*parent.size
+            }
+
+            Rectangle {
+                id: bar1
+                x: 0.4 * value * parent.width
+                y: (0.125 + 0.135 * value) * parent.height
+                width:  (1 - 0.4 * value) * parent.width
+                height: 0.15 * parent.height
+                rotation: 45 * value
+                antialiasing: true
+                color: root.lineColor
+            }
+
+            Rectangle {
+                id: bar2
+                x: 0.1 * value * parent.width
+                y: 0.425* parent.height
+                width: (1-0.2*value) * parent.width
+                height: 0.15*parent.height
+                antialiasing: true
+                color: root.lineColor
+            }
+            Rectangle {
+                id: bar3
+                x: 0.4 * value * parent.width
+                y: (0.725 - 0.135 * value) * parent.height
+                width:  (1 - 0.4 * value) * parent.width
+                height: 0.15*parent.height
+                rotation: -45 * value
+                antialiasing: true
+                color: root.lineColor
+            }
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: root.clicked()
+        }
     }
 
     state: "menu"
@@ -50,7 +79,7 @@ Item {
     ]
 
     onValueChanged: {
-            if (value == 1) root.state = "back"
-            else if(value == 0) root.state = "menu"
-        }
+        if (value == 1) root.state = "back"
+        else if(value == 0) root.state = "menu"
+    }
 }

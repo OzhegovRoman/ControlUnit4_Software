@@ -3,3 +3,4 @@
 *.pro.user
 User/build-SimpleApp_QML-Desktop_Qt_5_12_3_MinGW_32_bit-Debug/
 *.user.*
+User/SimpleApp_QML_old/

@@ -11,7 +11,7 @@ class TcpIpValidator : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString textToValidate READ textToValidate WRITE setTextToValidate)
-    Q_PROPERTY(bool validate READ validate)
+    Q_PROPERTY(bool validate READ validate NOTIFY validateChanged)
 
 public:
     QString textToValidate() const;
@@ -25,15 +25,5 @@ signals:
 private:
     QString mTextToValidate;
 };
-
-static QObject *tcpIpValidatorProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
-{
-    Q_UNUSED(engine)
-    Q_UNUSED(scriptEngine)
-
-    auto *singletonClass = new TcpIpValidator();
-    return singletonClass;
-}
-
 
 #endif // TCPIPVALIDATOR_H

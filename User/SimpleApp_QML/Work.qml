@@ -1,44 +1,101 @@
-import QtQuick 2.4
-import QtQuick.Controls 2.4
-import QtQuick.Layouts 1.3
+import QtQuick 2.13
+import QtQuick.Controls 2.13
 
-WorkForm {
+import AppCore 1.0
+
+Item {
     id: workForm
-    signal reconnected
-    property bool isOpened: false
-    property bool reconnectFlag: false
-    property int currentDriverAddress: -1
 
-    headerSize: dp(48)
-    titleTextSize: dp(24)
+    property color headerColor: "#d73c3c"
+    property color textColor: "white"
+    property int headerSize: dp(48)
+    property int titleTextSize: dp(24)
+    property string titleText: ""
+    property int currentDriverAddress: -1
+    property bool reconnectFlag: false
 
     Component.onCompleted: {
-        workForm.reconnected.connect(reconnect)
+        console.log("appcore.reconnectEnable: "+appcore.reconnectEnable);
+        logOutButton.visible = appcore.reconnectEnable;
     }
 
-    menuButton {
+    Rectangle {
+        id: headerRect
+        height: headerSize
+        color: headerColor
+        anchors {
+            top: parent.top
+            left: parent.left
+            right: parent.right
+        }
+    }
+
+    Text {
+        id: title
+        text: titleText
+        color: textColor
+        font.pixelSize: titleTextSize
+        anchors {
+            centerIn: headerRect
+        }
+    }
+
+    MenuBackIcon {
+        id: menuBackIcon
+        height: headerSize
+        width: headerSize
+        color: headerColor
+        lineColor: textColor
+        borderColor: headerColor
+        value: drawer.position
+        anchors {
+            verticalCenter: headerRect.Center
+            left: headerRect.left
+        }
+
         onClicked: {
-            if (isOpened){
-                drawer.close();
+            if (drawer.visible){
+                drawer.close()
             }
             else {
-                drawer.open();
+                drawer.open()
+            }
+        }
+
+    }
+
+    Item {
+        id: logOutButton
+        height: headerSize
+        width: headerSize * 0.8
+        anchors {
+            right: parent.right
+            rightMargin: headerSize * 0.3
+            top: parent.top
+        }
+        Image {
+            id: logOutImage
+            anchors {
+                fill: parent
+                margins: headerSize * 0.2
+            }
+            fillMode: Image.Stretch
+            source: "png/LogOut.png"
+        }
+        MouseArea {
+            id: logoutButton
+            anchors.fill: parent
+            onClicked: {
+                if (drawer.visible){
+                    drawer.close();
+                    reconnectFlag = true;
+                }
+                else
+                    reconnect();
             }
         }
     }
 
-    logoutButton {
-        onClicked: {
-            if (isOpened){
-                reconnectFlag = true
-                drawer.close();
-            }
-            else
-                reconnected();
-        }
-    }
-
-    menuBackIcon.value: drawer.position
 
     Drawer {
         id: drawer
@@ -49,94 +106,92 @@ WorkForm {
         clip: true
 
         Component{
-            id: devListDelegate
-            Item{
+            id: devDelegate
+            Item {
                 id: devListItem
-                height: headerSize*1.4
+                height: headerSize * 1.4
                 width: parent.width
-                Rectangle{
-                    id: button
+
+                Rectangle {
+                    id: devListItemButton
                     anchors{
                         fill: parent
                         margins: headerSize * 0.1
                     }
                     color: "whitesmoke"
                 }
+
                 Text {
-                    visible: type != "Reconnect"
                     id: typeText
                     text: type
                     anchors {
-                        top: button.top
-                        horizontalCenter: button.horizontalCenter
+                        top: devListItemButton.top
+                        horizontalCenter: devListItemButton.horizontalCenter
                         topMargin: titleTextSize * 0.3
                     }
-                    font.pixelSize: titleTextSize * 20/24
+                    font.pixelSize: titleTextSize * 0.8
                 }
+
                 Text {
-                    visible: type != "Reconnect"
                     text: "Address: " + address
                     anchors {
                         top: typeText.bottom
                         topMargin: titleTextSize * 0.1
-                        horizontalCenter: button.horizontalCenter
+                        horizontalCenter: devListItemButton.horizontalCenter
                     }
                     font.pixelSize: titleTextSize * 0.5
                 }
-                Text {
-                    visible: type === "Reconnect"
-                    text: type
-                    font.pixelSize: titleTextSize * 20/24
-                    anchors {
-                        horizontalCenter:   devListItem.horizontalCenter
-                        verticalCenter:     devListItem.verticalCenter
-                    }
-                }
+
                 MouseArea {
-                    anchors.fill: devListItem
+                    anchors.fill: devListItemButton
                     onClicked: {
-                        if (type === "Temperature") {
-                            currentDriverAddress = address;
-                            workPageLoader.setSource("WorkForms/Temperature.qml");
-                            title.text = qsTr("Temperature ("+address+")");
+                        if (type == "Temperature"){
+                            currentDriverAddress = address
+                            workPageLoader.setSource("./WorkForms/Temperature.qml");
+                            titleText = qsTr("Temperature") + " (" + address + ")";
                         }
-                        else
-                            if (type === "SSPD Driver"){
-                                currentDriverAddress = address;
-                                workPageLoader.setSource("WorkForms/Sspd.qml");
-                                title.text = qsTr("SSPD Driver ("+address+")");
-                            }
-                            else {
-                                workPageLoader.setSource("WorkForms/HomePage.qml");
-                                title.text = "";
-                            }
+                        else if (type == "SSPD Driver"){
+                            currentDriverAddress = address
+                            workPageLoader.setSource("./WorkForms/Sspd.qml");
+                            titleText = qsTr("SSPD Driver") + " (" + address + ")";
+                        }
+                        else {
+                            workPageLoader.setSource("./WorkForms/HomePage.qml");
+                            titleText = "";
+                        }
+
                         drawer.close();
                     }
-                }
 
+                }
             }
         }
 
         ListView {
-            id: deviceListView
+            id: devList
             anchors.fill: parent
-            model: devModel
-            delegate: devListDelegate
+            model: DeviceModel{
+                list: deviceList
+            }
+            delegate: devDelegate
         }
-
-        onOpened: {
-            menuBackIcon.state = "back";
-            isOpened = true;
-        }
-        onClosed: {
-            menuBackIcon.state = "menu";
-            isOpened = false;
+        onClosed:{
             if (reconnectFlag)
-                reconnected();
+                reconnect();
+            console.log("closed");
         }
+        onOpened:
+            console.log("opened");
     }
 
-    workPageLoader{
+    Loader {
+        id: workPageLoader
         source: "./WorkForms/HomePage.qml"
+        anchors {
+            top: headerRect.bottom
+            bottom: parent.bottom
+            left: parent.left
+            right: parent.right
+        }
     }
 }

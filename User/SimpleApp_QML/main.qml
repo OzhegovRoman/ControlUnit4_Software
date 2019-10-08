@@ -1,83 +1,66 @@
-import QtQuick 2.4
-import QtQuick.Controls 1.4
-import QtQuick.Controls.Material 2.0
-import QtQuick.Window 2.0
+import QtQuick 2.13
+import QtQuick.Controls 2.13
+import QtQuick.Window 2.12
 
 import AppCore 1.0
 
 ApplicationWindow {
+    visible: true
     width: 400
     height: 600
-    visible: true
-    Material.theme: Material.Light
-    Material.accent: Material.Green
 
-    // Conversion independent of the density of pixels to physical pixels the device
     readonly property int dpi: Screen.pixelDensity * 25.4
-    function dp(x){ return (dpi < 120) ? x : x * (dpi/120); }
-    function startUp(){
-        console.log(dpi);
-        AppCore.coreConnectToDefaultIpAddress();
+
+    AppCore {
+        id: appcore
+        // @disable-check M16
+        devList: deviceList
+        // @disable-check M16
+        mTempData: temperatureData
+        // @disable-check M16
+        mSspdData: sspdData
+
+        onConnectionReject: {
+            rootItem.state = "tcpIpConnectScreen"
+            console.log("Connection rejected. lastTcpIpAddress: " + lastIpAddress);
+        }
+        onConnectionApply: {
+            //хрен знает но без вывода почему то не работает
+            rootItem.state = "workScreen"
+            console.log("Connection accepted. TcpIpAddress: " + lastIpAddress);
+        }
     }
 
-    function connectionToIpAddress(address){
-        mainProcess.state = "welcomeScreen"
-        AppCore.coreConnectToIpAddress(address);
+    function dp(x){ return (dpi < 120) ? x : x * (dpi/120); }
+
+    function startUp(){
+        console.log("startUp function");
+        console.log(dpi);
+        appcore.coreConnectToDefaultIpAddress();
+    }
+
+    function connectToIpAddress(address){
+        console.log("Connect to TcpIp adress "+ address);
+        rootItem.state = "welcomeScreen"
+        appcore.coreConnectToIpAddress(address);
     }
 
     function reconnect(){
         console.log("reconnected")
-        mainProcess.state = "tcpIpConnectScreen"
-    }
-
-    property string lastTcpIpAddress: "127.0.0.1"
-
-    Connections {
-        target: AppCore
-        onConnectionReject: {
-            mainProcess.state = "tcpIpConnectScreen"
-            lastTcpIpAddress = AppCore.coreMessage
-            console.log("Connection reject. lastTcpIpAddress: "+AppCore.coreMessage);
-        }
-        onConnectionApply: function() {
-            lastTcpIpAddress = AppCore.lastIpAddress;
-            console.log(AppCore.coreMessage);
-            var tmpStr = AppCore.coreMessage;
-            tmpStr = tmpStr.replace(/\r?\n|\r/g,"");
-            var driverList = tmpStr.split(";<br>");
-            driverList.splice(0,1);
-
-            devModel.clear();
-            var count = 0;
-            for (var i = 0; i< driverList.length; i++){
-                var tmp = driverList[i];
-                var type;
-                if (tmp.search(/CU4SD/)>=0) type = "SSPD Driver"
-                if (tmp.search(/CU4TD/)>=0) type = "Temperature"
-
-                var address;
-                address = tmp.match(/address=[0-9]{1,2}:/g)[0].replace(/address=/,"").replace(":","");
-                devModel.append({
-                                    "type":     type,
-                                    "address":  address
-                                });
-            }
-            //хрен знает но без вывода почему то не работает
-            console.log("reconnectEnable: "+AppCore.reconnectEnable);
-            mainProcess.state = "workScreen"
-        }
+        rootItem.state = "tcpIpConnectScreen"
     }
 
     Item {
-        id: mainProcess
-        Component.onCompleted: startUp();
+        id: rootItem
         anchors.fill: parent
+        Component.onCompleted: startUp()
 
         state: "welcomeScreen"
 
         Loader {
             id: pageLoader
             anchors.fill: parent
+            source: "WelcomeForm.qml"
         }
 
         states: [
@@ -85,7 +68,7 @@ ApplicationWindow {
                 name: "welcomeScreen"
                 PropertyChanges {
                     target: pageLoader;
-                    source: "WelcomeForm.ui.qml"
+                    source: "WelcomeForm.qml"
                 }
             },
             State {
@@ -104,8 +87,5 @@ ApplicationWindow {
                 }
             }
         ]
-    }
-    ListModel {
-        id: devModel
     }
 }

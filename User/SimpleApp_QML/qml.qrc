@@ -1,24 +1,17 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
-        <file>WelcomeForm.ui.qml</file>
-        <file>TcpIpConnectForm.ui.qml</file>
-        <file>WorkForm.ui.qml</file>
-        <file>Work.qml</file>
+        <file>qtquickcontrols2.conf</file>
+        <file>WelcomeForm.qml</file>
         <file>TcpIpConnect.qml</file>
+        <file>Work.qml</file>
+        <file>MenuBackIcon.qml</file>
         <file>WorkForms/HomePage.qml</file>
-        <file>WorkForms/HomePageForm.ui.qml</file>
         <file>WorkForms/Temperature.qml</file>
-        <file>WorkForms/TemperatureForm.ui.qml</file>
         <file>WorkForms/Sspd.qml</file>
-        <file>WorkForms/SspdForm.ui.qml</file>
+        <file>WorkForms/ChangableItem.qml</file>
         <file>png/add.png</file>
         <file>png/delete.png</file>
-        <file>qtquickcontrols2.conf</file>
-        <file>WorkForms/SetttingsModel.qml</file>
-        <file>MenuBackIcon.qml</file>
         <file>png/LogOut.png</file>
-        <file>WorkForms/ChangableItem.qml</file>
-        <file>WorkForms/ChangableItemForm.ui.qml</file>
     </qresource>
 </RCC>

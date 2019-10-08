@@ -239,7 +239,7 @@ void Bootloader::clearProgram()
         }
     }
 
-    emit infoLoader("Delete Old Program (it may takes up to 5 seconds)");
+    emit infoLoader("Delete Old Program (it may take up to 5 seconds)");
     qApp->processEvents();
 
     writeData("D");
