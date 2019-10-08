@@ -1,0 +1,23 @@
+#ifndef SSPDDATALIST_H
+#define SSPDDATALIST_H
+
+#include <QObject>
+#include <QVector>
+
+struct SspdDataItem
+{
+    
+};
+
+class SspdData : public QObject
+{
+    Q_OBJECT
+public:
+    explicit SspdData(QObject *parent = nullptr);
+
+signals:
+
+public slots:
+};
+
+#endif // SSPDDATALIST_H

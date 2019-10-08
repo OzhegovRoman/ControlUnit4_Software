@@ -1,0 +1,6 @@
+#include "sspddatalist.h"
+
+SspdData::SspdDataList(QObject *parent) : QObject(parent)
+{
+
+}
