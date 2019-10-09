@@ -13,7 +13,8 @@ Item {
     property int timerCounts: 0
     property int direction: 1
     property double tmpValue: 0
-    property bool timerStarted: false;
+    property bool editing: false;
+
 
     height: size
 
@@ -61,8 +62,10 @@ Item {
 
         MouseArea{
             anchors.fill: parent;
-            onPressed:
+            onPressed:{
                 startTimer(1);
+                plusButton.focus = true
+            }
             onReleased: {
                 stopTimer();
             }
@@ -93,8 +96,10 @@ Item {
 
         MouseArea{
             anchors.fill: parent;
-            onPressed:
+            onPressed: {
                 startTimer(-1);
+                minusButton.focus = true;
+            }
             onReleased: {
                 console.log(tmpValue);
                 stopTimer();
@@ -112,7 +117,8 @@ Item {
 
     TextInput {
         id: textInput
-        text: parseFloat(clickerTimer.running ? tmpValue : value).toFixed(fixed)
+        property string tempStr;
+        text: focus ? tempStr: parseFloat(clickerTimer.running ? tmpValue : value).toFixed(fixed)
         anchors{
             verticalCenter: parent.verticalCenter
             right: plusButton.left
@@ -122,6 +128,26 @@ Item {
         horizontalAlignment: Text.AlignHCenter
         validator: RegExpValidator {
             regExp: /[-+]?[0-9]*\.?[0-9]*/
+        }
+        Keys.onReturnPressed:{
+            console.log("onReturnPressed")
+            changableItem.changed(displayText);
+            focus = false;
+        }
+        Keys.onEscapePressed:{
+            console.log("onEscapePressed")
+            focus = false;
+        }
+        onAccepted: {
+            console.log("onAccepted");
+        }
+        onEditingFinished: {
+            console.log("onEditingFinished. Value: "+value);
+        }
+        onFocusChanged: {
+            if (textInput.focus)
+                tempStr = displayText
+            console.log("onFocusChanged "+focus)
         }
     }
 

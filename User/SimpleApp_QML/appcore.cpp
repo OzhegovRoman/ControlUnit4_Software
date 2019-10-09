@@ -158,6 +158,9 @@ void AppCore::getSspdDriverParameters(quint8 address)
     if (!mSspdData || !ok)
         return;
 
+//    mSspdDriver->cmpReferenceLevel()->setValueSequence(static_cast<float>(QRandomGenerator::global()->generateDouble()*1000));
+//    qDebug()<<mSspdDriver->cmpReferenceLevel()->getValueSequence(nullptr,5);
+
     mSspdData->setData(mSspdData->getIndexByName("cmp"), static_cast<double>(sspdParams.Cmp_Ref_Level) * 1000.0);
     mSspdData->setData(mSspdData->getIndexByName("counter_timeOut"), static_cast<double>(sspdParams.Time_Const));
     mSspdData->setData(mSspdData->getIndexByName("threshold"), static_cast<double>(sspdParams.AutoResetThreshold));
@@ -166,8 +169,40 @@ void AppCore::getSspdDriverParameters(quint8 address)
 
 void AppCore::setNewData(int dataListIndex, double value)
 {
-    qDebug()<<"setNewData";
-    //TODO: установка значений в модули
+    if (!mSspdData || dataListIndex < 0 || dataListIndex >= mSspdData->items().size())
+        return;
+    QString name = mSspdData->items()[dataListIndex].name;
+
+    // будем считать что драйвер уже готов, иначе то как
+    if (name == "current")
+        mSspdDriver->current()->setValueSequence(static_cast<float>(value * 1e-6), nullptr, 5);
+
+    if (name == "short")
+        mSspdDriver->setShortEnable(value>0.01);
+
+    if (name == "amplifier")
+        mSspdDriver->setAmpEnable(value>0.01);
+
+    if (name == "cmp_on"){
+        CU4SDM0_Status_t status = mSspdDriver->deviceStatus()->getCurrentValue();
+        status.stCounterOn =
+                status.stRfKeyToCmp =
+                status.stCounterOn = value < 0.01 ? 0 : 1;
+        mSspdDriver->deviceStatus()->setValueSequence(status, nullptr, 5);
+    }
+
+    if (name == "autoreset_on")
+        mSspdDriver->setAutoResetEnable(value>0.01);
+
+    if (name == "cmp")
+        mSspdDriver->cmpReferenceLevel()->setValueSequence(static_cast<float>(value/1000), nullptr, 5);
+
+    if (name == "counter_timeOut")
+        mSspdDriver->timeConst()->setValueSequence(static_cast<float>(value), nullptr, 5);
+    if (name == "threshold")
+        mSspdDriver->autoResetThreshold()->setValueSequence(static_cast<float>(value), nullptr, 5);
+    if (name == "timeOut")
+        mSspdDriver->autoResetTimeOut()->setValueSequence(static_cast<float>(value), nullptr, 5);
 }
 
 int AppCore::getCurrentAddress() const

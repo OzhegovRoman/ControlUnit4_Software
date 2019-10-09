@@ -5,7 +5,7 @@ import AppCore 1.0
 
 Item {
 
-    id: temperatureForm
+    id: sspdForm
     anchors.fill: parent
     property double dataPart: 0.4
     property int pixelSize: dp(24)
