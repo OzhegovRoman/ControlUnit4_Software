@@ -25,7 +25,7 @@ defineReplace(droidVersionCode) {
         return($$first(vCode)$$first(suffix))
 }
 
-VERSION = 1.1.6
+VERSION = 1.1.7
 
 ANDROID_VERSION_NAME = $$VERSION
 
@@ -33,18 +33,26 @@ ANDROID_VERSION_CODE = $$droidVersionCode($$ANDROID_VERSION_NAME)
 
 
 DEFINES += \
-     VERSION=\\\"1.1.6\\\"
+     VERSION=\\\"1.1.7\\\"
 
 HEADERS += \
     appcore.h \
+    devicelist.h \
+    devicemodel.h \
+    sspddata.h \
     sspddatamodel.h \
-    tcpipvalidator.h
+    tcpipvalidator.h \
+    temperaturedata.h
 
 SOURCES += \
+        devicelist.cpp \
+        devicemodel.cpp \
         main.cpp \
         appcore.cpp \
+        sspddata.cpp \
         sspddatamodel.cpp \
-        tcpipvalidator.cpp
+        tcpipvalidator.cpp \
+        temperaturedata.cpp
 win32:{
     CONFIG(debug, debug|release){
         LIBS += \
@@ -94,8 +102,6 @@ DISTFILES += \
     android/res/values/libs.xml \
     android/build.gradle \
     android/gradle/wrapper/gradle-wrapper.properties \
-    android/gradlew.bat \
-    WorkForms/ChangableItem.qml \
-    WorkForms/SetttingsModel.qml
+    android/gradlew.bat
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
