@@ -6,6 +6,8 @@
 #include <QRegularExpression>
 #include <QDebug>
 #include <QStandardPaths>
+#include <QSettings>
+#include <QThread>
 
 #include <Drivers/adriver.h>
 #include <Interfaces/curs485iointerface.h>
@@ -22,6 +24,7 @@ cDevBoot::cDevBoot(QObject *parent) :
     mLoadFromURL(false),
     mForce(false),
     mHotPlug(false),
+    mUpdateAll(false),
     mFileName(QString("%1/fw.bin").arg("/home/pi")),
     mUrl(QString("http://rplab.ru/~ozhegov/ControlUnit4/Bin/Firmware/")),
     mDevType(QString()),
@@ -112,15 +115,53 @@ void cDevBoot::setFwVersion(const QString &value)
 
 void cDevBoot::startProcess()
 {
-
-    if (isLoadFromURL()){
+    if (isLoadFromURL())
         prepareVersionTypeMaps();
-        prepareOptions();
+
+    auto addressList = QVector<int>();
+
+    if (isUpdateAllEnabled()){
+        // подготавливаем список устройств для загрузки
+        QSettings settings("Scontel", "RaspPi Server");
+        int size = settings.beginReadArray("devices");
+        for (int i = 0; i < size; ++i) {
+            settings.setArrayIndex(i);
+            addressList<<settings.value("devAddress", 255).toInt();
+        }
+    }
+    else addressList<<mAddress;
+
+    for (auto lAddress: addressList){
+        if (isUpdateAllEnabled()){
+            qDebug()<<QString("__START UPDATING DEVICE. ADDRESS %1__").arg(lAddress);
+            mDevType = QString();
+            mFirmwareVersion = QString();
+        }
+
+        mAddress = lAddress;
+
+        if (isLoadFromURL())
+            prepareOptions();
+
+        disableAllDEvices();
+
+        bootloaderStart();
+
+        if (isUpdateAllEnabled()){
+            qDebug()<<"Waiting for restart all units (5 seconds)";
+            QThread::sleep(5);
+        }
+
+        if (mLoadFromURL){
+            QFile::remove(mFileName);
+        }
+
     }
 
-    disableAllDEvices();
+    qDebug()<<"Done & Exit";
 
-    bootloaderStart();
+    exit(0);
+
 }
 
 bool cDevBoot::isHotPlug() const
@@ -131,6 +172,16 @@ bool cDevBoot::isHotPlug() const
 void cDevBoot::setHotPlug(bool hotPlug)
 {
     mHotPlug = hotPlug;
+}
+
+bool cDevBoot::isUpdateAllEnabled() const
+{
+    return mUpdateAll;
+}
+
+void cDevBoot::setUpdateAllEnable(bool updateAll)
+{
+    mUpdateAll = updateAll;
 }
 
 QStringList cDevBoot::getFileList(QUrl url)
@@ -391,14 +442,6 @@ void cDevBoot::bootloaderFinished()
 {
     qDebug()<<"Complete";
     rebootAllDevices();
-
-    if (mLoadFromURL){
-        QFile::remove(mFileName);
-    }
-
-    qDebug()<<"Done & Exit";
-
-    exit(0);
 }
 
 void cDevBoot::bootloaderInfo(QString str)

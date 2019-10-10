@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
             //            qDebug()<<"  port <portName> - setting up information about prefered COM port;";
             //            qDebug()<<"  tcpip ? - getting prefered tcpip address;";
             //            qDebug()<<"  tcpip <address> - setting up prefered tcpip address;";
-            qDebug()<<"  devlist ? - request to get connected device list;";
+            qDebug()<<"  devlist ? (or devlist? or devlist or list or list?)- request to get connected device list;";
             qDebug()<<"  add <device address> - add device with address to device list;";
             qDebug()<<"  delete <device address> - delete device with address from device list (This command available only with serial interface mode);";
             qDebug()<<"  clear - delete all devices from device list (This command available only with serial interface mode);";

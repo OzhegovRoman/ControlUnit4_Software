@@ -21,52 +21,17 @@ cDevMngr::Commands cDevMngr::processCommand(QString command)
     command = command.trimmed();
     command.replace(QRegExp("[ ]{2,}")," ");
 
-    if (command == "exit" || command == "quit")
+    QStringList cmdList = command.split(" ");
+
+    if ((cmdList[0] == "exit" || cmdList[0] == "quit") && cmdList.size() == 1)
         tmpCmd = cmd_Exit;
 
-    if (command == "help")
+    if (cmdList[0] == "help" && cmdList.size() == 1)
         tmpCmd = cmd_Help;
 
-    //// Временно удалю эту часть, поскольку она приводит к более сложной логике программы
-    //    if (command.contains("interface ")){
-    //        QStringList tmpList = command.split(" ");
-    //        if (tmpList[1] == "serial" || tmpList[1] == "tcpip"){
-    //            tmpCmd = cmd_SetInterface;
-    //            setTcpIpProtocolEnabled(tmpList[1] == "tcpip");
-    //        }
-    //        if (tmpList[1] == "?")
-    //            tmpCmd = cmd_GetInterface;
-    //    }
-
-    //    if (command.contains("port ")){
-    //        QStringList tmpList = command.split(" ");
-    //        if (tmpList[1] == "?")
-    //            tmpCmd =  cmd_GetComPort;
-    //        else {
-    //            setPortName(command.split(" ")[1]);
-    //            tmpCmd = cmd_SetComPort;
-    //        }
-    //    }
-
-    //    if (command.contains("tcpip ")){
-    //        QStringList tmpList = command.split(" ");
-    //        if (tmpList[1] == "?")
-    //            tmpCmd =  cmd_GetTcpIpAddress;
-    //        else {
-    //            setTcpIpAddress(command.split(" ")[1]);
-    //            tmpCmd = cmd_SetTcpIpAddress;
-    //        }
-    //    }
-
-    if (command == "devlist ?"){
-        if (isTcpIpProtocol())
-            updateDeviceListViaTcpIp();
-        tmpCmd = cmd_GetDeviceList;
-    }
-
-    if (command.contains("add ")){
+    if (cmdList[0] == "add" && cmdList.size() == 2){
         bool ok;
-        int tmp = command.split(" ")[1].toInt(&ok);
+        int tmp = cmdList[1].toInt(&ok);
         if (ok){
             tmpCmd = Error;
             if (addDevice(tmp))
@@ -74,9 +39,20 @@ cDevMngr::Commands cDevMngr::processCommand(QString command)
         }
     }
 
-    if (command.contains("delete ")){
+    if ((cmdList[0] == "devlist?" || (cmdList[0] == "devlist")) && cmdList.size() == 1)
+        tmpCmd = cmd_GetDeviceList;
+    if (cmdList[0] == "devlist" && cmdList.size() == 2)
+        if (cmdList[1] == "?")
+            tmpCmd = cmd_GetDeviceList;
+    if ((cmdList[0] == "list?" || (cmdList[0] == "list")) && cmdList.size() == 1)
+        tmpCmd = cmd_GetDeviceList;
+    if (cmdList[0] == "list" && cmdList.size() == 2)
+        if (cmdList[1] == "?")
+            tmpCmd = cmd_GetDeviceList;
+
+    if (cmdList[0] == "delete" && cmdList.size() == 2){
         bool ok;
-        int tmp = command.split(" ")[1].toInt(&ok);
+        int tmp = cmdList[1].toInt(&ok);
         if (ok){
             tmpCmd = Error;
             if (deleteDevice(tmp))
@@ -187,7 +163,6 @@ void cDevMngr::initializeDeviceList()
     mDevList.clear();
 
     for (int i = 0; i < size; ++i) {
-        settings.setArrayIndex(i);
         deviceInfo tmpInfo;
         deviceInfo device;
         settings.setArrayIndex(i);

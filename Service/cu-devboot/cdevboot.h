@@ -39,12 +39,16 @@ public:
     bool isHotPlug() const;
     void setHotPlug(bool hotPlug);
 
+    bool isUpdateAllEnabled() const;
+    void setUpdateAllEnable(bool updateAll);
+
 private:
     QString mPortName;
     int mAddress;
     bool mLoadFromURL;
     bool mForce;
     bool mHotPlug;
+    bool mUpdateAll;
     QString mFileName;
     QString mUrl;
     QString mDevType;

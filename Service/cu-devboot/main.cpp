@@ -62,6 +62,11 @@ int main(int argc, char *argv[])
                                                                          "This option include force option (-f)"));
     parser.addOption(hotPlugOption);
 
+    QCommandLineOption updateAllOption(QStringList()<<"A"<<"all",
+                                       QCoreApplication::translate("main", "Update ALL connected devices. In this case device list will be getting up from system. "
+                                                                   "Options -t, -i, -a, -f, -b, -H will be ignored."));
+    parser.addOption(updateAllOption);
+
     parser.process(a);
 
     cDevBoot devBoot;
@@ -74,7 +79,7 @@ int main(int argc, char *argv[])
     if (parser.isSet(addressOption))
         devBoot.setAddress(parser.value(addressOption).toInt());
 
-    devBoot.setLoadFromURL(!parser.isSet(binOption));
+    devBoot.setLoadFromURL(!parser.isSet(binOption) || parser.isSet(updateAllOption));
 
     // local fileName
     if (!devBoot.isLoadFromURL())
@@ -84,8 +89,8 @@ int main(int argc, char *argv[])
     if (parser.isSet(urlOption))
         devBoot.setUrl(parser.value(urlOption));
 
-    devBoot.setForce(parser.isSet(forceOption) || parser.isSet(hotPlugOption));
-    devBoot.setHotPlug(parser.isSet(hotPlugOption));
+    devBoot.setForce((parser.isSet(forceOption) || parser.isSet(hotPlugOption)) && !parser.isSet(updateAllOption));
+    devBoot.setHotPlug(parser.isSet(hotPlugOption) && !parser.isSet(updateAllOption));
 
     if (parser.isSet(typeOption))
         devBoot.setDevType(parser.value(typeOption));
@@ -93,6 +98,7 @@ int main(int argc, char *argv[])
     if (parser.isSet(indexOption))
         devBoot.setFwVersion(parser.value(indexOption));
 
+    devBoot.setUpdateAllEnable(parser.isSet(updateAllOption));
     devBoot.startProcess();
 
     return a.exec();
