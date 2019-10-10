@@ -90,6 +90,9 @@ int main(int argc, char *argv[])
             qDebug()<<devMngr.portName();
             break;
         case cDevMngr::cmd_GetDeviceList:
+            if (devMngr.isTcpIpProtocol())
+                devMngr.updateDeviceListViaTcpIp();
+
             qDebug()<<"Device count:"<<devMngr.devList().count();
             for (int i = 0; i < devMngr.devList().count(); ++i){
                 qDebug()<<QString("Dev: %1; address: %2; type: %3")
