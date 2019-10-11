@@ -5,6 +5,8 @@ CppApplication{
     name: "cu-tcpipserver"
     consoleApplication: true
 
+    property bool fakeDeviceEnable: false
+
     cpp.cxxLanguageVersion: "c++14"
 
     Depends { //Fake Devices in AdditionalLibs with NonFreeSoftware
@@ -14,7 +16,7 @@ CppApplication{
 
     property stringList commonDefines: ["VERSION=\""+project.softwareVersion+"\""]
     Properties {
-        condition: FakeDevices.present
+        condition: FakeDevices.present && fakeDeviceEnable
         cpp.defines: commonDefines.concat("FAKE_DEVICES");
         cpp.includePaths: [
             "../../Libs/CuPlugins/",

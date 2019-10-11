@@ -16,6 +16,7 @@ QtApplication {
             "core",
             "serialport",
             "network",
+            "gui"
         ]
     }
 

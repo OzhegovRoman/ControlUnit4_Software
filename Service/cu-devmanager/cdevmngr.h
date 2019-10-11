@@ -4,6 +4,7 @@
 #include <QString>
 #include <QList>
 #include "Server/cuserver.h"
+#include "consolereader.h"
 
 class cDevMngr
 {
@@ -27,7 +28,7 @@ public:
     };
     cDevMngr();
 
-    Commands processCommand(QString command);
+//    Commands processCommand(QString command);
 
     QString portName() const;
     void setPortName(const QString &portName);
@@ -49,11 +50,14 @@ public:
 
     QList<deviceInfo> devList() const;
 
+    void run();
+
 private:
     bool mTcpIpProtocolEnabled {};
     QString mPortName;
     QString mTcpIpAddress;
     QList<deviceInfo> mDevList;
+    ConsoleReader *reader;
 
     void sortDevList();
 };

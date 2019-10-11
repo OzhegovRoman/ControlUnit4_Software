@@ -1,7 +1,6 @@
 #include "cdevmngr.h"
 #include <QElapsedTimer>
 #include <QRegExp>
-#include <QDebug>
 #include <QSettings>
 #include "Drivers/adriver.h"
 #include "Interfaces/curs485iointerface.h"
@@ -10,64 +9,11 @@
 
 cDevMngr::cDevMngr()
     : mPortName(QString("ttyS0"))
+    , reader(new ConsoleReader())
 {
 
 }
 
-cDevMngr::Commands cDevMngr::processCommand(QString command)
-{
-    Commands tmpCmd = cmd_Unknown;
-
-    command = command.trimmed();
-    command.replace(QRegExp("[ ]{2,}")," ");
-
-    QStringList cmdList = command.split(" ");
-
-    if ((cmdList[0] == "exit" || cmdList[0] == "quit") && cmdList.size() == 1)
-        tmpCmd = cmd_Exit;
-
-    if (cmdList[0] == "help" && cmdList.size() == 1)
-        tmpCmd = cmd_Help;
-
-    if (cmdList[0] == "add" && cmdList.size() == 2){
-        bool ok;
-        int tmp = cmdList[1].toInt(&ok);
-        if (ok){
-            tmpCmd = Error;
-            if (addDevice(tmp))
-                tmpCmd = cmd_AddDevice;
-        }
-    }
-
-    if ((cmdList[0] == "devlist?" || (cmdList[0] == "devlist")) && cmdList.size() == 1)
-        tmpCmd = cmd_GetDeviceList;
-    if (cmdList[0] == "devlist" && cmdList.size() == 2)
-        if (cmdList[1] == "?")
-            tmpCmd = cmd_GetDeviceList;
-    if ((cmdList[0] == "list?" || (cmdList[0] == "list")) && cmdList.size() == 1)
-        tmpCmd = cmd_GetDeviceList;
-    if (cmdList[0] == "list" && cmdList.size() == 2)
-        if (cmdList[1] == "?")
-            tmpCmd = cmd_GetDeviceList;
-
-    if (cmdList[0] == "delete" && cmdList.size() == 2){
-        bool ok;
-        int tmp = cmdList[1].toInt(&ok);
-        if (ok){
-            tmpCmd = Error;
-            if (deleteDevice(tmp))
-                tmpCmd = cmd_DeleteDevice;
-        }
-    }
-
-    if (command == "clear")
-        tmpCmd = cmd_ClearAll;
-
-    if (command == "save")
-        tmpCmd = cmd_SaveData;
-
-    return tmpCmd;
-}
 
 QString cDevMngr::portName() const
 {
@@ -146,7 +92,6 @@ bool cDevMngr::addDevice(int address)
 
 bool cDevMngr::deleteDevice(int address)
 {
-    //TODO: реализовать запрос на удаление устройства.
     if (isTcpIpProtocol()) return true;
 
     for (int i = 0; i < mDevList.count(); i++)
@@ -241,6 +186,82 @@ void cDevMngr::saveDeviceList()
 QList<deviceInfo> cDevMngr::devList() const
 {
     return mDevList;
+}
+
+void cDevMngr::run()
+{
+    // связываем все сигналы консоли и запускаем ее
+
+    reader->run();
+    QObject::connect(reader, &ConsoleReader::quit, [](){exit(0);});
+    QObject::connect(reader, &ConsoleReader::list, [=](){
+        if (isTcpIpProtocol())
+            updateDeviceListViaTcpIp();
+        reader->write(QString("Device count: %1").arg(devList().count()));
+        for (int i = 0; i < devList().count(); ++i){
+            reader->write(QString("Dev: %1; address: %2; type: %3")
+                          .arg(i)
+                          .arg(devList()[i].devAddress)
+                          .arg(devList()[i].devType));
+        }
+        reader->newCommand();
+    });
+    QObject::connect(reader, &ConsoleReader::clear, [=](){
+        if (isTcpIpProtocol()){
+            reader->write("ERROR: Server doesn't support this command. Available only in serial interface mode");
+        }
+        else{
+            clearDeviceList();
+            reader->write("DONE!!!");
+        }
+        reader->newCommand();
+    });
+    QObject::connect(reader, &ConsoleReader::save, [=](){
+        saveDeviceList();
+        reader->write("DONE!!!");
+        reader->newCommand();
+    });
+    QObject::connect(reader, &ConsoleReader::add, [=](const int address){
+        if (addDevice(address))
+            reader->write("DONE!!!");
+        else
+            reader->write("ERROR!!!");
+        reader->newCommand();
+    });
+    QObject::connect(reader, &ConsoleReader::remove, [=](const int address){
+        if (isTcpIpProtocol())
+            reader->write("ERROR: Server doesn't support this command. Available only in serial interface mode");
+        else
+            if (deleteDevice(address))
+                reader->write("DONE!!!");
+            else
+                reader->write("ERROR!!!");
+        reader->newCommand();
+    });
+
+    QObject::connect(reader, &ConsoleReader::description, [=](const int address){
+
+        cuIOInterfaceImpl *mInterface = nullptr;
+        if (isTcpIpProtocol()){
+            cuTcpSocketIOInterface *pInterface = new cuTcpSocketIOInterface();
+            pInterface->setAddress(convertToHostAddress(tcpIpAddress()));
+            pInterface->setPort(SERVER_TCPIP_PORT);
+            mInterface = pInterface;
+        }
+        else{
+            cuRs485IOInterface *pInterface = new cuRs485IOInterface();
+            pInterface->setPortName(portName());
+            mInterface = pInterface;
+        }
+
+        AbstractDriver driver;
+        driver.setIOInterface(mInterface);
+        driver.setDevAddress(static_cast<quint8>(address));
+
+        reader->write(driver.getDeviceDescription()->getValueSequence(nullptr, 5));
+
+        reader->newCommand();
+    });
 }
 
 void cDevMngr::sortDevList()
