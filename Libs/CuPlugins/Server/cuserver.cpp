@@ -1501,19 +1501,15 @@ bool cuServer::isDeviceInformationCorrect(deviceInfo info)
     driver.setIOInterface(iOInterface());
     driver.setDevAddress(info.devAddress);
     
-    for (int i=0; i<2; i++){
-        cUDID UDID;
-        bool ok;
-        UDID = driver.getUDID()->getValueSequence(&ok, 10); // крайне важная операция будем пробовать аж до 10 раз
-        if (!ok) return false;
-        
-        // Проверяем Id устройства,
-        // Более ничего не проверяем, считаем что UDID уникален и 2 устройства с одинаковым UDID не может быть
-        // как следствие UDID точно соответствует его Type и т.д.
-        
-        if (info.devUDID.toString() == UDID.toString()) return true;
-        //если UDID не совпал, то на всякий случай проверяем его еще раз. Об этом говорит загаловок 
-    }
+    bool ok;
+    cUDID UDID = driver.getUDID()->getValueSequence(&ok, 10); // крайне важная операция будем пробовать аж до 10 раз
+    if (!ok) return false;
+
+    // Проверяем Id устройства,
+    // Более ничего не проверяем, считаем что UDID уникален и 2 устройства с одинаковым UDID не может быть
+    // как следствие UDID точно соответствует его Type и т.д.
+
+    if (info.devUDID.toString() == UDID.toString()) return true;
     
     return false;
 }
