@@ -123,6 +123,8 @@ void cuServer::destroySocket(QObject *sender)
     
     foreach (SocketData data, mSocketsData) {
         if (data.first == socket){
+            if (mLastSocket == data.first)
+                mLastSocket = nullptr;
             mSocketsData.removeOne(data);
             socket->deleteLater();
         }
@@ -1313,7 +1315,7 @@ void cuServer::deviceRequest(deviceInfo *info, QByteArray &packet)
 // Отсылаем данные по TcpIp
 void cuServer::sendAnswer(quint8 address, quint8 command, quint8 dataLength, quint8 *data)
 {
-    if (mLastSocket->isValid())
+    if (mLastSocket && mLastSocket->isValid())
         if (mLastSocket->isOpen() && (mLastSocket->state() == QAbstractSocket::ConnectedState) && (!isSCPICommand)){
             qDebug()<<"sendAnswer: "<<QTime::currentTime().toString("hh:mm:ss.zzz");
             qDebug()<<"TcpSocket: "<<mLastSocket->peerAddress().toString();
@@ -1329,7 +1331,7 @@ void cuServer::sendAnswer(quint8 address, quint8 command, quint8 dataLength, qui
 
 void cuServer::sendString(QString str)
 {
-    if (mLastSocket->isValid())
+    if (mLastSocket && mLastSocket->isValid())
         if (mLastSocket->isOpen()){
             mLastSocket->write(str.toLocal8Bit());
             mLastSocket->flush();
@@ -1398,38 +1400,27 @@ bool cuServer::addDevice(quint8 address)
     newDevice.devAddress = address;
     
     bool ok = false;
-    QString tmp;
     i = 0;
-    // делаем по MAX_DEVICE_TRY_COUNT попыток чтения всего
-    while ((!ok) && (i++<MAX_DEVICE_TRY_COUNT))
-        tmp = driver.getDeviceType()->getValueSequence(&ok);
-    //        newDevice.devType = driver.getDeviceType()->getValueSequence(&ok);
+    QString tmp = driver.getDeviceType()->getValueSequence(&ok, 5);
+    qDebug()<<"getDeviceType:"<< ok;
+
     if (!ok) return false;
     newDevice.devType = tmp;
+    qDebug()<<tmp;
     
-    ok = false; i = 0;
-    while ((!ok) && (i++<MAX_DEVICE_TRY_COUNT))
-        newDevice.devUDID = driver.getUDID()->getValueSequence(&ok);
+    newDevice.devUDID = driver.getUDID()->getValueSequence(&ok, 5);
     if (!ok) return false;
     
-    ok = false; i = 0;
-    while ((!ok) && (i++<MAX_DEVICE_TRY_COUNT))
-        newDevice.devModVersion = driver.getModificationVersion()->getValueSequence(&ok);
+    newDevice.devModVersion = driver.getModificationVersion()->getValueSequence(&ok, 5);
     if (!ok) return false;
     
-    ok = false; i = 0;
-    while ((!ok) && (i++<MAX_DEVICE_TRY_COUNT))
-        newDevice.devHwVersion = driver.getHardwareVersion()->getValueSequence(&ok);
+    newDevice.devHwVersion = driver.getHardwareVersion()->getValueSequence(&ok, 5);
     if (!ok) return false;
     
-    ok = false; i = 0;
-    while ((!ok) && (i++<MAX_DEVICE_TRY_COUNT))
-        newDevice.devFwVersion = driver.getFirmwareVersion()->getValueSequence(&ok);
+    newDevice.devFwVersion = driver.getFirmwareVersion()->getValueSequence(&ok, 5);
     if (!ok) return false;
     
-    ok = false; i = 0;
-    while ((!ok) && (i++<MAX_DEVICE_TRY_COUNT))
-        newDevice.devDescription = driver.getDeviceDescription()->getValueSequence(&ok);
+    newDevice.devDescription = driver.getDeviceDescription()->getValueSequence(&ok, 5);
     if (!ok) return false;
     
     qDebug()<<"success";
