@@ -119,6 +119,7 @@ Item {
         id: textInput
         property string tempStr;
         text: focus ? tempStr: parseFloat(clickerTimer.running ? tmpValue : value).toFixed(fixed)
+        inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhPreferNumbers
         anchors{
             verticalCenter: parent.verticalCenter
             right: plusButton.left
@@ -131,6 +132,11 @@ Item {
         }
         Keys.onReturnPressed:{
             console.log("onReturnPressed")
+            changableItem.changed(displayText);
+            focus = false;
+        }
+        Keys.onEnterPressed: {
+            console.log("onEnterPressed")
             changableItem.changed(displayText);
             focus = false;
         }

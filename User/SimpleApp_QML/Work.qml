@@ -145,6 +145,7 @@ Item {
                 MouseArea {
                     anchors.fill: devListItemButton
                     onClicked: {
+                        drawer.close();
                         if (type == "Temperature"){
                             currentDriverAddress = address
                             workPageLoader.setSource("./WorkForms/Temperature.qml");
@@ -159,10 +160,7 @@ Item {
                             workPageLoader.setSource("./WorkForms/HomePage.qml");
                             titleText = "";
                         }
-
-                        drawer.close();
                     }
-
                 }
             }
         }
