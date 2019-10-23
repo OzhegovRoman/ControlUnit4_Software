@@ -9,8 +9,6 @@ cTcpIpProcess::cTcpIpProcess(QObject *parent)
 {
 }
 
-//TODO: Буферизация команд, а нужна ли она в случае когда у нас 1 команда- 1 ответ на нее
-
 void cTcpIpProcess::initializeTcpIpSocket(qintptr handle)
 {
     mSocket = new QTcpSocket(this);

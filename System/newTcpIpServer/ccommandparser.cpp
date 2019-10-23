@@ -1,10 +1,21 @@
 #include "ccommandparser.h"
 #include "ctcpipserver.h"
 #include "Server/servercommands.h"
+#include <QSettings>
+#include "cdeviceinfo.h"
 
-cCommandParser::cCommandParser(QObject *parent) : QObject(parent)
+cCommandParser::cCommandParser(QObject *parent)
+    : QObject(parent)
+    , mInited(false)
 {
 
+}
+
+void cCommandParser::initialize()
+{
+    cTcpIpServer::consoleWriteDebug("Command Parser initialization");
+    prepareDeviceInfoList();
+    // начинаем процесс проверки каждого элемента через отправку команд в executor и чтения ответов
 }
 
 void cCommandParser::parse(QObject *tcpIpProcess, QByteArray data)
@@ -52,6 +63,11 @@ void cCommandParser::parse(QObject *tcpIpProcess, QByteArray data)
 
 }
 
+bool cCommandParser::isInited() const
+{
+    return mInited;
+}
+
 bool cCommandParser::isRawData(const QByteArray &ba)
 {
     /// проверка на несоответствие протоколу SCPI
@@ -62,4 +78,26 @@ bool cCommandParser::isRawData(const QByteArray &ba)
         (ba.size() > ba[2] + 2))
             return true;
     return false;
+}
+
+void cCommandParser::prepareDeviceInfoList()
+{
+    cTcpIpServer::consoleWriteDebug("CommandParser: preparing DeviceInfoList");
+    QSettings settings("Scontel", "RaspPi Server");
+    int size = settings.beginReadArray("devices");
+    mDeviceInfoList.clear();
+    for (int i = 0; i < size; ++i){
+        cDeviceInfo deviceInfo;
+        settings.setArrayIndex(i);
+        deviceInfo.setAddress(static_cast<quint8>(settings.value("devAddress", 255).toInt()));
+        deviceInfo.setType(settings.value("devType","None").toString());
+        deviceInfo.setDescription(settings.value("devDescription", "None").toString());
+        deviceInfo.setUDID(cUDID(reinterpret_cast<quint8*>(settings.value("devUDID","0").toByteArray().data())));
+        deviceInfo.setFirmwareVersion(settings.value("devFwVersion", "None").toString());
+        deviceInfo.setHardwareVersion(settings.value("devHwVersion", "None").toString());
+        deviceInfo.setModificationVersion(settings.value("devModVersion", "None").toString());
+        mDeviceInfoList.append(deviceInfo);
+    }
+    settings.endArray();
+    cTcpIpServer::consoleWriteDebug(QString("Loaded devices from SETTINGS: %1").arg(mDeviceInfoList.size()));
 }

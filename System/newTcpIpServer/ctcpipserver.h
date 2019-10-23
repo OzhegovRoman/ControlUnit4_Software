@@ -5,13 +5,16 @@
 
 class cuIOInterface;
 class cCommandParser;
+class cCommandExecutor;
 
 class cTcpIpServer : public QTcpServer
 {
     Q_OBJECT
 public:
     explicit cTcpIpServer(QObject * parent = nullptr);
+    ~cTcpIpServer() override;
     void StartServer();
+    void stop();
 
     cuIOInterface *interface() const;
     void setInterface(cuIOInterface *interface);
@@ -26,6 +29,7 @@ protected:
 private:
     cuIOInterface *mInterface;
     cCommandParser *mParser;
+    cCommandExecutor *mExecutor;
 };
 
 #endif // CTCPIPSERVER_H

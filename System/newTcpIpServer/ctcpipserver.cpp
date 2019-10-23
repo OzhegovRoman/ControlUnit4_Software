@@ -8,18 +8,48 @@
 #include <QString>
 #include "ctcpipprocess.h"
 #include "ccommandparser.h"
+#include "ccommandexecutor.h"
+#include <QThread>
+#include <QCoreApplication>
 
 cTcpIpServer::cTcpIpServer(QObject * parent)
     : QTcpServer(parent)
     , mInterface(nullptr)
     , mParser(new cCommandParser(this))
+    , mExecutor(new cCommandExecutor())
 {
 
 }
 
+cTcpIpServer::~cTcpIpServer()
+{
+   stop();
+}
+
 void cTcpIpServer::StartServer()
 {
-    consoleWriteDebug("Start server");
+    consoleWriteDebug("Start command executor thread");
+
+    QThread *thread = new QThread(this);
+    mExecutor->moveToThread(thread);
+
+//    qRegisterMetaType<>
+
+    connect(thread, &QThread::started, mExecutor, &cCommandExecutor::doWork);
+    connect(mExecutor, &cCommandExecutor::finished, thread, &QThread::quit);
+    connect(mExecutor, &cCommandExecutor::finished, mExecutor, &cCommandExecutor::deleteLater);
+    connect(thread, &QThread::finished, thread, &QThread::deleteLater);
+    thread->start();
+    QThread::msleep(10);
+
+    mParser->initialize();
+
+    // ждем пока не проинитится. Надеюсь, что signal-slot при таком подходе работают, возможно придется переделать на qApp->processEvent();
+    while (!mParser->isInited())
+        QThread::msleep(10);
+
+    consoleWriteDebug("Start TcpIp Server");
+
     setProxy(QNetworkProxy::NoProxy);
     if (listen(QHostAddress::Any, 9876)){
         consoleWrite("Server: started");
@@ -29,7 +59,7 @@ void cTcpIpServer::StartServer()
                 consoleWrite(address.toString());
         consoleWrite("Available TcpIp Port: 9876");
 
-        //TODO: подготовить список учтановленных устройств
+        //TODO: подготовить список установленных устройств
 
 //        enumerate();
 //        qDebug()<<"Enumerate devices. Available"<<mUnits.count()<<"Device(s)";
@@ -37,6 +67,12 @@ void cTcpIpServer::StartServer()
     }
     else
         consoleWrite("Server: not started!");
+}
+
+void cTcpIpServer::stop()
+{
+    if (!mExecutor)
+        mExecutor->stop();
 }
 
 cuIOInterface *cTcpIpServer::interface() const
