@@ -48,5 +48,8 @@ void cTcpIpProcess::writeToSocket(QByteArray ba)
         cTcpIpServer::consoleWriteError("socket is empty");
         return;
     }
-    cTcpIpServer::consoleWriteDebug(QString("Socket %1 write: %2").arg(mSocket->socketDescriptor()).arg(ba.data()));
+    if (mSocket->isValid()){
+        cTcpIpServer::consoleWriteDebug(QString("Socket %1 write: %2").arg(mSocket->socketDescriptor()).arg(ba.data()));
+        mSocket->write(ba);
+    }
 }

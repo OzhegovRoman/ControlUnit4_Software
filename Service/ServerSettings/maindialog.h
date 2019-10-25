@@ -16,7 +16,7 @@ class MainDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit MainDialog(QWidget *parent = 0);
+    explicit MainDialog(QWidget *parent = nullptr);
     ~MainDialog();
 
     bool isTimeOut() const;

@@ -1,5 +1,12 @@
 #include "cdeviceinfo.h"
 
+cDeviceInfo::cDeviceInfo()
+    : mAddress(255)
+    , mActive(false)
+{
+
+}
+
 quint8 cDeviceInfo::address() const
 {
     return mAddress;

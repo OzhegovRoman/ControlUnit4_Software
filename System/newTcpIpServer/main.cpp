@@ -4,6 +4,7 @@
 #include <QDebug>
 
 #include "ctcpipserver.h"
+#include "ccommandexecutor.h"
 
 #ifdef FAKE_DEVICES
 #include "../../../Libs/FakeDevicesLib/fakesspddevice.h"
@@ -86,8 +87,9 @@ int main(int argc, char *argv[])
 #endif
 
     cTcpIpServer *server = new cTcpIpServer();
-    server->setInterface(mInterface);
-    server->StartServer();
-
+    cCommandExecutor *executor = new cCommandExecutor();
+    executor->setInterface(mInterface);
+    server->setExecutor(executor);
+    server->initialize();
     return a.exec();
 }

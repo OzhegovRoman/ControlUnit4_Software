@@ -4,7 +4,6 @@
 #include <QTcpServer>
 
 class cuIOInterface;
-class cCommandParser;
 class cCommandExecutor;
 
 class cTcpIpServer : public QTcpServer
@@ -13,23 +12,25 @@ class cTcpIpServer : public QTcpServer
 public:
     explicit cTcpIpServer(QObject * parent = nullptr);
     ~cTcpIpServer() override;
-    void StartServer();
-    void stop();
 
-    cuIOInterface *interface() const;
-    void setInterface(cuIOInterface *interface);
+    void initialize();
+    void stop();
 
     static void consoleWrite(QString string);
     static void consoleWriteDebug(QString string);
     static void consoleWriteError(QString string);
 
+    cCommandExecutor *executor() const;
+    void setExecutor(cCommandExecutor *executor);
+
 protected:
     void incomingConnection(qintptr handle) override;
 
 private:
-    cuIOInterface *mInterface;
-    cCommandParser *mParser;
     cCommandExecutor *mExecutor;
+private slots:
+    void startServer();
+    void sendAnswer(QObject * process, QByteArray data);
 };
 
 #endif // CTCPIPSERVER_H

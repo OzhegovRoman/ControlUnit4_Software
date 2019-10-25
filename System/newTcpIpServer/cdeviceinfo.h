@@ -7,6 +7,8 @@
 class cDeviceInfo
 {
 public:
+    cDeviceInfo();
+
     quint8 address() const;
     void setAddress(const quint8 &address);
 
@@ -36,6 +38,7 @@ private:
     QString mHardwareVersion;
     QString mFirmwareVersion;
     QString mDescription;
+    bool mActive;
 };
 
 #endif // CDEVICEINFO_H
