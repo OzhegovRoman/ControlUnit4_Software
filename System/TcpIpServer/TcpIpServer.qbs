@@ -12,7 +12,10 @@ CppApplication{
         required: false
     }
 
-    property stringList commonDefines: ["VERSION=\""+project.softwareVersion+"\""]
+    property stringList commonDefines: [
+        "VERSION=\""+project.softwareVersion+"\"",
+        "DEBUG_LOG"
+    ]
     Properties {
         condition: FakeDevices.present
         cpp.defines: commonDefines.concat("FAKE_DEVICES");
@@ -46,6 +49,7 @@ CppApplication{
 
     Group {
         name: "Source"
+        prefix: "**/"
         files: [
             "*.cpp",
             "*.h",

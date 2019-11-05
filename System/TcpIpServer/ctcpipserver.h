@@ -23,11 +23,23 @@ public:
     cCommandExecutor *executor() const;
     void setExecutor(cCommandExecutor *executor);
 
+    bool isDebugInfoEnabled() const;
+    void setDebugInfoEnable(bool isDebugInfoEnabled);
+
+    bool isErrorInfoEnabled() const;
+    void setErrorInfoEnable(bool isErrorInfoEnabled);
+
+    bool isInfoEnabled() const;
+    void setInfoEnable(bool isInfoEnabled);
+
 protected:
     void incomingConnection(qintptr handle) override;
 
 private:
     cCommandExecutor *mExecutor;
+    static bool mDebugInfoEnable;
+    static bool mErrorInfoEnable;
+    static bool mInfoEnable;
 private slots:
     void startServer();
     void sendAnswer(QObject * process, QByteArray data);

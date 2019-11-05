@@ -4,9 +4,10 @@
 #include <QObject>
 #include <QTimer>
 #include "cdeviceinfo.h"
+#include "settingsprovider.h"
 
 class cuIOInterface;
-class SettingsProvider;
+class cAbstractCommandParser;
 
 class Command
 {
@@ -43,8 +44,17 @@ class cCommandExecutor : public QObject
 public:
     explicit cCommandExecutor(QObject *parent = nullptr);
 
+    void prepareAnswer(quint8 address, quint8 command, quint8 dataLength, char *data);
+    void prepareAnswer(QString answer);
+    bool addDevice(quint8 address);
+
     cuIOInterface *interface() const;
     void setInterface(cuIOInterface *interface);
+
+    SettingsProvider *settings() const;
+    void setSettings(SettingsProvider *value);
+
+    void moveToThread(QThread *thread);
 
 signals:
     void finished();
@@ -64,15 +74,11 @@ private:
     cuIOInterface *mInterface;
     QTimer *processTimer;
     QList<Command> cmdList;
-    SettingsProvider *settings;
+    SettingsProvider *mSettings;
+    QList<cAbstractCommandParser*> parsers;
 
     void initialize();
-    void parse(const QByteArray& data);
-    bool isRawData(const QByteArray &ba);
     bool checkDevice(const cDeviceInfo &info);
-    void serverRequest(const QByteArray &packet);
-    void prepareAnswer(quint8 address, quint8 command, quint8 dataLength, char *data);
-    bool addDevice(quint8 address);
 
 };
 

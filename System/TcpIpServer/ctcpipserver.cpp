@@ -11,6 +11,10 @@
 #include <QThread>
 #include <QCoreApplication>
 
+bool cTcpIpServer::mDebugInfoEnable = false;
+bool cTcpIpServer::mErrorInfoEnable = false;
+bool cTcpIpServer::mInfoEnable = false;
+
 cTcpIpServer::cTcpIpServer(QObject * parent)
     : QTcpServer(parent)
     , mExecutor(nullptr)
@@ -34,8 +38,6 @@ void cTcpIpServer::initialize()
     QThread *thread = new QThread(this);
     mExecutor->moveToThread(thread);
 
-    //    qRegisterMetaType<>
-
     connect(thread, &QThread::started, mExecutor, &cCommandExecutor::doWork);
     connect(mExecutor, &cCommandExecutor::finished, thread, &QThread::quit);
     connect(mExecutor, &cCommandExecutor::finished, mExecutor, &cCommandExecutor::deleteLater);
@@ -54,19 +56,20 @@ void cTcpIpServer::stop()
 
 void cTcpIpServer::consoleWrite(QString string)
 {
-    std::cout<<string.toLatin1().data()<<std::endl;
+    if (mInfoEnable)
+        std::cout<<string.toLatin1().data()<<std::endl;
 }
 
 void cTcpIpServer::consoleWriteDebug(QString string)
 {
-#ifdef DEBUG_LOG
-    std::cout<<"Debug: "<<string.toLatin1().data()<<std::endl;
-#endif
+    if (mInfoEnable && mDebugInfoEnable)
+        std::cout<<"Debug: "<<string.toLatin1().data()<<std::endl;
 }
 
 void cTcpIpServer::consoleWriteError(QString string)
 {
-    std::cerr<<"Error: "<<string.toLatin1().data()<<std::endl;
+    if (mInfoEnable && mErrorInfoEnable)
+        std::cerr<<"Error: "<<string.toLatin1().data()<<std::endl;
 }
 
 void cTcpIpServer::incomingConnection(qintptr handle)
@@ -75,7 +78,36 @@ void cTcpIpServer::incomingConnection(qintptr handle)
     process->initializeTcpIpSocket(handle);
 
     connect(process, &cTcpIpProcess::socketReaded, mExecutor, &cCommandExecutor::executeCommand);
-    //ToDo: make  signal-slot connection for receiving answer
+}
+
+bool cTcpIpServer::isInfoEnabled() const
+{
+    return mInfoEnable;
+}
+
+void cTcpIpServer::setInfoEnable(bool infoEnable)
+{
+    mInfoEnable = infoEnable;
+}
+
+bool cTcpIpServer::isErrorInfoEnabled() const
+{
+    return mErrorInfoEnable;
+}
+
+void cTcpIpServer::setErrorInfoEnable(bool errorInfoEnable)
+{
+    mErrorInfoEnable = errorInfoEnable;
+}
+
+bool cTcpIpServer::isDebugInfoEnabled() const
+{
+    return mDebugInfoEnable;
+}
+
+void cTcpIpServer::setDebugInfoEnable(bool debugInfoEnable)
+{
+    mDebugInfoEnable = debugInfoEnable;
 }
 
 cCommandExecutor *cTcpIpServer::executor() const

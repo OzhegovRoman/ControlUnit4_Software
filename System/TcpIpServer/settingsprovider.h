@@ -19,7 +19,7 @@ public:
     void remove(int index);
     void removeDeviceWithAddress(quint8 address);
     void append(const cDeviceInfo &info);
-
+    cDeviceInfo* deviceByAddress(quint8 address);
 
 private:
     QList<cDeviceInfo> mDeviceInfoList;

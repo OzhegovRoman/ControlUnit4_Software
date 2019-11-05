@@ -5,6 +5,7 @@
 #include <QTimer>
 #include "../cuiodeviceimpl.h"
 #include "../cudid.h"
+#include <QDebug>
 
 //#define DRIVER_TIME_OUT 2000
 

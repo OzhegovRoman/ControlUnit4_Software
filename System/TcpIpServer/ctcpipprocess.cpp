@@ -24,6 +24,8 @@ void cTcpIpProcess::initializeTcpIpSocket(qintptr handle)
 void cTcpIpProcess::killProcess()
 {
     cTcpIpServer::consoleWriteDebug("Client disconnected");
+    mSocket->deleteLater();
+    mSocket = nullptr;
     deleteLater();
 }
 
