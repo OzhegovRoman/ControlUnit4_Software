@@ -5,26 +5,34 @@
 #include "ctcpipserver.h"
 #include "Server/servercommands.h"
 #include "Drivers/adriver.h"
-#include "settingsprovider.h"
+#include "CommandParsers/commandparser.h"
 
 cCommandExecutor::cCommandExecutor(QObject *parent)
     : QObject(parent)
     , mStopFlag(false)
     , mInterface(nullptr)
-    , processTimer(new QTimer(this))
-    , settings(new SettingsProvider(this))
+    , processTimer(nullptr)
+    , mSettings(new SettingsProvider(this))
 {
-    processTimer->setInterval(10);
-    processTimer->setSingleShot(true);
-    connect(processTimer, &QTimer::timeout, this, &cCommandExecutor::process);
+    parsers << new ServerRawDataCommandParser(this);
+    parsers << new DeviceRawDataCommandParser(this);
+    parsers << new CommonScpiCommands(this);
+    parsers << new SystemScpiCommands(this);
+    parsers << new GeneralScpiCommands(this);
+    parsers << new SspdScpiCommands(this);
+    parsers << new TemperatureScpiCommands(this);
 }
 
 void cCommandExecutor::doWork()
 {
     cTcpIpServer::consoleWriteDebug("Command executor started");
-
     initialize();
-    processTimer->start();
+
+    processTimer = new QTimer(this);
+    processTimer->setInterval(10);
+    processTimer->setSingleShot(true);
+    connect(processTimer, &QTimer::timeout, this, &cCommandExecutor::process);
+    process();
 }
 
 void cCommandExecutor::stop()
@@ -56,13 +64,34 @@ void cCommandExecutor::process()
             }
         }
 
-        if (!sameProcessFounded)
-            parse(cmdList.begin()->data());
+        if (!sameProcessFounded){
+            bool done = false;
+            for (auto iter = parsers.begin(); iter<parsers.end() && !done; iter++)
+                done = (*iter)->parse(cmdList.begin()->data());
+            if (!done)
+                prepareAnswer("UNKNOWN COMMAND\r\n");
+        }
 
         // в конце удаляем команду из начала списка команд
         cmdList.removeAt(0);
     }
     processTimer->start();
+}
+
+SettingsProvider *cCommandExecutor::settings() const
+{
+    return mSettings;
+}
+
+void cCommandExecutor::setSettings(SettingsProvider *value)
+{
+    mSettings = value;
+}
+
+void cCommandExecutor::moveToThread(QThread *thread)
+{
+    mInterface->moveToThread(thread);
+    QObject::moveToThread(thread);
 }
 
 cuIOInterface *cCommandExecutor::interface() const
@@ -77,14 +106,16 @@ void cCommandExecutor::setInterface(cuIOInterface *interface)
 
 void cCommandExecutor::initialize()
 {
-    settings->prepareDeviceInfoList();
+    cTcpIpServer::consoleWriteDebug("Initialize Comand Executor");
+
+    mSettings->prepareDeviceInfoList();
 
     //activate all devices
-    for (int i = 0; i < settings->deviceCount();){
-        const cDeviceInfo info = settings->at(i);
+    for (int i = 0; i < mSettings->deviceCount();){
+        const cDeviceInfo info = mSettings->at(i);
         if (!checkDevice(info)){
             cTcpIpServer::consoleWriteError(QString("initialization device with address %1 FAILED.").arg(info.address()));
-            settings->remove(i);
+            mSettings->remove(i);
         }
         else {
             cTcpIpServer::consoleWriteDebug(QString("initialization device with address %1 SUCCESS.").arg(info.address()));
@@ -92,68 +123,20 @@ void cCommandExecutor::initialize()
         }
     }
 
-    cTcpIpServer::consoleWriteDebug(QString("Initialized devices: %1").arg(settings->deviceCount()));
+    cTcpIpServer::consoleWriteDebug("test Point");
+
+
+    for (auto iter = parsers.begin(); iter < parsers.end(); iter++)
+        (*iter)->initializeParser();
+
+    cTcpIpServer::consoleWriteDebug(QString("Initialized devices: %1").arg(mSettings->deviceCount()));
     emit inited();
-}
-
-void cCommandExecutor::parse(const QByteArray &data)
-{
-    cTcpIpServer::consoleWriteDebug("cCommandExecutor::parse().");
-    if (isRawData(data)){
-        cTcpIpServer::consoleWriteDebug("Raw command packet");
-        // смотрим адрес устройства
-        if (static_cast<quint8>(data.at(0)) == SERVER_ADDRESS){
-            cTcpIpServer::consoleWriteDebug(QString("SERVER: %1").arg(data.toHex().data()));
-            // это запрос к серверу
-            //TODO: serverRequest
-            serverRequest(data);
-        }
-        else {
-            cTcpIpServer::consoleWriteDebug(QString("DEVICE: %1").arg(data.toHex().data()));
-            //ToDO: Device Request
-            // а это запрос к Устройству
-            //            deviceInfo *info = currentDevice(data.second[0]);
-            //            // если такого устройства совсем нет, то и не будем обрабатывать это устройство
-            //            if (info != nullptr){
-            //                deviceRequest(info, ba);
-            //            }
-        }
-        return;
-    }
-    // Разбор SCPI команды
-    QString tmpStr = QString(data).simplified();
-    QStringList cmdList = tmpStr.split(" ");
-    QString cmd = cmdList[0];
-    QString params;
-    if (cmdList.count()>1) {
-        cmdList.removeFirst();
-        params = cmdList.join(" ");
-    }
-
-    //удаляем все прописные символы из команды
-    int i = 0;
-    while (i<cmd.size()){
-        if (cmd[i].isLower()) cmd.remove(i,1);
-        else i++;
-    }
-
-    cTcpIpServer::consoleWriteDebug(QString("SCPI command: %1 Params: %2").arg(cmd).arg(params));
-}
-
-bool cCommandExecutor::isRawData(const QByteArray &ba)
-{
-    /// проверка на несоответствие протоколу SCPI
-    /// основная тонкость заключается в том, что в SCPI используется только текстовая информация
-    /// а в обычном пакете данных первый символ - не соответствует текстовому символу, на этом и производим сверку протоколов
-    /// делаем расшифровку команд
-    if ((ba.size() > 2) &&
-            (ba.size() > ba[2] + 2))
-        return true;
-    return false;
 }
 
 bool cCommandExecutor::checkDevice(const cDeviceInfo &info)
 {
+    cTcpIpServer::consoleWriteDebug(QString("Check Device: %1").arg(info.address()));
+
     if (!mInterface)
         return false;
 
@@ -165,62 +148,14 @@ bool cCommandExecutor::checkDevice(const cDeviceInfo &info)
     // Более ничего не проверяем, считаем что UDID уникален и 2 устройства с одинаковым UDID не может быть
     // как следствие UDID точно соответствует его Type и т.д.
     bool ok;
+
+    cTcpIpServer::consoleWriteDebug(QString("Try to get UDID"));
     cUDID UDID = driver.getUDID()->getValueSequence(&ok, 10); // крайне важная операция будем пробовать аж до 10 раз
+    cTcpIpServer::consoleWriteDebug(QString("Result: %1").arg(ok ? "success" : "failed"));
     if (!ok) return false;
+    cTcpIpServer::consoleWriteDebug(QString("UDID: %1").arg(UDID.toString()));
     if (info.UDID().toString() == UDID.toString()) return true;
     return false;
-}
-
-void cCommandExecutor::serverRequest(const QByteArray &packet)
-{
-    // команда серверу
-    // здесь будет обработка его команд
-    //    qDebug()<<"Server request";
-    quint8 command = static_cast<quint8>(packet[1]);
-    const char* data = packet.data() + 3;
-
-    switch (command) {
-    // полный список всех доступных устройств
-    case CMD_SERVER_GET_DEVICE_LIST:
-    {
-        QString tmpStr;
-        tmpStr.clear();
-        tmpStr.append(QString("DevCount: %1").arg(settings->deviceCount()));
-        for (int i = 0; i < settings->deviceCount(); ++i){
-            const cDeviceInfo &info= settings->at(i);
-            tmpStr.append(";<br>");
-            tmpStr.append(QString("Dev%1: address=%2: type=%3")
-                          .arg(i)
-                          .arg(info.address())
-                          .arg(info.type()));
-        }
-        prepareAnswer(SERVER_ADDRESS, command, static_cast<quint8>(tmpStr.count()), tmpStr.toLocal8Bit().data());
-        break;
-    }
-    case CMD_SERVER_SEARCH_DEVICES:
-    {
-        for (quint8 i = 0; i < MAX_COUNT_DEVICES; ++i)
-            addDevice(i);
-        char tmpUint8 = static_cast<char>(settings->deviceCount());
-        prepareAnswer(SERVER_ADDRESS, command, 1, &tmpUint8);
-        break;
-    }
-    case CMD_SERVER_ADD_DEVICE:
-    {
-        char tmpUint8 = static_cast<char>(addDevice(*reinterpret_cast<const quint8*>(data)));
-        prepareAnswer(SERVER_ADDRESS, command, 1, &tmpUint8);
-        break;
-    }
-    case CMD_SERVER_SAVE_DEVICE_LIST:
-    {
-        char tmpUint8 = 1;
-        settings->saveDeviceInformation();
-        prepareAnswer(SERVER_ADDRESS, command, 1, &tmpUint8);
-        break;
-    }
-    default:
-        break;
-    }
 }
 
 void cCommandExecutor::prepareAnswer(quint8 address, quint8 command, quint8 dataLength, char *data)
@@ -233,15 +168,23 @@ void cCommandExecutor::prepareAnswer(quint8 address, quint8 command, quint8 data
     ba.append(*reinterpret_cast<char*>(&dataLength));
     ba.append(data, dataLength);
 
-    cTcpIpServer::consoleWriteDebug(QString("Answer %1").arg(data));
+    cTcpIpServer::consoleWriteDebug(QString("Answer: %1").arg(ba.toHex().data()));
 
     emit sendAnswer(cmdList.begin()->process(), ba);
+}
+
+void cCommandExecutor::prepareAnswer(QString answer)
+{
+    cTcpIpServer::consoleWriteDebug("Preparing answer as string");
+    cTcpIpServer::consoleWriteDebug(QString("Answer: %1").arg(answer));
+
+    emit sendAnswer(cmdList.begin()->process(), QByteArray(answer.toLocal8Bit()));
 }
 
 bool cCommandExecutor::addDevice(quint8 address)
 {
     cTcpIpServer::consoleWriteDebug(QString("Add device with address %1").arg(address));
-    settings->removeDeviceWithAddress(address);
+    mSettings->removeDeviceWithAddress(address);
 
     AbstractDriver driver;
     driver.setIOInterface(mInterface);
@@ -267,7 +210,7 @@ bool cCommandExecutor::addDevice(quint8 address)
     info.setDescription(driver.getDeviceDescription()->getValueSequence(&ok, 5));
     if (!ok) return false;
 
-    settings->append(info);
+    mSettings->append(info);
     cTcpIpServer::consoleWriteDebug(QString("SUCCESS"));
     return true;
 }

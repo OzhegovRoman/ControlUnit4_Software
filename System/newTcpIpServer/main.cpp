@@ -28,6 +28,18 @@ int main(int argc, char *argv[])
                                         QCoreApplication::translate("main", "serial port name"));
     parser.addOption(serialPortOption);
 
+    QCommandLineOption debugInfoOption(QStringList()<<"d"<<"debug",
+                                        QCoreApplication::translate("main", "Debug Info Enable"));
+    parser.addOption(debugInfoOption);
+
+    QCommandLineOption commonInfoOption(QStringList()<<"i"<<"info",
+                                        QCoreApplication::translate("main", "Common Info Enable"));
+    parser.addOption(commonInfoOption);
+
+    QCommandLineOption errorOption(QStringList()<<"e"<<"error",
+                                        QCoreApplication::translate("main", "Error messages Enable"));
+    parser.addOption(errorOption);
+
 #ifdef FAKE_DEVICES
     QCommandLineOption fakeOptions(QStringList()<<"f"<<"fake",
                                    QCoreApplication::translate("main", "Fake option. Server will be operate in simulation mode with 2 SSRD Devices(address 0 and 1). "
@@ -90,6 +102,10 @@ int main(int argc, char *argv[])
     cCommandExecutor *executor = new cCommandExecutor();
     executor->setInterface(mInterface);
     server->setExecutor(executor);
+    server->setInfoEnable(parser.isSet(commonInfoOption));
+    server->setDebugInfoEnable(parser.isSet(debugInfoOption));
+    server->setErrorInfoEnable(parser.isSet(errorOption));
+
     server->initialize();
     return a.exec();
 }

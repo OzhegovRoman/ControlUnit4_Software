@@ -49,6 +49,7 @@ CppApplication{
 
     Group {
         name: "Source"
+        prefix: "**/"
         files: [
             "*.cpp",
             "*.h",

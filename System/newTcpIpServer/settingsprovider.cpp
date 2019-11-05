@@ -81,11 +81,24 @@ void SettingsProvider::append(const cDeviceInfo &info)
     sortDeviceInfoList();
 }
 
+cDeviceInfo *SettingsProvider::deviceByAddress(quint8 address)
+{
+    for (int idx = 0; idx < mDeviceInfoList.count(); ++idx)
+        if (mDeviceInfoList[idx].address() == address)
+            return &mDeviceInfoList[idx];
+    return nullptr;
+}
+
 void SettingsProvider::sortDeviceInfoList()
 {
     // сортируем по адресу
-    std::sort(mDeviceInfoList.begin(), mDeviceInfoList.end(),
-              [](cDeviceInfo& a, cDeviceInfo& b)
+#ifdef __linux__
+    qSort
+        #else
+    std::sort
+        #endif
+            (mDeviceInfoList.begin(), mDeviceInfoList.end(),
+             [](cDeviceInfo& a, cDeviceInfo& b)
     {
         return a.address() < b.address();
     });

@@ -75,6 +75,8 @@ bool cuRs485IOInterface::pSendMsg(quint8 address, quint8 command, quint8 dataLen
 
 bool cuRs485IOInterface::pInitialize()
 {
+//    qDebug()<<"cuRs485IOInterface::pInitialize()";
+
     cStarProtocolPC::instance().clearBuffer();
 
     if (mPortName.isEmpty()) return false; //имя порта не установлено
@@ -107,9 +109,9 @@ bool cuRs485IOInterface::pInitialize()
 
 void cuRs485IOInterface::dataReady()
 {
+//    qDebug()<<"RS485 data ready";
     QByteArray ba = mSerialPort->readAll();
-//    qDebug()<<ba;
-
+//    qDebug()<<"Data"<<ba.toHex().data();
     for (int i = 0; i < ba.length(); ++i) {
         uint8_t ch = ba[i];
         cStarProtocolPC& sp = cStarProtocolPC::instance();
