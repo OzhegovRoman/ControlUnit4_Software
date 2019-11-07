@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     parser.addOption(indexOption);
 
     QCommandLineOption addressOption(QStringList()<<"a"<<"address",
-                                     QCoreApplication::translate("main", "Device address. All other devices will be mute. Default adderss: 0."),
+                                     QCoreApplication::translate("main", "Device address. All other devices will be mute. Default address: 0."),
                                      QCoreApplication::translate("main","address"));
     parser.addOption(addressOption);
 
