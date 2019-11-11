@@ -1,5 +1,7 @@
 #include "curs485iointerface.h"
 #include "cstarprotocolpc.h"
+#include <QDebug>
+#include <QElapsedTimer>
 
 #ifdef RASPBERRY_PI
 #include "../RaspPiMMap/rasppimmap.h"
@@ -64,28 +66,22 @@ bool cuRs485IOInterface::pSendMsg(quint8 address, quint8 command, quint8 dataLen
     QByteArray ba = QByteArray((const char*)starProtocol.buffer(),MaxBufferSize);
     int l = ba.indexOf(END_PACKET)+1;
 
-    mSerialPort->write((const char*)starProtocol.buffer(),l);
+    mSerialPort->write((const char*)starProtocol.buffer(), l);
     mSerialPort->flush();
-    bool ok = mSerialPort->waitForBytesWritten(5);
-
+    // внимание-внимание flush отправляет в буфер? чтобы начать отправку надо сделать
+    // qApp -> processEvent();
+    qApp->processEvents();
+    QThread::usleep(1000);
 
     setReceverEnable();
-    return ok;
+    return true;
 }
 
 bool cuRs485IOInterface::pInitialize()
 {
-//    qDebug()<<"cuRs485IOInterface::pInitialize()";
-
     cStarProtocolPC::instance().clearBuffer();
 
     if (mPortName.isEmpty()) return false; //имя порта не установлено
-
-    QList<QSerialPortInfo> serialPortsList = QSerialPortInfo::availablePorts();
-//    qDebug()<<"Available serial ports:";
-//    foreach (QSerialPortInfo serialPortInfo, serialPortsList) {
-//        qDebug()<<serialPortInfo.portName()<<serialPortInfo.description();
-//    }
 
     if (mSerialPort == nullptr) {
         mSerialPort = new QSerialPort(mPortName);

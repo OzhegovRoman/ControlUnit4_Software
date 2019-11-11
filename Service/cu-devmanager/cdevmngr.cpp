@@ -240,7 +240,6 @@ void cDevMngr::run()
     });
 
     QObject::connect(reader, &ConsoleReader::description, [=](const int address){
-
         cuIOInterfaceImpl *mInterface = nullptr;
         if (isTcpIpProtocol()){
             cuTcpSocketIOInterface *pInterface = new cuTcpSocketIOInterface();
@@ -260,6 +259,7 @@ void cDevMngr::run()
 
         reader->write(driver.getDeviceDescription()->getValueSequence(nullptr, 5));
 
+        mInterface->deleteLater();
         reader->newCommand();
     });
 }
