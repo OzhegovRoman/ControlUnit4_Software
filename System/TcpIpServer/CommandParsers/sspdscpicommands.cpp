@@ -58,6 +58,15 @@ SspdScpiCommands::SspdScpiCommands(QObject *parent)
  * SSPD:DEVice<N>:CurrentDACcoeff <Value|JSON> - установка коэффициентов
  * SSPD:DEVice<N>:CoMParatorCoeff? - получение коэффициентов
  * SSPD:DEVice<N>:CoMParatorCoeff <Value|JSON> - установка коэффициентов
+ * 
+ * SSPD:DEVice<N>:PIDStatus? - получение статуса работы PID регулятора
+ * SSPD:DEVice<N>:PIDStatus <Value|bool> - включение PID регулятора
+ * SSPD:DEVice<N>:PWMStatus? - получение статуса работы PWM на закоротке
+ * SSPD:DEVice<N>:PWMStatus <Value|bool> - включение PWM на закоротке
+ * SSPD:DEVice<N>:PWMFrequency? - получение частоты работы PWM на закоротке
+ * SSPD:DEVice<N>:PWMFrequency <Value|float> - учтановка частоты PWM на закоротке
+ * SSPD:DEVice<N>:PWMDuty? - получение скважности PWM на закоротке
+ * SSPD:DEVice<N>:PWMDuty <Value|float> - установка скважности PWM на закоротке
  */
 
 bool SspdScpiCommands::executeCommand(QString command, QString params)
@@ -535,6 +544,83 @@ bool SspdScpiCommands::executeCommand(QString command, QString params)
         }
         else answer = PA_ErrorData;
     }
+    
+    if (command == "PIDS?"){
+        quint8 data = driver.PIDEnableStatus()->getValueSequence(&ok);
+        if (ok) {
+            executor()->prepareAnswer(QString("%1\r\n").arg(data));
+            return true;
+        }
+        answer = PA_TimeOut;
+    }
+    if (command == "PIDS"){
+        quint8 data = static_cast<quint8>(params.toInt(&ok));
+        if (ok) {
+            driver.PIDEnableStatus()->setValueSequence(data);
+            if (driver.waitingAnswer()) answer = PA_Ok;
+            else answer = PA_TimeOut;
+        }
+        else answer = PA_ErrorData;
+    }
+
+    if (command == "PWMS?"){
+        quint8 data = driver.PWMShortCircuitStatus()->getValueSequence(&ok);
+        if (ok) {
+            executor()->prepareAnswer(QString("%1\r\n").arg(data));
+            return true;
+        }
+        answer = PA_TimeOut;
+    }
+    if (command == "PWMS"){
+        quint8 data = static_cast<quint8>(params.toInt(&ok));
+        if (ok) {
+            driver.PWMShortCircuitStatus()->setValueSequence(data);
+            if (driver.waitingAnswer()) answer = PA_Ok;
+            else answer = PA_TimeOut;
+        }
+        else answer = PA_ErrorData;
+    }
+
+    if (command == "PWMF?"){
+        double data = static_cast<double>(driver.pWMShortCircuitFrequency()->getValueSequence(&ok));
+        if (ok) {
+            executor()->prepareAnswer(QString("%1\r\n").arg(data));
+            return true;
+        }
+        answer = PA_TimeOut;
+    }
+    if (command == "PWMF"){
+        float data = static_cast<float>(params.toDouble(&ok));
+        if (ok) {
+            driver.pWMShortCircuitFrequency()->setValueSequence(data);
+            if (driver.waitingAnswer()) answer = PA_Ok;
+            else answer = PA_TimeOut;
+        }
+        else answer = PA_ErrorData;
+    }
+
+    if (command == "PWMD?"){
+        double data = static_cast<double>(driver.pWMShortCircuitDuty()->getValueSequence(&ok));
+        if (ok) {
+            executor()->prepareAnswer(QString("%1\r\n").arg(data));
+            return true;
+        }
+        answer = PA_TimeOut;
+    }
+    if (command == "PWMD"){
+        float data = static_cast<float>(params.toDouble(&ok));
+        if (ok) {
+            driver.pWMShortCircuitDuty()->setValueSequence(data);
+            if (driver.waitingAnswer()) answer = PA_Ok;
+            else answer = PA_TimeOut;
+        }
+        else answer = PA_ErrorData;
+    }
+    //    * SSPD:DEVice<N>:PWMFrequency? - получение частоты работы PWM на закоротке
+//    * SSPD:DEVice<N>:PWMFrequency <Value|float> - учтановка частоты PWM на закоротке
+//    * SSPD:DEVice<N>:PWMDuty? - получение скважности PWM на закоротке
+//    * SSPD:DEVice<N>:PWMDuty <Value|float> - установка скважности PWM на закоротке
+    
 
     switch (answer) {
     case CommonScpiCommands::PA_Ok:

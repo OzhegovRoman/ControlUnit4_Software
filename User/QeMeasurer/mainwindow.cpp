@@ -77,6 +77,8 @@ void MainWindow::contextMenuRequest(QPoint pos)
 
 void MainWindow::on_pbInitialize_clicked()
 {
+    bool secretMode = QGuiApplication::queryKeyboardModifiers() == (Qt::ControlModifier | Qt::ShiftModifier);
+
 #ifdef TCPIP_SOCKET_INTERFACE
     QString str = ui->leTcpAddress->text();
     while (str.contains(".0")){
@@ -105,19 +107,27 @@ void MainWindow::on_pbInitialize_clicked()
         return;
     }
 
-    ui->lbStatus->setText(QString("Status: Device %1 inited<br>"
-                                  "Modification: %2<br>"
-                                  "Hardware: %3<br>"
-                                  "Firmware: %4<br>"
-                                  "Description: %5<br>"
-                                  "DeviceId: %6")
-                          .arg(mDriver->getDeviceType()->getCurrentValue())
-                          .arg(mDriver->getModificationVersion()->getCurrentValue())
-                          .arg(mDriver->getHardwareVersion()->getCurrentValue())
-                          .arg(mDriver->getFirmwareVersion()->getCurrentValue())
-                          .arg(mDriver->getDeviceDescription()->getCurrentValue())
-                          .arg(mDriver->getUDID()->getCurrentValue().toString()));
+    QString tmpStr = QString("Status: Device %1 inited<br>"
+                             "Modification: %2<br>"
+                             "Hardware: %3<br>"
+                             "Firmware: %4<br>"
+                             "Description: %5<br>"
+                             "DeviceId: %6")
+            .arg(mDriver->getDeviceType()->getCurrentValue())
+            .arg(mDriver->getModificationVersion()->getCurrentValue())
+            .arg(mDriver->getHardwareVersion()->getCurrentValue())
+            .arg(mDriver->getFirmwareVersion()->getCurrentValue())
+            .arg(mDriver->getDeviceDescription()->getCurrentValue())
+            .arg(mDriver->getUDID()->getCurrentValue().toString());
 
+    if (secretMode){
+        tmpStr.append("<br>Secret Mode Activated");
+        ui->lwActions->addItem("Secret Params");
+        ui->lwActions->item(4)->setFont(ui->lwActions->item(3)->font());
+        ui->lePwmFrequency->setValidator(new QDoubleValidator(this));
+        ui->lePwmDuty->setValidator(new QDoubleValidator(this));
+    }
+    ui->lbStatus->setText(tmpStr);
     for (int i = 0; i<4; ++i) {
         ui->lwActions->item(i)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
     }
@@ -474,4 +484,68 @@ void MainWindow::on_cbType_currentIndexChanged(int index)
     default:
         break;
     }
+}
+
+void MainWindow::on_pbGetSecretParams_clicked()
+{
+    bool ok;
+    bool tmpBool = mDriver->PIDEnableStatus()->getValueSequence(&ok, 5);
+    if (!ok){
+        ui->lbSecretStatus->setText("Error at PIDEnableStatus()->getValueSequence");
+        return;
+    }
+    ui->cbPID->setChecked(tmpBool);
+
+    tmpBool = mDriver->PWMShortCircuitStatus()->getValueSequence(&ok, 5);
+    if (!ok){
+        ui->lbSecretStatus->setText("PWMShortCircuitStatus()->getValueSequence");
+        return;
+    }
+    ui->cbPWM->setChecked(tmpBool);
+
+    float tmpFloat = mDriver->pWMShortCircuitFrequency()->getValueSequence(&ok, 5);
+    if (!ok){
+        ui->lbSecretStatus->setText("pWMShortCircuitFrequency()->getValueSequence");
+        return;
+    }
+    ui->lePwmFrequency->setText(QString::number(static_cast<double>(tmpFloat)));
+
+    tmpFloat = mDriver->pWMShortCircuitDuty()->getValueSequence(&ok, 5);
+    if (!ok){
+        ui->lbSecretStatus->setText("pWMShortCircuitDuty()->getValueSequence");
+        return;
+    }
+    ui->lePwmDuty->setText(QString::number(static_cast<double>(tmpFloat)));
+
+    ui->lbSecretStatus->setText("Success");
+}
+
+void MainWindow::on_pbSetSecretParams_clicked()
+{
+    bool ok;
+    mDriver->PIDEnableStatus()->setValueSequence(ui->cbPID->isChecked(), &ok, 5);
+    if (!ok){
+        ui->lbSecretStatus->setText("Error at PIDEnableStatus()->setValueSequence");
+        return;
+    }
+
+    mDriver->PWMShortCircuitStatus()->setValueSequence(ui->cbPWM->isChecked(), &ok, 5);
+    if (!ok){
+        ui->lbSecretStatus->setText("PWMShortCircuitStatus()->setValueSequence");
+        return;
+    }
+
+    bool ok2;
+    mDriver->pWMShortCircuitFrequency()->setValueSequence(ui->lePwmFrequency->text().toFloat(&ok2), &ok, 5);
+    if (!ok){
+        ui->lbSecretStatus->setText("pWMShortCircuitFrequency()->setValueSequence");
+        return;
+    }
+
+    mDriver->pWMShortCircuitDuty()->setValueSequence(ui->lePwmDuty->text().toFloat(&ok2), &ok, 5);
+    if (!ok){
+        ui->lbSecretStatus->setText("pWMShortCircuitDuty()->setValueSequence");
+        return;
+    }
+    ui->lbSecretStatus->setText("Success");
 }

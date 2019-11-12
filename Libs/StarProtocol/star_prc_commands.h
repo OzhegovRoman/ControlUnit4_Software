@@ -78,7 +78,15 @@ enum enum_CU4SDM0V1 {
 
     // новые команды
     SD_GetPIDStatus          ,      // PID регулятор стабилизации тока смещения
-    SD_SetPIDStatus
+    SD_SetPIDStatus          ,
+
+    // PWM на ShortCircuitPin
+    SD_GetPWMShortCircuitStatus     ,
+    SD_SetPWMShortCircuitStatus     ,
+    SD_GetPWMShortCircuitFrequency  ,
+    SD_SetPWMShortCircuitFrequency  ,
+    SD_GetPWMShortCircuitDuty       ,
+    SD_SetPWMShortCircuitDuty
 };
 /*
  * Команды для CU4TDM0V1
