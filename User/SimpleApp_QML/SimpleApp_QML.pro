@@ -25,7 +25,7 @@ defineReplace(droidVersionCode) {
         return($$first(vCode)$$first(suffix))
 }
 
-VERSION = 1.1.7
+VERSION = 1.1.8
 
 ANDROID_VERSION_NAME = $$VERSION
 
@@ -33,7 +33,7 @@ ANDROID_VERSION_CODE = $$droidVersionCode($$ANDROID_VERSION_NAME)
 
 
 DEFINES += \
-     VERSION=\\\"1.1.7\\\"
+     VERSION=\\\"1.1.8\\\"
 
 HEADERS += \
     appcore.h \

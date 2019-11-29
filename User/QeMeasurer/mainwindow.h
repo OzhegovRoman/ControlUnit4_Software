@@ -75,11 +75,14 @@ private slots:
 
     void on_pbSetSecretParams_clicked();
 
+    void on_tbUpdateAdresses_clicked();
+
 private:
     Ui::MainWindow *ui;
     cCu4SdM0Driver *mDriver;
     IOInterface_t *mInterface;
     QTimer *mTimer;
+    QString mLastTcpIpAddress;
     int mMode{};
     double mCurrentValue{};
 };

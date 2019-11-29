@@ -5,6 +5,7 @@
 
 class cuIOInterface;
 class cCommandExecutor;
+class QUdpSocket;
 
 class cTcpIpServer : public QTcpServer
 {
@@ -40,6 +41,11 @@ private:
     static bool mDebugInfoEnable;
     static bool mErrorInfoEnable;
     static bool mInfoEnable;
+    QString availableTcpIpAddresses;
+
+    QUdpSocket *udpSocket;
+    void updateAvailableTcpIpAddresses();
+
 private slots:
     void startServer();
     void sendAnswer(QObject * process, QByteArray data);

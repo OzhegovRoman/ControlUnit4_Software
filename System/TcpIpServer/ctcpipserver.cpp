@@ -10,6 +10,7 @@
 #include "ccommandexecutor.h"
 #include <QThread>
 #include <QCoreApplication>
+#include "Server/servercommands.h"
 
 bool cTcpIpServer::mDebugInfoEnable = false;
 bool cTcpIpServer::mErrorInfoEnable = false;
@@ -18,8 +19,8 @@ bool cTcpIpServer::mInfoEnable = false;
 cTcpIpServer::cTcpIpServer(QObject * parent)
     : QTcpServer(parent)
     , mExecutor(nullptr)
+    , udpSocket (new QUdpSocket(this))
 {
-
 }
 
 cTcpIpServer::~cTcpIpServer()
@@ -29,6 +30,34 @@ cTcpIpServer::~cTcpIpServer()
 
 void cTcpIpServer::initialize()
 {
+
+
+    udpSocket->bind(SERVER_TCPIP_PORT + 1, QUdpSocket::ShareAddress);
+    connect(udpSocket, &QUdpSocket::readyRead, [=](){
+        QByteArray datagram;
+        updateAvailableTcpIpAddresses();
+        while (udpSocket->hasPendingDatagrams()){
+            datagram.resize(int(udpSocket->pendingDatagramSize()));
+            udpSocket->readDatagram(datagram.data(), datagram.size());
+            consoleWriteDebug(tr("Getted UDP diagram: %1").arg(datagram.constData()));
+            QStringList adList = QString(datagram).split(";");
+            for(QString addr: adList){
+                if (!addr.isEmpty()){
+                    QTcpSocket socket;
+                    socket.setProxy(QNetworkProxy::NoProxy);
+                    socket.connectToHost(QHostAddress(addr), SERVER_TCPIP_PORT + 2);
+                    qDebug()<<QHostAddress(addr);
+                    qApp->processEvents();
+                    socket.waitForConnected(100);
+                    if (socket.isOpen())
+                        consoleWriteDebug("Send TcpIpAddress to "+addr);
+                    socket.write(availableTcpIpAddresses.toLocal8Bit());
+                    socket.flush();
+                }
+            }
+        }
+    });
+
     consoleWriteDebug("Start command executor thread");
     if (!mExecutor){
         consoleWriteError("CommandExecutor are not exist!!!");
@@ -80,6 +109,14 @@ void cTcpIpServer::incomingConnection(qintptr handle)
     connect(process, &cTcpIpProcess::socketReaded, mExecutor, &cCommandExecutor::executeCommand);
 }
 
+void cTcpIpServer::updateAvailableTcpIpAddresses()
+{
+    availableTcpIpAddresses = QString();
+    for (QHostAddress address: QNetworkInterface::allAddresses())
+        if (address.protocol() == QAbstractSocket::IPv4Protocol)
+            availableTcpIpAddresses.append(address.toString()+";");
+}
+
 bool cTcpIpServer::isInfoEnabled() const
 {
     return mInfoEnable;
@@ -124,12 +161,11 @@ void cTcpIpServer::startServer()
 {
     consoleWriteDebug("Start TcpIp Server");
     setProxy(QNetworkProxy::NoProxy);
-    if (listen(QHostAddress::Any, 9876)){
+    if (listen(QHostAddress::Any, SERVER_TCPIP_PORT)){
         consoleWrite("Server: started");
         consoleWrite("Available TcpIp addresses:");
-        for (QHostAddress address: QNetworkInterface::allAddresses())
-            if (address.protocol() == QAbstractSocket::IPv4Protocol)
-                consoleWrite(address.toString());
+        updateAvailableTcpIpAddresses();
+        consoleWrite(availableTcpIpAddresses);
         consoleWrite("Available TcpIp Port: 9876");
     }
     else

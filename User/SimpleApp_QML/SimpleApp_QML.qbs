@@ -6,7 +6,7 @@ CppApplication {
     name: "cu-simpleapp_qml"
     consoleApplication: false
 
-    condition: project.isWindows
+    condition: project.isWindows || project.isAndroid
 
     Depends { name: "Qt.core" }
     Depends { name: "Qt.quick" }

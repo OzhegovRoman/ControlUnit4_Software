@@ -4,16 +4,21 @@
 
 #include <QSettings>
 #include <QSerialPortInfo>
+#include <QtNetwork>
+#include <QNetworkProxy>
+#include <QNetworkInterface>
+
+#include "Server/servercommands.h"
 
 TcpIpAddressDialog::TcpIpAddressDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::TcpIpAddressDialog)
 {
     ui->setupUi(this);
+
     QSettings settings("Scontel", "cu-simpleapp");
     bool isSerialPort = settings.value("isSerialProtocol",true).toBool();
     ui->cbType->setCurrentIndex(isSerialPort ? 0 : 1);
-    ui->leTcpIpAddress->setText(settings.value("TcpIpAddress","127.000.000.001").toString());
 
     QStringList availableSerials;
     foreach (QSerialPortInfo info, QSerialPortInfo::availablePorts()) {
@@ -26,6 +31,13 @@ TcpIpAddressDialog::TcpIpAddressDialog(QWidget *parent) :
     if (idx >= 0) ui->cbSerial->setCurrentIndex(idx);
 
     on_cbType_activated(ui->cbType->currentIndex());
+
+    QStringList list = availableControlUnits();
+    ui->cbTcpIp->clear();
+    ui->cbTcpIp->addItems(list);
+    QString LastTcpIpAddress = settings.value("TcpIpAddress","127.000.000.001").toString();
+    int i = list.indexOf(LastTcpIpAddress);
+    if (i>=0) ui->cbTcpIp->setCurrentIndex(i);
 }
 
 TcpIpAddressDialog::~TcpIpAddressDialog()
@@ -35,7 +47,7 @@ TcpIpAddressDialog::~TcpIpAddressDialog()
 
 QHostAddress TcpIpAddressDialog::getAddress()
 {
-    return convertToHostAddress(ui->leTcpIpAddress->text());
+    return convertToHostAddress(ui->cbTcpIp->currentText());
 }
 
 QString TcpIpAddressDialog::getPortName()
@@ -52,7 +64,7 @@ void TcpIpAddressDialog::accept()
 {
     QSettings settings("Scontel", "cu-simpleapp");
     settings.setValue("isSerialProtocol", ui->cbType->currentIndex() == 0);
-    settings.setValue("TcpIpAddress", ui->leTcpIpAddress->text());
+    settings.setValue("TcpIpAddress", ui->cbTcpIp->currentText());
     settings.setValue("SerialPortName", ui->cbSerial->currentText());
 
     QDialog::accept();

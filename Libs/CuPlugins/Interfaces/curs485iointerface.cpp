@@ -1,6 +1,5 @@
 #include "curs485iointerface.h"
 #include "cstarprotocolpc.h"
-#include <QDebug>
 #include <QElapsedTimer>
 
 #ifdef RASPBERRY_PI
@@ -69,9 +68,7 @@ bool cuRs485IOInterface::pSendMsg(quint8 address, quint8 command, quint8 dataLen
     mSerialPort->write((const char*)starProtocol.buffer(), l);
     mSerialPort->flush();
     // внимание-внимание flush отправляет в буфер? чтобы начать отправку надо сделать
-    // qApp -> processEvent();
-    qApp->processEvents();
-    QThread::usleep(1000);
+    QThread::usleep(2000);
 
     setReceverEnable();
     return true;
@@ -105,9 +102,7 @@ bool cuRs485IOInterface::pInitialize()
 
 void cuRs485IOInterface::dataReady()
 {
-//    qDebug()<<"RS485 data ready";
     QByteArray ba = mSerialPort->readAll();
-//    qDebug()<<"Data"<<ba.toHex().data();
     for (int i = 0; i < ba.length(); ++i) {
         uint8_t ch = ba[i];
         cStarProtocolPC& sp = cStarProtocolPC::instance();

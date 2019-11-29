@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mDriver->setDevAddress(0);
 
     QSettings settings("Scontel","QeMeasurer");
-    ui->leTcpAddress->setText(settings.value("TcpAddress",QString()).toString());
+    mLastTcpIpAddress = settings.value("TcpAddress",QString()).toString();
     ui->sbDeviceAddress->setValue(settings.value("DeviceAddress",0).toInt());
 
 #if  defined(FAKE)
@@ -38,6 +38,8 @@ MainWindow::MainWindow(QWidget *parent) :
 #elif defined(RASPBERRY_PI)
     mInterface->setPortName("ttyAMA0");
 #endif
+
+    on_tbUpdateAdresses_clicked();
 
     mTimer->setSingleShot(true);
 
@@ -80,7 +82,7 @@ void MainWindow::on_pbInitialize_clicked()
     bool secretMode = QGuiApplication::queryKeyboardModifiers() == (Qt::ControlModifier | Qt::ShiftModifier);
 
 #ifdef TCPIP_SOCKET_INTERFACE
-    QString str = ui->leTcpAddress->text();
+    QString str = ui->cbTcpIpAddress->currentText();
     while (str.contains(".0")){
         str.replace(".0",".");
     }
@@ -135,7 +137,9 @@ void MainWindow::on_pbInitialize_clicked()
     on_pbReadParams_clicked();
 
     QSettings settings("Scontel","QeMeasurer");
-    settings.setValue("TcpAddress", ui->leTcpAddress->text());
+    mLastTcpIpAddress = ui->cbTcpIpAddress->currentText();
+    settings.setValue("TcpAddress", mLastTcpIpAddress);
+
     settings.setValue("DeviceAddress", ui->sbDeviceAddress->value());
 }
 
@@ -548,4 +552,14 @@ void MainWindow::on_pbSetSecretParams_clicked()
         return;
     }
     ui->lbSecretStatus->setText("Success");
+}
+
+void MainWindow::on_tbUpdateAdresses_clicked()
+{
+    QStringList list = availableControlUnits();
+    ui->cbTcpIpAddress->clear();
+    ui->cbTcpIpAddress->addItems(list);
+    int i = list.indexOf(mLastTcpIpAddress);
+    if (i>=0) ui->cbTcpIpAddress->setCurrentIndex(i);
+
 }

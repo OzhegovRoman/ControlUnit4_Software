@@ -96,8 +96,6 @@ bool cuTcpSocketIOInterface::pSendMsg(quint8 address, quint8 command, quint8 dat
 
 bool cuTcpSocketIOInterface::pInitialize()
 {
-    QElapsedTimer timer;
-    timer.start();
     if (!isSocketReady()){
         mSocket->connectToHost(address(), port());
     }

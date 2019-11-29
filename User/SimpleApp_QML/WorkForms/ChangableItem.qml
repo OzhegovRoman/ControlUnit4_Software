@@ -118,7 +118,7 @@ Item {
     TextInput {
         id: textInput
         property string tempStr;
-        text: focus ? tempStr: parseFloat(clickerTimer.running ? tmpValue : value).toFixed(fixed)
+        text: activeFocus ? tempStr: parseFloat(clickerTimer.running ? tmpValue : value).toFixed(fixed)
         inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhPreferNumbers
         anchors{
             verticalCenter: parent.verticalCenter
@@ -150,9 +150,11 @@ Item {
         onEditingFinished: {
             console.log("onEditingFinished. Value: "+value);
         }
-        onFocusChanged: {
-            if (textInput.focus)
-                tempStr = displayText
+        onActiveFocusChanged: {
+            if (activeFocus){
+                tempStr = displayText;
+                selectAll()
+            }
             console.log("onFocusChanged "+focus)
         }
     }

@@ -4,5 +4,6 @@
 #include <QHostAddress>
 
 QHostAddress convertToHostAddress(QString str);
+QStringList availableControlUnits();
 
 #endif // QCUSTOMLIB_H

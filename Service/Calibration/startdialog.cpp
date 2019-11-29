@@ -22,7 +22,7 @@ StartDialog::StartDialog(QWidget *parent) :
 
     QSettings settings("Scontel", "ControlUnit4_Calibration");
     ui->cbInterface->setCurrentIndex(settings.value("Protocol", 0).toInt());
-    ui->leTcpIpAddress->setText(settings.value("TcpIpAddress","127.000.000.001").toString());
+
     ui->sbDeviceAddress->setValue(settings.value("DeviceAddress",0).toInt());
 
     on_cbInterface_activated(ui->cbInterface->currentIndex());
@@ -37,6 +37,12 @@ StartDialog::StartDialog(QWidget *parent) :
     int idx = availableSerials.indexOf(lastPortName);
     if (idx >= 0) ui->cbSerial->setCurrentIndex(idx);
 
+    QStringList list = availableControlUnits();
+    ui->cbTcpIp->clear();
+    ui->cbTcpIp->addItems(list);
+    QString LastTcpIpAddress = settings.value("TcpIpAddress","127.000.000.001").toString();
+    int i = list.indexOf(LastTcpIpAddress);
+    if (i>=0) ui->cbTcpIp->setCurrentIndex(i);
 }
 
 StartDialog::~StartDialog()
@@ -61,7 +67,7 @@ void StartDialog::on_buttonBox_accepted()
         tmpInterface = new cuTcpSocketIOInterface(this);
         tmpInterface->initialize();
 
-        tmpInterface->setAddress(convertToHostAddress(ui->leTcpIpAddress->text()));
+        tmpInterface->setAddress(convertToHostAddress(ui->cbTcpIp->currentText()));
         tmpInterface->setPort(SERVER_TCPIP_PORT);
 
         mInterface = tmpInterface;
@@ -107,7 +113,7 @@ void StartDialog::on_buttonBox_accepted()
     // если все в порядке, сохраняем текущие данные и закрываем окошко
     QSettings settings("Scontel", "ControlUnit4_Calibration");
     settings.setValue("Protocol",ui->cbInterface->currentIndex());
-    settings.setValue("TcpIpAddress", ui->leTcpIpAddress->text());
+    settings.setValue("TcpIpAddress", ui->cbTcpIp->currentText());
     settings.setValue("DeviceAddress", ui->sbDeviceAddress->value());
     settings.setValue("SerialPortName", ui->cbSerial->currentText());
     accept();

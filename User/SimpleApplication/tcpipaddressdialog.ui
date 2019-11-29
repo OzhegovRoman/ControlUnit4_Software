@@ -70,14 +70,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QLineEdit" name="leTcpIpAddress">
-           <property name="inputMask">
-            <string>000.000.000.000;_</string>
-           </property>
-           <property name="text">
-            <string>127.000.000.001</string>
-           </property>
-          </widget>
+          <widget class="QComboBox" name="cbTcpIp"/>
          </item>
         </layout>
        </widget>
@@ -136,8 +129,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>66</x>
-     <y>118</y>
+     <x>76</x>
+     <y>86</y>
     </hint>
     <hint type="destinationlabel">
      <x>90</x>
@@ -152,8 +145,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>165</x>
-     <y>118</y>
+     <x>220</x>
+     <y>86</y>
     </hint>
     <hint type="destinationlabel">
      <x>168</x>

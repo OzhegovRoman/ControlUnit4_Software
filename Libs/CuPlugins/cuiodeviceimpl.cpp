@@ -1,4 +1,5 @@
 #include "cuiodeviceimpl.h"
+#include <QDebug>
 
 cuIODeviceImpl::cuIODeviceImpl(QObject *parent)
     : cuIODevice(parent)
