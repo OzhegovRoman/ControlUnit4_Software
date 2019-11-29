@@ -13,6 +13,8 @@ public:
 
     void initializeTcpIpSocket(qintptr handle);
 
+    bool isWorked();
+
 signals:
     void socketReaded(QObject* process, QByteArray data);
 

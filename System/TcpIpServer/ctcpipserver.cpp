@@ -174,9 +174,16 @@ void cTcpIpServer::startServer()
 
 void cTcpIpServer::sendAnswer(QObject *process, QByteArray data)
 {
+    consoleWriteDebug("cTcpIpServer::sendAnswer");
     if (process){
         auto tmp = qobject_cast<cTcpIpProcess*>(process);
-        if (tmp)
-            tmp->writeToSocket(data);
+        if (tmp){
+            if (!tmp->isWorked()){
+                tmp->deleteLater();
+                tmp = nullptr;
+            }
+            else
+                tmp->writeToSocket(data);
+        }
     }
 }

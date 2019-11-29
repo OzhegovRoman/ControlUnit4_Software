@@ -21,12 +21,16 @@ void cTcpIpProcess::initializeTcpIpSocket(qintptr handle)
     cTcpIpServer::consoleWriteDebug(QString("Client connected at %1").arg(handle));
 }
 
+bool cTcpIpProcess::isWorked()
+{
+    return mSocket !=nullptr;
+}
+
 void cTcpIpProcess::killProcess()
 {
     cTcpIpServer::consoleWriteDebug("Client disconnected");
     mSocket->deleteLater();
     mSocket = nullptr;
-    deleteLater();
 }
 
 void cTcpIpProcess::read()
