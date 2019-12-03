@@ -14,12 +14,16 @@
 #define FAKE_SPECIAL_SYMBOL	(SPECIAL_SYMBOL+FakeSymbolShift)// fake special symbol
 
 // Описание ошибок в работе протокола
-#define NO_ERROR                    0x00
-#define PACKET_ERROR                0x01
-#define CRC32_ERROR                 0x02
-#define WRONG_PACKET_LENGTH         0x03
-#define MAX_BUFFER_SIZE_EXCEEDED    0x04
-#define UNKNOWN_COMMAND             0x05
+namespace StartProtocol {
+enum StartProtocolError{
+    speOk                       = 0x00,
+    spePacketError              = 0x01,
+    speCrc32Error               = 0x02,
+    spePacketLengthError        = 0x03,
+    speMaxBufferSizeExceeded    = 0x04,
+    speUnknown                  = 0x05
+};
+}
 
 typedef struct {
     char Address;
@@ -39,7 +43,7 @@ public:
     virtual ~cAbstractStarProtocol() = default;
     void clearBuffer();
     void codeData(char address, char command, char dataLength, char *data);
-    uint8_t encodeBuffer();
+    StartProtocol::StartProtocolError encodeBuffer();
 
     uint8_t *buffer();
     void addData(uint8_t *data, char dataLength);

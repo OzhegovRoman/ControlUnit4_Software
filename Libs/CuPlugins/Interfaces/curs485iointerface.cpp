@@ -111,7 +111,7 @@ void cuRs485IOInterface::dataReady()
         sp.addData(&ch,1);
 
         if (ch == END_PACKET) {
-            if (sp.encodeBuffer() == NO_ERROR) {
+            if (sp.encodeBuffer() == StartProtocol::speOk) {
                 emit msgReceived(sp.headPacket().Address,
                                  sp.headPacket().Command,
                                  sp.headPacket().dataLength,

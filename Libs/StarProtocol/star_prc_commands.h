@@ -127,7 +127,6 @@ enum enum_CU4TDM0V1 {
     TD_GetTempTableValues           = 0x28,
     TD_SetTempTableValues           = 0x29
 };
-
 }
 
 #endif /* STAR_PRC_COMMANDS_H_ */

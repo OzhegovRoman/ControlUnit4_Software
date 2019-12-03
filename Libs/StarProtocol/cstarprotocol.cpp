@@ -65,13 +65,13 @@ void cAbstractStarProtocol::codeData(char address, char command, char dataLength
     addByteToBuffer(END_PACKET);
 }
 
-uint8_t cAbstractStarProtocol::encodeBuffer()
+StartProtocol::StartProtocolError cAbstractStarProtocol::encodeBuffer()
 {
     uint8_t* dest = mBuffer;
     uint8_t* source = dest+1;
     // проверяем начало пакета
     // Делается обратный byte_staffing
-    if (*dest != START_PACKET) return PACKET_ERROR;
+    if (*dest != START_PACKET) return StartProtocol::spePacketError;
     while ((*source!=END_PACKET) && (source - dest < MaxBufferSize))  //TODO: сделать проверку на выход за пределы буфера
     {
         if (*source == SPECIAL_SYMBOL){
@@ -79,19 +79,19 @@ uint8_t cAbstractStarProtocol::encodeBuffer()
             if ((*source == FAKE_START_PACKET) || (*source == FAKE_END_PACKET) || (*source == FAKE_SPECIAL_SYMBOL))
                 *source -= FakeSymbolShift;
             else
-                return PACKET_ERROR;
+                return StartProtocol::spePacketError;
         }
         *dest++ = *source++;
     }
 
-    if (source - dest >= MaxBufferSize) return MAX_BUFFER_SIZE_EXCEEDED;
+    if (source - dest >= MaxBufferSize) return StartProtocol::speMaxBufferSizeExceeded;
 
     // Проверяется соответствие CRC
     int len = dest-mBuffer;
-    if (len - mBuffer[2] != 7) return WRONG_PACKET_LENGTH;
+    if (len - mBuffer[2] != 7) return StartProtocol::spePacketLengthError;
 
     unsigned int result = crc32Stm32Function(mBuffer, len-4, (int)CRC32_Clear);
-    if (result != *((unsigned int*) (mBuffer+len-4)))  return CRC32_ERROR;
+    if (result != *((unsigned int*) (mBuffer+len-4)))  return StartProtocol::speCrc32Error;
 
     // Заполняется заголовок пакета
     source = dest = mBuffer;
@@ -104,7 +104,7 @@ uint8_t cAbstractStarProtocol::encodeBuffer()
     for (i = 0; i < mStarHead.dataLength; i++)
         *dest++ = *source++;
 
-    return NO_ERROR;
+    return StartProtocol::speOk;
 }
 
 uint8_t *cAbstractStarProtocol::buffer()
