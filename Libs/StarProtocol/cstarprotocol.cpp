@@ -72,7 +72,7 @@ uint8_t cAbstractStarProtocol::encodeBuffer()
     // проверяем начало пакета
     // Делается обратный byte_staffing
     if (*dest != START_PACKET) return PACKET_ERROR;
-    while (*source!=END_PACKET) //TODO: сделать проверку на выход за пределы буфера
+    while ((*source!=END_PACKET) && (source - dest < MaxBufferSize))  //TODO: сделать проверку на выход за пределы буфера
     {
         if (*source == SPECIAL_SYMBOL){
             ++source;
@@ -84,8 +84,12 @@ uint8_t cAbstractStarProtocol::encodeBuffer()
         *dest++ = *source++;
     }
 
+    if (source - dest >= MaxBufferSize) return MAX_BUFFER_SIZE_EXCEEDED;
+
     // Проверяется соответствие CRC
     int len = dest-mBuffer;
+    if (len - mBuffer[2] != 7) return WRONG_PACKET_LENGTH;
+
     unsigned int result = crc32Stm32Function(mBuffer, len-4, (int)CRC32_Clear);
     if (result != *((unsigned int*) (mBuffer+len-4)))  return CRC32_ERROR;
 
@@ -110,6 +114,7 @@ uint8_t *cAbstractStarProtocol::buffer()
 
 void cAbstractStarProtocol::addData(uint8_t *data, char dataLength)
 {
-    while (dataLength--) mBuffer[mStopBufferPosition++] = *data++;
+    while ((dataLength--) && (mStopBufferPosition < MaxBufferSize))
+        mBuffer[mStopBufferPosition++] = *data++;
 }
 

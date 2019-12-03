@@ -13,7 +13,7 @@
 /*
  * Общие команды для всех устройств
  */
-#define MaxBufferSize   	0x80
+#define MaxBufferSize   	0x100
 
 namespace cmd {
 enum General {

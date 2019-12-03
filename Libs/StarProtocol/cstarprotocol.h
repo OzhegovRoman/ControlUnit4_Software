@@ -14,10 +14,12 @@
 #define FAKE_SPECIAL_SYMBOL	(SPECIAL_SYMBOL+FakeSymbolShift)// fake special symbol
 
 // Описание ошибок в работе протокола
-#define NO_ERROR			0x00
-#define PACKET_ERROR		0x01
-#define CRC32_ERROR			0x02
-#define UNKNOWN_COMMAND		0x03
+#define NO_ERROR                    0x00
+#define PACKET_ERROR                0x01
+#define CRC32_ERROR                 0x02
+#define WRONG_PACKET_LENGTH         0x03
+#define MAX_BUFFER_SIZE_EXCEEDED    0x04
+#define UNKNOWN_COMMAND             0x05
 
 typedef struct {
     char Address;
