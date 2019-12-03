@@ -86,7 +86,13 @@ enum enum_CU4SDM0V1 {
     SD_GetPWMShortCircuitFrequency  ,
     SD_SetPWMShortCircuitFrequency  ,
     SD_GetPWMShortCircuitDuty       ,
-    SD_SetPWMShortCircuitDuty
+    SD_SetPWMShortCircuitDuty       ,
+
+    // расширение команд для CU4SDM1
+    SD_GetCurrentMonitor            ,
+    SD_GetCurrentMonitorAdcCoeff    ,
+    SD_SetCurrentMonitorAdcCoeff
+
 };
 /*
  * Команды для CU4TDM0V1

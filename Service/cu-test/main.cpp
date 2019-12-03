@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
                                                                "The latter, if available, are ignored"));
     parser.addOption(firmwareOption);
 
-    QCommandLineOption hardwareOption(QStringList()<<"hm"<<"hard",
+    QCommandLineOption hardwareOption(QStringList()<<"h"<<"hard",
                                    QCoreApplication::translate("main", "Trying to get the module hardware version. "
                                                                "Without specifying this option, the test is conducted on obtaining "
                                                                "the type of module. This option is stronger than the options -m. "

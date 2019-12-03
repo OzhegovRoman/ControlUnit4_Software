@@ -24,6 +24,20 @@ typedef union {
     unsigned char Data;   // статус
 } CU4SDM0_Status_t;
 
+//typedef union {
+//    struct {
+//        unsigned char stInite: 1;
+//        unsigned char stShorted: 1;
+//        unsigned char stAmplifierOn: 1;
+//        unsigned char stRfKeyToCmp: 1;
+//        unsigned char stComparatorOn: 1;
+//        unsigned char stCounterOn: 1;
+//        unsigned char stAutoResetOn: 1;
+//        unsigned char stError: 1;
+//    };
+//    unsigned char Data;   // статус
+//} CU4SDM1_Status_t;
+
 // CU4SDM0V1 данные
 typedef struct {
     float Current;          // ток смещения детектора в [Амперах]
@@ -31,6 +45,14 @@ typedef struct {
     float Counts;           // количество отсчетов
     CU4SDM0_Status_t Status;
 } CU4SDM0V1_Data_t;
+
+typedef struct {
+    float Current;          // ток смещения детектора в [Амперах]
+    float CurrentMonitor;   // ток смещения снимаемый с последовательного резистора в [Fvgthf[]
+    float Voltage;          // напряжение смещения детектора в [Вольтах]
+    float Counts;           // количество отсчетов
+    CU4SDM0_Status_t Status; // статус пока оставляю прежним
+} CU4SDM1_Data_t;
 
 // Подробное описание битов статуса устройства
 #define CU4SDM0V1_STATUS_INITED        (0x01) // устройство проинициализировано / запарковано
@@ -67,6 +89,14 @@ typedef struct {
     pair_t<float> Current_DAC;    // требуемое к установке значение ЦАП считается как Value*DAC_slope+DAC_intercept;
     pair_t<float> Cmp_Ref_DAC;
 } CU4SDM0V1_EEPROM_Const_t;
+
+typedef struct {
+    pair_t<float> Current_ADC;    // из показаний АЦП ток пересчитывается как Current_ADC_slope*ADC_Value+Current_ADC_intercept
+    pair_t<float> Current_Monitor_ADC;    // из показаний АЦП ток монитора пересчитывается как Current_ADC_slope*ADC_Value+Current_ADC_intercept
+    pair_t<float> Voltage_ADC;    // из показаний АЦП напряжение пересчитывается как Voltage_ADC_slope*ADC_Value+Voltage_ADC_intercept
+    pair_t<float> Current_DAC;    // требуемое к установке значение ЦАП считается как Value*DAC_slope+DAC_intercept;
+    pair_t<float> Cmp_Ref_DAC;
+} CU4SDM1_EEPROM_Const_t;
 
 //--------------------------------------------------------------------------------------------------------------
 // CU4TDM0V1 данные
