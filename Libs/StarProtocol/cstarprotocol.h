@@ -42,7 +42,7 @@ public:
     cAbstractStarProtocol();
     virtual ~cAbstractStarProtocol() = default;
     void clearBuffer();
-    void codeData(char address, char command, char dataLength, char *data);
+    void codeData(char address, char command, char dataLength, const char *data);
     StartProtocol::StartProtocolError encodeBuffer();
 
     uint8_t *buffer();

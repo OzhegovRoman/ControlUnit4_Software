@@ -36,7 +36,7 @@ void cAbstractStarProtocol::clearBuffer()
     mStopBufferPosition = 0;
 }
 
-void cAbstractStarProtocol::codeData(char address, char command, char dataLength, char *data)
+void cAbstractStarProtocol::codeData(char address, char command, char dataLength, const char *data)
 {
     // используем tmp для расчета CRC32
     uint8_t tmp[4];
