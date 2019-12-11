@@ -11,7 +11,6 @@ cStarProtocolStm32::cStarProtocolStm32()
     mHcrc.Instance = CRC;
     HAL_CRC_Init(&mHcrc);
     __HAL_RCC_CRC_CLK_ENABLE();
-
 }
 
 uint32_t crc32Stm32(uint8_t *bfr, uint8_t len, bool clear, CRC_HandleTypeDef *HCrc)
