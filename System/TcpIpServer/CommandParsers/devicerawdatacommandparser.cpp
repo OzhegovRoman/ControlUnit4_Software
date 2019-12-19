@@ -1,7 +1,7 @@
 #include "devicerawdatacommandparser.h"
 #include "../ctcpipserver.h"
 #include "Interfaces/cuiointerface.h"
-#include "star_prc_commands.h"
+#include "../../Libs/StarProtocol/star_prc_commands.h"
 #include <QElapsedTimer>
 #include <QCoreApplication>
 

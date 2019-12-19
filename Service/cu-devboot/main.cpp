@@ -67,6 +67,10 @@ int main(int argc, char *argv[])
                                                                    "Options -t, -i, -a, -f, -b, -H will be ignored."));
     parser.addOption(updateAllOption);
 
+    QCommandLineOption betaVersions(QStringList()<<"beta",
+                                       QCoreApplication::translate("main", "Use beta version if firmware version is higher."));
+    parser.addOption(betaVersions);
+
     parser.process(a);
 
     cDevBoot devBoot;
@@ -91,6 +95,8 @@ int main(int argc, char *argv[])
 
     devBoot.setForce((parser.isSet(forceOption) || parser.isSet(hotPlugOption)) && !parser.isSet(updateAllOption));
     devBoot.setHotPlug(parser.isSet(hotPlugOption) && !parser.isSet(updateAllOption));
+
+    devBoot.setBetaVersionsEnable(parser.isSet(betaVersions));
 
     if (parser.isSet(typeOption))
         devBoot.setDevType(parser.value(typeOption));

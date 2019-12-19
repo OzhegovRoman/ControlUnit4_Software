@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include "adriver.h"
-#include "star_prc_structs.h"
+#include "../StarProtocol/star_prc_structs.h"
 
 class cCu4SdM0Driver : public AbstractDriver
 {
@@ -31,9 +31,6 @@ public:
     cuDeviceParam_settable<pair_t<float> > *cmpReferenceCoeff() const;
 
     cuDeviceParam_settable<bool> *PIDEnableStatus() const;
-    cuDeviceParam_settable<bool> *PWMShortCircuitStatus() const;
-    cuDeviceParam_settable<float> *pWMShortCircuitFrequency() const;
-    cuDeviceParam_settable<float> *pWMShortCircuitDuty() const;
 
 protected:
     bool pMsgReceived(quint8 address, quint8 command, quint8 dataLength, quint8* data) override;
@@ -80,11 +77,6 @@ private:
 
     //PID Enable Status
     cuDeviceParam_settable<bool> *mPIDEnableStatus;
-    //PWM on ShortCircuitPin Status
-    cuDeviceParam_settable<bool> *mPWMShortCircuitStatus;
-    cuDeviceParam_settable<float> *mPWMShortCircuitFrequency;
-    cuDeviceParam_settable<float> *mPWMShortCircuitDuty;
-
 };
 
 #endif // CCU4SDM0DRIVER_H

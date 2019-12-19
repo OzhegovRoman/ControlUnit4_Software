@@ -23,9 +23,6 @@ cCu4SdM0Driver::cCu4SdM0Driver(QObject *parent)
     , mCurrentDacCoeff(new cuDeviceParam_settable<pair_t<float> >(this, SD_GetCurrentDacCoeff))
     , mCmpReferenceCoeff(new cuDeviceParam_settable<pair_t<float> >(this, SD_GetComparatorCoeff))
     , mPIDEnableStatus(new cuDeviceParam_settable<bool>(this, SD_GetPIDStatus))
-    , mPWMShortCircuitStatus(new cuDeviceParam_settable<bool>(this, SD_GetPWMShortCircuitStatus))
-    , mPWMShortCircuitFrequency(new cuDeviceParam_settable<float>(this, SD_GetPWMShortCircuitFrequency))
-    , mPWMShortCircuitDuty(new cuDeviceParam_settable<float>(this, SD_GetPWMShortCircuitDuty))
 {
 
 }
@@ -161,20 +158,6 @@ bool cCu4SdM0Driver::pMsgReceived(quint8 address, quint8 command, quint8 dataLen
             mPIDEnableStatus->setCurrentValue(*reinterpret_cast<bool*>(data));
         }
         break;
-    case SD_GetPWMShortCircuitStatus:
-        if (dataLength == sizeof(bool)) {
-            mPWMShortCircuitStatus->setCurrentValue(*reinterpret_cast<bool*>(data));
-        }
-        break;
-    case SD_GetPWMShortCircuitFrequency:
-        if (dataLength == sizeof(float)) {
-            mPWMShortCircuitFrequency->setCurrentValue(*reinterpret_cast<float*>(data));
-        }
-        break;
-    case SD_GetPWMShortCircuitDuty:
-        if (dataLength == sizeof(float)) {
-            mPWMShortCircuitDuty->setCurrentValue(*reinterpret_cast<float*>(data));
-        }
         break;
     case SD_SetCurrent:  //не знаю что делать на эту команду
     case SD_SetStatus:
@@ -185,9 +168,6 @@ bool cCu4SdM0Driver::pMsgReceived(quint8 address, quint8 command, quint8 dataLen
     case SD_SetCounterEnable:
     case SD_SetAutoResEnable:
     case SD_SetPIDStatus:
-    case SD_SetPWMShortCircuitStatus:
-    case SD_SetPWMShortCircuitFrequency:
-    case SD_SetPWMShortCircuitDuty:
         emit valueSetted();
         break;
 
@@ -352,21 +332,6 @@ void cCu4SdM0Driver::setCounterEnable(bool value)
 void cCu4SdM0Driver::setAutoResetEnable(bool value)
 {
     sendMsg(SD_SetAutoResEnable, sizeof(bool), (quint8 *) &value);
-}
-
-cuDeviceParam_settable<float> *cCu4SdM0Driver::pWMShortCircuitDuty() const
-{
-    return mPWMShortCircuitDuty;
-}
-
-cuDeviceParam_settable<float> *cCu4SdM0Driver::pWMShortCircuitFrequency() const
-{
-    return mPWMShortCircuitFrequency;
-}
-
-cuDeviceParam_settable<bool> *cCu4SdM0Driver::PWMShortCircuitStatus() const
-{
-    return mPWMShortCircuitStatus;
 }
 
 cuDeviceParam_settable<bool> *cCu4SdM0Driver::PIDEnableStatus() const

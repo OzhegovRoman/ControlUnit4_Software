@@ -16,6 +16,7 @@
 #include "../RaspPiMMap/rasppimmap.h"
 #endif
 
+#include <tuple>
 
 cDevBoot::cDevBoot(QObject *parent) :
     QObject(parent),
@@ -25,6 +26,7 @@ cDevBoot::cDevBoot(QObject *parent) :
     mForce(false),
     mHotPlug(false),
     mUpdateAll(false),
+    mBetaVersions(false),
     mFileName(QString("%1/fw.bin").arg("/home/pi")),
     mUrl(QString("http://rplab.ru/~ozhegov/ControlUnit4/Bin/Firmware/")),
     mDevType(QString()),
@@ -184,6 +186,16 @@ void cDevBoot::setUpdateAllEnable(bool updateAll)
     mUpdateAll = updateAll;
 }
 
+bool cDevBoot::isBetaVersionsEnabled() const
+{
+    return mBetaVersions;
+}
+
+void cDevBoot::setBetaVersionsEnable(bool betaVersions)
+{
+    mBetaVersions = betaVersions;
+}
+
 QStringList cDevBoot::getFileList(QUrl url)
 {
     QNetworkAccessManager manager;
@@ -231,14 +243,20 @@ void cDevBoot::downloadFile(QUrl url)
 
 bool cDevBoot::compareVersion(const QString &str1, const QString &str2)
 {
-    QStringList strL1 = str1.split(".");
-    QStringList strL2 = str2.split(".");
-    for (int i = 0; i < qMin(strL1.size(), strL2.size()); ++i){
-        if (strL1[i]!=strL2[i])
-            return strL1[i].toInt()>strL2[i].toInt();
-    }
-    return strL1.size()>strL2.size();
-
+    auto stringListVersion = [](const QString &str) -> QList<int>
+    {
+        QList<int> res;
+        QString tmpStr = str;
+        bool beta = tmpStr.endsWith('b');
+        if (beta) tmpStr.chop(1);
+        auto strL = str.split(".");
+        for (auto st: strL)
+            res<<st.toInt();
+        if (beta) res<<-1;
+        else res<<0;
+        return res;
+    };
+    return stringListVersion(str1)>stringListVersion(str2);
 }
 
 void cDevBoot::prepareVersionTypeMaps()
@@ -248,6 +266,8 @@ void cDevBoot::prepareVersionTypeMaps()
     QStringList list = getFileList(mUrl);
     foreach (QString tmpStr, list){
         tmpStr.chop(1);
+        if ((!mBetaVersions) && (QRegExp("b$").indexIn(tmpStr,0)!=-1))
+            continue;
         QStringList tmpStrList = getFileList(QString("%1%2/").arg(mUrl).arg(tmpStr));
         for (int i = 0; i < tmpStrList.size(); ++i){
             if (tmpStrList[i].contains("_code.bin")){
@@ -376,7 +396,8 @@ void cDevBoot::prepareOptions()
     downloadFile(QString("%1%2/%3_code.bin")
                  .arg(mUrl)
                  .arg(mFirmwareVersion)
-                 .arg(mDevType));
+                 .arg(mDevType)
+                 );
 }
 
 void cDevBoot::disableAllDEvices()

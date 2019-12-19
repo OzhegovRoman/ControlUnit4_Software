@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include "cabstractcommandparser.h"
-#include "star_prc_structs.h"
+#include "../../Libs/StarProtocol/star_prc_structs.h"
 
 class CommonScpiCommands: public cAbstractCommandParser
 {

@@ -42,6 +42,9 @@ public:
     bool isUpdateAllEnabled() const;
     void setUpdateAllEnable(bool updateAll);
 
+    bool isBetaVersionsEnabled() const;
+    void setBetaVersionsEnable(bool betaVersions);
+
 private:
     QString mPortName;
     int mAddress;
@@ -49,6 +52,7 @@ private:
     bool mForce;
     bool mHotPlug;
     bool mUpdateAll;
+    bool mBetaVersions;
     QString mFileName;
     QString mUrl;
     QString mDevType;
@@ -68,7 +72,6 @@ private:
     void disableAllDEvices();
     void bootloaderStart();
     void rebootAllDevices();
-signals:
 
 public slots:
     void bootloaderProgressChanged(int progress);
