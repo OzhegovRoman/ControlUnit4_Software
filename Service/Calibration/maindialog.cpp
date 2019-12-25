@@ -6,6 +6,7 @@
 #include <QDir>
 #include <QMessageBox>
 #include <QDebug>
+#include "Drivers/ccu4sdm1driver.h"
 
 MainDialog::MainDialog(QWidget *parent) :
     QDialog(parent),
@@ -30,9 +31,18 @@ void MainDialog::on_pbGetEeprom_clicked()
 {
     disableGUI();
     switch (mDriverType) {
-    case tDriverType::CU4SD:{
+    case tDriverType::CU4SDM0:{
         bool ok = false;
         qobject_cast<cCu4SdM0Driver*>(mDriver)->eepromConst()->getValueSequence(&ok, 5);
+
+        if (!ok)
+            QMessageBox::warning(this, "Warning!!!", "Can't read eeprom data");
+        break;
+    }
+        //TODO: реализовать
+    case tDriverType::CU4SDM1:{
+        bool ok = false;
+        qobject_cast<cCu4SdM1Driver*>(mDriver)->eepromConst()->getValueSequence(&ok, 5);
 
         if (!ok)
             QMessageBox::warning(this, "Warning!!!", "Can't read eeprom data");
@@ -71,9 +81,17 @@ void MainDialog::on_pbSetEeprom_clicked()
 {
     disableGUI();
     switch (mDriverType) {
-    case tDriverType::CU4SD:{
+    case tDriverType::CU4SDM0:{
         bool ok = false;
         qobject_cast<cCu4SdM0Driver*>(mDriver)->eepromConst()->setValueSequence(ui->wSspd->getEepromConst(), &ok, 5);
+        if (!ok)
+            QMessageBox::warning(this, "Warning!!!","Can't set eeprom constants. Please try one more time!!!");
+        break;
+    }
+        //TODO: реализовать поведение драйвера
+    case tDriverType::CU4SDM1:{
+        bool ok = false;
+        qobject_cast<cCu4SdM1Driver*>(mDriver)->eepromConst()->setValueSequence(ui->wSspd->getEepromM1Const(), &ok, 5);
         if (!ok)
             QMessageBox::warning(this, "Warning!!!","Can't set eeprom constants. Please try one more time!!!");
         break;
@@ -93,6 +111,7 @@ void MainDialog::on_pbSetEeprom_clicked()
             lDriver->tempTable()[i] = tTable[i];
         }
         ok = lDriver->sendTempTable();
+        break;
     }
     default:
         break;
@@ -135,7 +154,7 @@ void MainDialog::on_pbSave_clicked()
     calibrObject["DeviceType"] = mDriver->getDeviceType()->getValueSequence(&ok);
     calibrObject["UDID"] = mDriver->getUDID()->getValueSequence(&ok).toString();
     switch (mDriverType) {
-    case tDriverType::CU4SD: {
+    case tDriverType::CU4SDM0: {
         QJsonArray value;
         CU4SDM0V1_EEPROM_Const_t eepromConst = ui->wSspd->getEepromConst();
         value.append(static_cast<double>(eepromConst.Voltage_ADC.first));
@@ -150,6 +169,10 @@ void MainDialog::on_pbSave_clicked()
         value[0] = static_cast<double>(eepromConst.Cmp_Ref_DAC.first);
         value[1] = static_cast<double>(eepromConst.Cmp_Ref_DAC.second);
         calibrObject["leCmpRefDacCoeffs"] = value;
+        break;
+    }
+        //TODO: реализовать
+    case tDriverType::CU4SDM1: {
         break;
     }
     case tDriverType::CU4TD: {
@@ -186,7 +209,6 @@ void MainDialog::on_pbSave_clicked()
     default:
         QMessageBox::warning(nullptr,"Warning","Unknown type of Device");
         return;
-        break;
     };
 
     mSaveDialog->setJsonData(calibrObject);
@@ -203,7 +225,7 @@ void MainDialog::on_pbLoad_clicked()
     QJsonObject json = mOpenDialog->jsonData();
 
     switch (mDriverType) {
-    case tDriverType::CU4SD: {
+    case tDriverType::CU4SDM0: {
         CU4SDM0V1_EEPROM_Const_t eepromConst;
 
         QJsonArray value = json["VoltageAdcCoeffs"].toArray();
@@ -223,6 +245,10 @@ void MainDialog::on_pbLoad_clicked()
         eepromConst.Cmp_Ref_DAC.second = static_cast<float>(value[1].toDouble());
 
         ui->wSspd->onEepromConstReceived(eepromConst);
+        break;
+    }
+        // TODO: реализовать поведение драйвера
+    case tDriverType::CU4SDM1: {
         break;
     }
     case tDriverType::CU4TD: {
@@ -290,8 +316,10 @@ void MainDialog::enableGUI(bool enable)
 void MainDialog::setDeviceType(const QString &deviceType)
 {
     mDriverType = tDriverType::UNKNOWN;
-    if (deviceType.contains("CU4SD"))
-        mDriverType = tDriverType::CU4SD;
+    if (deviceType.contains("CU4SDM0"))
+        mDriverType = tDriverType::CU4SDM0;
+    if (deviceType.contains("CU4SDM1"))
+        mDriverType = tDriverType::CU4SDM1;
     if (deviceType.contains("CU4TD"))
         mDriverType = tDriverType::CU4TD;
 }
@@ -299,12 +327,22 @@ void MainDialog::setDeviceType(const QString &deviceType)
 void MainDialog::initializeUI()
 {
     switch (mDriverType){
-    case tDriverType::CU4SD:
+    case tDriverType::CU4SDM0:
+    {
         ui->stackedWidget->setCurrentIndex(0);
         mDriver = new cCu4SdM0Driver(this);
         connect(mDriver, SIGNAL(eepromConstUpdated(CU4SDM0V1_EEPROM_Const_t)),
                 ui->wSspd, SLOT(onEepromConstReceived(CU4SDM0V1_EEPROM_Const_t)));
         break;
+    }
+        // TODO: реализовать поведение драйвера
+    case tDriverType::CU4SDM1: {
+        ui->stackedWidget->setCurrentIndex(0);
+        mDriver = new cCu4SdM1Driver(this);
+        connect(mDriver, SIGNAL(eepromConstUpdated(CU4SDM1_EEPROM_Const_t)),
+                ui->wSspd, SLOT(onEepromConstReceived(CU4SDM1_EEPROM_Const_t)));
+        break;
+    }
     case tDriverType::CU4TD:
         ui->stackedWidget->setCurrentIndex(1);
         mDriver = new cCu4TdM0Driver(this);
@@ -314,15 +352,13 @@ void MainDialog::initializeUI()
     default:
         QMessageBox::warning(nullptr,"Warning","Unknown type of Device");
         exit(0);
-        return;
-        break;
     }
 
     mDriver->setIOInterface(mInterface);
     mDriver->setDevAddress(static_cast<quint8>(mDeviceAddress));
 
     on_pbGetEeprom_clicked();
-    ui->stackedWidget->setCurrentIndex(static_cast<int>(mDriverType));
+//    ui->stackedWidget->setCurrentIndex(static_cast<int>(mDriverType));
 }
 
 void MainDialog::setInterface(cuIOInterfaceImpl *interface)

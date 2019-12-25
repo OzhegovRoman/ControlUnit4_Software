@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>270</width>
-    <height>235</height>
+    <width>289</width>
+    <height>299</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -146,6 +146,26 @@
       <item row="7" column="1">
        <widget class="QLineEdit" name="leCmpRefDacIntercept"/>
       </item>
+      <item row="8" column="0">
+       <widget class="QLabel" name="lbCurrentMonitorAdcSlope">
+        <property name="text">
+         <string>Current Monitor Adc slope</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="1">
+       <widget class="QLineEdit" name="leCurrentMonitorAdcSlope"/>
+      </item>
+      <item row="9" column="0">
+       <widget class="QLabel" name="lbCurrentMonitorAdcIntercept">
+        <property name="text">
+         <string>Current Monitor ADC intercept</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="1">
+       <widget class="QLineEdit" name="leCurrentMonitorAdcIntercept"/>
+      </item>
      </layout>
      <zorder>leCurrentAdcSlope</zorder>
      <zorder>label_3</zorder>
@@ -154,6 +174,7 @@
      <zorder>leCurrentDacSlope</zorder>
      <zorder>label_5</zorder>
      <zorder>leCurrentDacIntercept</zorder>
+     <zorder>label_2</zorder>
      <zorder>label_6</zorder>
      <zorder>leVoltageAdcSlope</zorder>
      <zorder>label_7</zorder>
@@ -162,7 +183,10 @@
      <zorder>leCmpRefDacSlope</zorder>
      <zorder>label_9</zorder>
      <zorder>leCmpRefDacIntercept</zorder>
-     <zorder>label_2</zorder>
+     <zorder>lbCurrentMonitorAdcSlope</zorder>
+     <zorder>leCurrentMonitorAdcSlope</zorder>
+     <zorder>lbCurrentMonitorAdcIntercept</zorder>
+     <zorder>leCurrentMonitorAdcIntercept</zorder>
     </widget>
    </item>
   </layout>

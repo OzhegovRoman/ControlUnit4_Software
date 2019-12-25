@@ -48,10 +48,10 @@ typedef struct {
 
 typedef struct {
     float Current;          // ток смещения детектора в [Амперах]
-    float CurrentMonitor;   // ток смещения снимаемый с последовательного резистора в [Fvgthf[]
+    float CurrentMonitor;   // ток, измеренный с монитора в [Амперах]
     float Voltage;          // напряжение смещения детектора в [Вольтах]
     float Counts;           // количество отсчетов
-    CU4SDM0_Status_t Status; // статус пока оставляю прежним
+    CU4SDM0_Status_t Status;
 } CU4SDM1_Data_t;
 
 // Подробное описание битов статуса устройства
@@ -92,9 +92,9 @@ typedef struct {
 
 typedef struct {
     pair_t<float> Current_ADC;    // из показаний АЦП ток пересчитывается как Current_ADC_slope*ADC_Value+Current_ADC_intercept
-    pair_t<float> Current_Monitor_ADC;    // из показаний АЦП ток монитора пересчитывается как Current_ADC_slope*ADC_Value+Current_ADC_intercept
     pair_t<float> Voltage_ADC;    // из показаний АЦП напряжение пересчитывается как Voltage_ADC_slope*ADC_Value+Voltage_ADC_intercept
     pair_t<float> Current_DAC;    // требуемое к установке значение ЦАП считается как Value*DAC_slope+DAC_intercept;
+    pair_t<float> CurrentMonitor_ADC;
     pair_t<float> Cmp_Ref_DAC;
 } CU4SDM1_EEPROM_Const_t;
 

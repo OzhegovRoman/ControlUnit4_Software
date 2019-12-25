@@ -158,7 +158,6 @@ bool cCu4SdM0Driver::pMsgReceived(quint8 address, quint8 command, quint8 dataLen
             mPIDEnableStatus->setCurrentValue(*reinterpret_cast<bool*>(data));
         }
         break;
-        break;
     case SD_SetCurrent:  //не знаю что делать на эту команду
     case SD_SetStatus:
     case SD_SetShortEnable:

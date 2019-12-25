@@ -83,6 +83,7 @@ private:
     IOInterface_t *mInterface;
     QTimer *mTimer;
     QString mLastTcpIpAddress;
+    bool isM0{true};
     int mMode{};
     double mCurrentValue{};
 };

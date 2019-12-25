@@ -3,18 +3,16 @@
 #include <QDebug>
 #include <QSettings>
 #include "../qCustomLib/qCustomLib.h"
+#include "Drivers/ccu4sdm1driver.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::MainWindow),
-    mDriver(new cCu4SdM0Driver(this)),
+    mDriver(nullptr),
     mInterface(new IOInterface_t(this)),
     mTimer(new QTimer(this))
 {
     ui->setupUi(this);
-
-    mDriver->setIOInterface(mInterface);
-    mDriver->setDevAddress(0);
 
     QSettings settings("Scontel","QeMeasurer");
     mLastTcpIpAddress = settings.value("TcpAddress",QString()).toString();
@@ -79,6 +77,9 @@ void MainWindow::contextMenuRequest(QPoint pos)
 
 void MainWindow::on_pbInitialize_clicked()
 {
+    // сначала нужно получить информацию от модуля и выбрать подходящий тип
+    AbstractDriver driver;
+    driver.setIOInterface(mInterface);
     bool secretMode = QGuiApplication::queryKeyboardModifiers() == (Qt::ControlModifier | Qt::ShiftModifier);
 
 #ifdef TCPIP_SOCKET_INTERFACE
@@ -95,13 +96,25 @@ void MainWindow::on_pbInitialize_clicked()
     mInterface->setAddress(convertToHostAddress(str));
     qDebug()<<mInterface->address();
     mInterface->setPort(SERVER_TCPIP_PORT);
-    mDriver->setDevAddress(static_cast<const quint8>(ui->sbDeviceAddress->value()));
+    driver.setDevAddress(static_cast<const quint8>(ui->sbDeviceAddress->value()));
 #endif
 
-    if (!mDriver->getDeviceInfo()) {
+    if (!driver.getDeviceInfo()) {
         ui->lbStatus->setText("Status: Error at getDeviceInfo function");
         return;
     }
+    // а вот тут уже создаем новый
+    if (mDriver!= nullptr)
+        mDriver->deleteLater();
+    if (driver.getDeviceType()->getCurrentValue().contains("CU4SDM0"))
+        mDriver = new cCu4SdM0Driver(this);
+    else{
+        isM0 = false;
+        mDriver = new cCu4SdM1Driver(this);
+    }
+
+    mDriver->setIOInterface(mInterface);
+    mDriver->setDevAddress(driver.devAddress());
 
     mDriver->init();
     if (!mDriver->waitingAnswer()) {
@@ -115,12 +128,12 @@ void MainWindow::on_pbInitialize_clicked()
                              "Firmware: %4<br>"
                              "Description: %5<br>"
                              "DeviceId: %6")
-            .arg(mDriver->getDeviceType()->getCurrentValue())
-            .arg(mDriver->getModificationVersion()->getCurrentValue())
-            .arg(mDriver->getHardwareVersion()->getCurrentValue())
-            .arg(mDriver->getFirmwareVersion()->getCurrentValue())
-            .arg(mDriver->getDeviceDescription()->getCurrentValue())
-            .arg(mDriver->getUDID()->getCurrentValue().toString());
+            .arg(driver.getDeviceType()->getCurrentValue())
+            .arg(driver.getModificationVersion()->getCurrentValue())
+            .arg(driver.getHardwareVersion()->getCurrentValue())
+            .arg(driver.getFirmwareVersion()->getCurrentValue())
+            .arg(driver.getDeviceDescription()->getCurrentValue())
+            .arg(driver.getUDID()->getCurrentValue().toString());
 
     if (secretMode){
         tmpStr.append("<br>Secret Mode Activated");
@@ -137,7 +150,6 @@ void MainWindow::on_pbInitialize_clicked()
     QSettings settings("Scontel","QeMeasurer");
     mLastTcpIpAddress = ui->cbTcpIpAddress->currentText();
     settings.setValue("TcpAddress", mLastTcpIpAddress);
-
     settings.setValue("DeviceAddress", ui->sbDeviceAddress->value());
 }
 
@@ -182,19 +194,35 @@ void MainWindow::on_stackedWidget_currentChanged(int arg1)
 void MainWindow::updateData()
 {
     bool ok;
-    CU4SDM0V1_Data_t data = mDriver->deviceData()->getValueSequence(&ok);
-    if (ok){
-
-        ui->lbData->setText(QString("I: %1 uA<br>U: %2 mV")
-                            .arg(static_cast<double>(data.Current)*1e6, 6,'f', 1)
-                            .arg(static_cast<double>(data.Voltage)*1e3, 6, 'f', 2));
-        ui->cbAmplifier->setChecked(data.Status.stAmplifierOn);
-        ui->cbShort->setChecked(data.Status.stShorted);
-        ui->cbComparator->setChecked(data.Status.stComparatorOn);
-        qDebug()<<"new data. Status:" << data.Status.Data;
-        qDebug()<<"new data. Comparator:" << data.Status.stComparatorOn;
+    if (isM0){
+        CU4SDM0V1_Data_t data = mDriver->deviceData()->getValueSequence(&ok);
+        if (ok){
+            ui->lbData->setText(QString("I: %1 uA<br>U: %2 mV")
+                                .arg(static_cast<double>(data.Current)*1e6, 6,'f', 1)
+                                .arg(static_cast<double>(data.Voltage)*1e3, 6, 'f', 2));
+            ui->cbAmplifier->setChecked(data.Status.stAmplifierOn);
+            ui->cbShort->setChecked(data.Status.stShorted);
+            ui->cbComparator->setChecked(data.Status.stComparatorOn);
+            qDebug()<<"new data. Status:" << data.Status.Data;
+            qDebug()<<"new data. Comparator:" << data.Status.stComparatorOn;
+        }
+        else qDebug()<<"error at getting data";
     }
-    else qDebug()<<"error at getting data";
+    else {
+        CU4SDM1_Data_t data = qobject_cast<cCu4SdM1Driver*>(mDriver)->deviceData()->getValueSequence(&ok);
+        if (ok){
+            ui->lbData->setText(QString("I: %1 uA<br>U: %2 mV<br>Imon: %3 uA")
+                                .arg(static_cast<double>(data.Current)*1e6, 6,'f', 1)
+                                .arg(static_cast<double>(data.Voltage)*1e3, 6, 'f', 2)
+                                .arg(static_cast<double>(data.CurrentMonitor)*1e3, 6, 'f', 2));
+            ui->cbAmplifier->setChecked(data.Status.stAmplifierOn);
+            ui->cbShort->setChecked(data.Status.stShorted);
+            ui->cbComparator->setChecked(data.Status.stComparatorOn);
+            qDebug()<<"new data. Status:" << data.Status.Data;
+            qDebug()<<"new data. Comparator:" << data.Status.stComparatorOn;
+        }
+        else qDebug()<<"error at getting data";
+    }
     mTimer->start();
 }
 

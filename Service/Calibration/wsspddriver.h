@@ -17,12 +17,15 @@ public:
     ~wSspdDriver() override;
 
     CU4SDM0V1_EEPROM_Const_t getEepromConst();
+    CU4SDM1_EEPROM_Const_t getEepromM1Const();
 
 public slots:
     void onEepromConstReceived(CU4SDM0V1_EEPROM_Const_t eepromConst);
+    void onEepromConstReceived(CU4SDM1_EEPROM_Const_t eepromConst);
 
 private:
     Ui::wSspdDriver *ui;
+
 };
 
 #endif // WSSPDDRIVER_H

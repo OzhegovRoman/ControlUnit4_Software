@@ -8,7 +8,8 @@
 #include "cagilent34401avisainterface.h"
 
 typedef enum {
-    CU4SD,
+    CU4SDM0,
+    CU4SDM1,
     CU4TD,
     UNKNOWN
 } tDriverType ;
