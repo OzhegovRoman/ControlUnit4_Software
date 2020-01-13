@@ -276,25 +276,33 @@ void MainWindow::setCurrentValue()
 
 void MainWindow::addPoint2MeasureGraphs()
 {
-    CU4SDM0V1_Data_t data;
-    double key;
-    double value;
+    double key = 0;
+    double value = 0;
+    if (isM0){
+        CU4SDM0V1_Data_t data;
 
-    data = mDriver->deviceData()->getValueSequence(nullptr, 5);
-    value =  static_cast<double>(data.Counts/mDriver->deviceParams()->getCurrentValue().Time_Const);
-    if (static_cast<double>(data.Voltage) > ui->sbTrigger->value()){ //триггер сработал
-        on_pbStop_clicked();
-        return;
-    }
-
-    switch (ui->cbType->currentIndex()) {
-    case 0:
+        data = mDriver->deviceData()->getValueSequence(nullptr, 5);
+        value =  static_cast<double>(data.Counts/mDriver->deviceParams()->getCurrentValue().Time_Const);
+        if (static_cast<double>(data.Voltage) > ui->sbTrigger->value()){ //триггер сработал
+            on_pbStop_clicked();
+            return;
+        }
         key = static_cast<double>(data.Current)*1E6;
-        break;
-    default:
-        key = mCurrentValue;
-        break;
     }
+    else{
+        CU4SDM1_Data_t data;
+
+        data = qobject_cast<cCu4SdM1Driver*>(mDriver)->deviceData()->getValueSequence(nullptr, 5);
+        value =  static_cast<double>(data.Counts/mDriver->deviceParams()->getCurrentValue().Time_Const);
+        if (static_cast<double>(data.Voltage) > ui->sbTrigger->value()){ //триггер сработал
+            on_pbStop_clicked();
+            return;
+        }
+        key = static_cast<double>(data.CurrentMonitor)*1E3;
+    }
+
+    if (ui->cbType->currentIndex() !=0 )
+        key = mCurrentValue;
 
 
     ui->wMeasurerPlot->graph(ui->wMeasurerPlot->graphCount() - 1)->addData(key, value);
@@ -548,4 +556,63 @@ void MainWindow::on_tbUpdateAdresses_clicked()
     int i = list.indexOf(mLastTcpIpAddress);
     if (i>=0) ui->cbTcpIpAddress->setCurrentIndex(i);
 
+}
+
+void MainWindow::on_pbReading_clicked()
+{
+    mTimer->stop();
+    disconnect(mTimer, nullptr, nullptr, nullptr);
+    if (ui->pbReading->isChecked()){
+        auto driver = qobject_cast<cCu4SdM1Driver*>(mDriver);
+        if (driver){
+            mTimer->setInterval(500);
+            connect(mTimer, SIGNAL(timeout()), SLOT(updateSecureData()));
+            updateSecureData();
+            mTimer->start();
+        }
+        else ui->pbReading->setChecked(false);
+    }
+
+}
+
+void MainWindow::on_pbRecording_clicked()
+{
+    if (ui->pbRecording->isChecked()){
+        mFileName = QFileDialog::getSaveFileName(this,
+                                                 tr("Save File..."),
+                                                 "output.txt",
+                                                 tr("Text files (*.txt)"));
+        qDebug()<<mFileName;
+        if (mFileName.isEmpty())
+            ui->pbRecording->setChecked(false);
+    }
+}
+
+void MainWindow::updateSecureData()
+{
+    static int i = 0;
+    qDebug()<<i++;
+    bool ok;
+    CU4SDM1_Data_t data = qobject_cast<cCu4SdM1Driver*>(mDriver)->deviceData()->getValueSequence(&ok);
+    if (ok){
+        ui->lbSecretStatus->setText(QString("I: %1 uA<br>U: %2 mV<br>Imon: %3 uA<br>Count: %4")
+                                    .arg(static_cast<double>(data.Current)*1e6, 6,'f', 1)
+                                    .arg(static_cast<double>(data.Voltage)*1e3, 6, 'f', 2)
+                                    .arg(static_cast<double>(data.CurrentMonitor)*1e3, 6, 'f', 2)
+                                    .arg(static_cast<double>(data.Counts), 6, 'f', 2));
+        if (ui->pbRecording->isChecked()){
+            QFile m_File(mFileName);
+            m_File.open(QIODevice::WriteOnly | QIODevice::Append);
+            QTextStream out(&m_File);
+            out<<QString("%1\t%2\t%3\t%4\r\n")
+                 .arg(static_cast<double>(data.Current)*1e6, 6,'f', 1)
+                 .arg(static_cast<double>(data.Voltage)*1e3, 6, 'f', 2)
+                 .arg(static_cast<double>(data.CurrentMonitor)*1e3, 6, 'f', 2)
+                 .arg(static_cast<double>(data.Counts), 6, 'f', 2);
+            m_File.close();
+        }
+    }
+    else qDebug()<<"error at getting data";
+
+    mTimer->start();
 }

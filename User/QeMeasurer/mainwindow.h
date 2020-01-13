@@ -70,12 +70,13 @@ private slots:
     void on_pbStop_clicked();
 
     void on_cbType_currentIndexChanged(int index);
-
     void on_pbGetSecretParams_clicked();
-
     void on_pbSetSecretParams_clicked();
-
     void on_tbUpdateAdresses_clicked();
+    void on_pbReading_clicked();
+    void on_pbRecording_clicked();
+
+    void updateSecureData();
 
 private:
     Ui::MainWindow *ui;
@@ -83,6 +84,7 @@ private:
     IOInterface_t *mInterface;
     QTimer *mTimer;
     QString mLastTcpIpAddress;
+    QString mFileName;
     bool isM0{true};
     int mMode{};
     double mCurrentValue{};
