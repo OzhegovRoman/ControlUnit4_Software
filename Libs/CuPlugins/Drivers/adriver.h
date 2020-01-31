@@ -120,7 +120,7 @@ public:
      * @return
      */
     void getValue() {
-        mDriver->sendMsg(mCommand, 0 ,nullptr);
+        mDriver->sendMsg(mCommand, 0, nullptr);
     }
 
     /**
@@ -173,8 +173,6 @@ public:
             tmp = cuDeviceParam<T>::mDriver->waitingAnswer();
 
             if (tmp){
-                mLastSettedValue = value;
-                mUnsettedPreviously = false;
                 break;
             }
         }

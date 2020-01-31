@@ -84,7 +84,7 @@
        <bool>true</bool>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="pInitialize">
        <layout class="QVBoxLayout" name="verticalLayout">
@@ -458,10 +458,10 @@
              <string notr="true">font: 14pt &quot;MS Shell Dlg 2&quot;;</string>
             </property>
             <property name="decimals">
-             <number>1</number>
+             <number>2</number>
             </property>
             <property name="minimum">
-             <double>0.100000000000000</double>
+             <double>0.010000000000000</double>
             </property>
             <property name="value">
              <double>1.000000000000000</double>

@@ -1,15 +1,18 @@
 import qbs
 
 StaticLibrary {
-    name: "CuPlugins"
+    files: [
+        "Drivers_V2/driverproperty.qmodel",
+    ]
 
+    name: "CuPlugins"
+    Depends { name: "cpp" }
+
+    cpp.cxxLanguageVersion: "c++14"
     cpp.includePaths: [
         "../StarProtocol/",
         "."
     ]
-
-    Depends { name: "cpp" }
-    cpp.cxxLanguageVersion: "c++14"
     Depends {
         name: "Qt";
         submodules: [
@@ -20,7 +23,6 @@ StaticLibrary {
         ]
     }
     Depends {name: "StarProtocol"}
-
     Depends {
         name: "RaspPiMMap"
         condition: project.isRaspberryPi
@@ -43,7 +45,7 @@ StaticLibrary {
 
     Group {
         name: "Drivers"
-        prefix: "Drivers/**/"
+        prefix: "Drivers*/**/"
         files: [
             "*.cpp",
             "*.h"
@@ -73,6 +75,7 @@ StaticLibrary {
         files: [
             "*.h",
             "*.cpp",
+            "*.hpp",
         ]
     }
 }

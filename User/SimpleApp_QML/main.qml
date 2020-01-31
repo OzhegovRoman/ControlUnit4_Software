@@ -9,7 +9,7 @@ ApplicationWindow {
     width: 400
     height: 600
 
-    readonly property int dpi: Screen.pixelDensity * 25.4
+    readonly property int dpi: Screen.pixelDensity * 25.4 * Screen.devicePixelRatio
 
     AppCore {
         id: appcore
@@ -31,11 +31,15 @@ ApplicationWindow {
         }
     }
 
-    function dp(x){ return (dpi < 120) ? x : x * (dpi/120); }
+    function dp(x){ return (dpi < 480) ? x : x * (dpi/480); }
 
     function startUp(){
         console.log("startUp function");
         console.log(dpi);
+        console.log("PixelDensity:"+Screen.pixelDensity);
+        console.log("PixelRatio:"+Screen.devicePixelRatio);
+        console.log("10:"+ dp(10));
+        console.log("100:"+ dp(100));
         appcore.coreConnectToDefaultIpAddress();
     }
 

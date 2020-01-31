@@ -7,10 +7,14 @@
 class cUDID
 {
 public:
-    cUDID()= default;
+    cUDID() = default;
     cUDID(const quint8 *newUDID)
     {
         setUDID(newUDID);
+    }
+    cUDID(const cUDID &value)
+    {
+        setUDID(value.mUDID);
     }
 
     void setUDID (const quint8 *newUDID)

@@ -85,6 +85,7 @@ private:
     QTimer *mTimer;
     QString mLastTcpIpAddress;
     QString mFileName;
+    int mTimerCount_Interval;
     bool isM0{true};
     int mMode{};
     double mCurrentValue{};

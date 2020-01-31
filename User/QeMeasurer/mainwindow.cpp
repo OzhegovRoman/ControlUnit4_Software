@@ -172,7 +172,8 @@ void MainWindow::on_stackedWidget_currentChanged(int arg1)
         break;
     case 2:
         params = mDriver->deviceParams()->getValueSequence(&ok);
-        mTimer->setInterval(static_cast<int>(static_cast<double>(params.Time_Const)*1000.0));
+        mTimerCount_Interval = static_cast<int>(static_cast<double>(params.Time_Const)*1000.0);
+        mTimer->setInterval(qMax(100, mTimerCount_Interval));
         qDebug()<<"Time_Const:"<<params.Time_Const;
 
         status = mDriver->deviceStatus()->getValueSequence(&ok);
@@ -214,7 +215,7 @@ void MainWindow::updateData()
             ui->lbData->setText(QString("I: %1 uA<br>U: %2 mV<br>Imon: %3 uA")
                                 .arg(static_cast<double>(data.Current)*1e6, 6,'f', 1)
                                 .arg(static_cast<double>(data.Voltage)*1e3, 6, 'f', 2)
-                                .arg(static_cast<double>(data.CurrentMonitor)*1e3, 6, 'f', 2));
+                                .arg(static_cast<double>(data.CurrentMonitor)*1e6, 6, 'f', 2));
             ui->cbAmplifier->setChecked(data.Status.stAmplifierOn);
             ui->cbShort->setChecked(data.Status.stShorted);
             ui->cbComparator->setChecked(data.Status.stComparatorOn);
@@ -235,7 +236,7 @@ void MainWindow::updateCountsGraph()
         mTimer->start();
         return;
     }
-    counts *= 1000.0/mTimer->interval();
+    counts *= 1000.0/static_cast<double>(mTimerCount_Interval);
     qreal key = QDateTime::currentDateTime().currentMSecsSinceEpoch()/1000.0;
 
     ui->wCounterPlot->graph(0)->addData(key, counts);
@@ -298,7 +299,7 @@ void MainWindow::addPoint2MeasureGraphs()
             on_pbStop_clicked();
             return;
         }
-        key = static_cast<double>(data.CurrentMonitor)*1E3;
+        key = static_cast<double>(data.CurrentMonitor)*1E6;
     }
 
     if (ui->cbType->currentIndex() !=0 )
@@ -426,8 +427,9 @@ void MainWindow::on_pbReadParams_clicked()
 
 void MainWindow::on_pbSetParams_clicked()
 {
-    mDriver->timeConst()->setValueSequence(static_cast<float>(ui->sbTimeConst->value()), nullptr, 5);
-    mTimer->setInterval(static_cast<int>(ui->sbTimeConst->value()*1000.0));
+    mTimerCount_Interval = static_cast<int>(ui->sbTimeConst->value()*1000.0);
+    mDriver->timeConst()->setValueSequence(static_cast<float>(mTimerCount_Interval)/1000.0f, nullptr, 5);
+    mTimer->setInterval(qMax(100, mTimerCount_Interval));
 }
 
 void MainWindow::on_pbStart_clicked()
@@ -598,7 +600,7 @@ void MainWindow::updateSecureData()
         ui->lbSecretStatus->setText(QString("I: %1 uA<br>U: %2 mV<br>Imon: %3 uA<br>Count: %4")
                                     .arg(static_cast<double>(data.Current)*1e6, 6,'f', 1)
                                     .arg(static_cast<double>(data.Voltage)*1e3, 6, 'f', 2)
-                                    .arg(static_cast<double>(data.CurrentMonitor)*1e3, 6, 'f', 2)
+                                    .arg(static_cast<double>(data.CurrentMonitor)*1e6, 6, 'f', 2)
                                     .arg(static_cast<double>(data.Counts), 6, 'f', 2));
         if (ui->pbRecording->isChecked()){
             QFile m_File(mFileName);
@@ -607,7 +609,7 @@ void MainWindow::updateSecureData()
             out<<QString("%1\t%2\t%3\t%4\r\n")
                  .arg(static_cast<double>(data.Current)*1e6, 6,'f', 1)
                  .arg(static_cast<double>(data.Voltage)*1e3, 6, 'f', 2)
-                 .arg(static_cast<double>(data.CurrentMonitor)*1e3, 6, 'f', 2)
+                 .arg(static_cast<double>(data.CurrentMonitor)*1e6, 6, 'f', 2)
                  .arg(static_cast<double>(data.Counts), 6, 'f', 2);
             m_File.close();
         }
