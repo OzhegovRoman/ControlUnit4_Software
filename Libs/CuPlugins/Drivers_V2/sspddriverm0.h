@@ -29,6 +29,19 @@ public:
 
     DriverProperty<CU4SDM0V1_Param_t> *params() const;
 
+    DriverProperty<float> *cmpReferenceLevel() const;
+    DriverProperty<float> *timeConst() const;
+    DriverProperty<float> *autoResetThreshold() const;
+    DriverProperty<float> *autoResetTimeOut() const;
+    DriverProperty<unsigned int> *autoResetAlarmsCounts() const;
+
+    DriverProperty<CU4SDM0V1_EEPROM_Const_t> *eepromConst() const;
+
+    DriverProperty<pair_t<float> > *currentAdcCoeff() const;
+    DriverProperty<pair_t<float> > *voltageAdcCoeff() const;
+    DriverProperty<pair_t<float> > *currentDacCoeff() const;
+    DriverProperty<pair_t<float> > *cmpReferenceCoeff() const;
+
 signals:
     void dataUpdated(CU4SDM0V1_Data_t);
     void paramsUpdated(CU4SDM0V1_Param_t);
@@ -62,6 +75,16 @@ private:
     DriverProperty<float> *mAutoResetThreshold;
     DriverProperty<float> *mAutoResetTimeOut;
     DriverProperty<unsigned int> *mAutoResetAlarmsCounts;
+
+    //Device EEPROM
+    DriverProperty<CU4SDM0V1_EEPROM_Const_t> *mEepromConst;
+    DriverProperty<pair_t<float> > *mCurrentAdcCoeff;
+    DriverProperty<pair_t<float> > *mVoltageAdcCoeff;
+    DriverProperty<pair_t<float> > *mCurrentDacCoeff;
+    DriverProperty<pair_t<float> > *mCmpReferenceCoeff;
+
+//    //PID Enable Status
+//    cuDeviceParam_settable<bool> *mPIDEnableStatus;
 
 };
 
