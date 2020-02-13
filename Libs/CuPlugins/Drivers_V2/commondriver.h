@@ -24,6 +24,8 @@ public:
     DriverCommand *reboot() const;
     DriverCommand *writeEeprom() const;
 
+    bool getDeviceInfo();
+
 signals:
     void eepromWrited();
 

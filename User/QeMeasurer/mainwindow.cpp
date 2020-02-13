@@ -3,7 +3,6 @@
 #include <QDebug>
 #include <QSettings>
 #include "../qCustomLib/qCustomLib.h"
-#include "Drivers/ccu4sdm1driver.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent),
@@ -78,7 +77,7 @@ void MainWindow::contextMenuRequest(QPoint pos)
 void MainWindow::on_pbInitialize_clicked()
 {
     // сначала нужно получить информацию от модуля и выбрать подходящий тип
-    AbstractDriver driver;
+    CommonDriver driver;
     driver.setIOInterface(mInterface);
     bool secretMode = QGuiApplication::queryKeyboardModifiers() == (Qt::ControlModifier | Qt::ShiftModifier);
 
@@ -106,18 +105,14 @@ void MainWindow::on_pbInitialize_clicked()
     // а вот тут уже создаем новый
     if (mDriver!= nullptr)
         mDriver->deleteLater();
-    if (driver.getDeviceType()->getCurrentValue().contains("CU4SDM0"))
-        mDriver = new cCu4SdM0Driver(this);
-    else{
-        isM0 = false;
-        mDriver = new cCu4SdM1Driver(this);
-    }
 
+    mDriver = new SspdDriverM0(this);
     mDriver->setIOInterface(mInterface);
     mDriver->setDevAddress(driver.devAddress());
 
-    mDriver->init();
-    if (!mDriver->waitingAnswer()) {
+    bool ok = false;
+    mDriver->init()->executeSync(&ok);
+    if (!ok) {
         ui->lbStatus->setText("Status: Error at init function");
         return;
     }
@@ -128,12 +123,12 @@ void MainWindow::on_pbInitialize_clicked()
                              "Firmware: %4<br>"
                              "Description: %5<br>"
                              "DeviceId: %6")
-            .arg(driver.getDeviceType()->getCurrentValue())
-            .arg(driver.getModificationVersion()->getCurrentValue())
-            .arg(driver.getHardwareVersion()->getCurrentValue())
-            .arg(driver.getFirmwareVersion()->getCurrentValue())
-            .arg(driver.getDeviceDescription()->getCurrentValue())
-            .arg(driver.getUDID()->getCurrentValue().toString());
+            .arg(driver.deviceType()->currentValue())
+            .arg(driver.modificationVersion()->currentValue())
+            .arg(driver.hardwareVersion()->currentValue())
+            .arg(driver.firmwareVersion()->currentValue())
+            .arg(driver.deviceDescription()->currentValue())
+            .arg(driver.UDID()->currentValue().toString());
 
     if (secretMode){
         tmpStr.append("<br>Secret Mode Activated");
@@ -171,15 +166,14 @@ void MainWindow::on_stackedWidget_currentChanged(int arg1)
         updateData();
         break;
     case 2:
-        params = mDriver->deviceParams()->getValueSequence(&ok);
+        params = mDriver->params()->getValueSync(&ok);
         mTimerCount_Interval = static_cast<int>(static_cast<double>(params.Time_Const)*1000.0);
         mTimer->setInterval(qMax(100, mTimerCount_Interval));
         qDebug()<<"Time_Const:"<<params.Time_Const;
 
-        status = mDriver->deviceStatus()->getValueSequence(&ok);
+        status = mDriver->status()->getValueSync(&ok);
         status.Data = status.Data | CU4SDM0V1_STATUS_COUNTER_WORKED;
-        mDriver->deviceStatus()->setValue(status);
-        mDriver->waitingAnswer();
+        mDriver->status()->setValueSync(status);
 
         connect(mTimer, SIGNAL(timeout()), SLOT(updateCountsGraph()));
         updateCountsGraph();
@@ -194,43 +188,26 @@ void MainWindow::on_stackedWidget_currentChanged(int arg1)
 
 void MainWindow::updateData()
 {
-    bool ok;
-    if (isM0){
-        CU4SDM0V1_Data_t data = mDriver->deviceData()->getValueSequence(&ok);
-        if (ok){
-            ui->lbData->setText(QString("I: %1 uA<br>U: %2 mV")
-                                .arg(static_cast<double>(data.Current)*1e6, 6,'f', 1)
-                                .arg(static_cast<double>(data.Voltage)*1e3, 6, 'f', 2));
-            ui->cbAmplifier->setChecked(data.Status.stAmplifierOn);
-            ui->cbShort->setChecked(data.Status.stShorted);
-            ui->cbComparator->setChecked(data.Status.stComparatorOn);
-            qDebug()<<"new data. Status:" << data.Status.Data;
-            qDebug()<<"new data. Comparator:" << data.Status.stComparatorOn;
-        }
-        else qDebug()<<"error at getting data";
+    bool ok = false;
+    auto data = mDriver->data()->getValueSync(&ok);
+    if (ok){
+        ui->lbData->setText(QString("I: %1 uA<br>U: %2 mV")
+                            .arg(static_cast<double>(data.Current)*1e6, 6,'f', 1)
+                            .arg(static_cast<double>(data.Voltage)*1e3, 6, 'f', 2));
+        ui->cbAmplifier->setChecked(data.Status.stAmplifierOn);
+        ui->cbShort->setChecked(data.Status.stShorted);
+        ui->cbComparator->setChecked(data.Status.stComparatorOn);
+        qDebug()<<"new data. Status:" << data.Status.Data;
+        qDebug()<<"new data. Comparator:" << data.Status.stComparatorOn;
     }
-    else {
-        CU4SDM1_Data_t data = qobject_cast<cCu4SdM1Driver*>(mDriver)->deviceData()->getValueSequence(&ok);
-        if (ok){
-            ui->lbData->setText(QString("I: %1 uA<br>U: %2 mV<br>Imon: %3 uA")
-                                .arg(static_cast<double>(data.Current)*1e6, 6,'f', 1)
-                                .arg(static_cast<double>(data.Voltage)*1e3, 6, 'f', 2)
-                                .arg(static_cast<double>(data.CurrentMonitor)*1e6, 6, 'f', 2));
-            ui->cbAmplifier->setChecked(data.Status.stAmplifierOn);
-            ui->cbShort->setChecked(data.Status.stShorted);
-            ui->cbComparator->setChecked(data.Status.stComparatorOn);
-            qDebug()<<"new data. Status:" << data.Status.Data;
-            qDebug()<<"new data. Comparator:" << data.Status.stComparatorOn;
-        }
-        else qDebug()<<"error at getting data";
-    }
+    else qDebug()<<"error at getting data";
     mTimer->start();
 }
 
 void MainWindow::updateCountsGraph()
 {
     bool ok;
-    auto counts = static_cast<double>(mDriver->counts()->getValueSequence(&ok, 5));
+    auto counts = static_cast<double>(mDriver->counts()->getValueSync(&ok, 5));
     if (!ok) {
         qDebug()<<"can't read counts data";
         mTimer->start();
@@ -263,11 +240,11 @@ void MainWindow::setCurrentValue()
     switch (ui->cbType->currentIndex()) {
     case 0:
         //Bias
-        mDriver->current()->setValueSequence(static_cast<float>(mCurrentValue*1E-6), nullptr, 5);
+        mDriver->current()->setValueSync(static_cast<float>(mCurrentValue*1E-6), nullptr, 5);
         break;
     case 1:
         //Cmp  ref level
-        mDriver->cmpReferenceLevel()->setValueSequence(static_cast<float>(mCurrentValue), nullptr, 5);
+        mDriver->cmpReferenceLevel()->setValueSync(static_cast<float>(mCurrentValue), nullptr, 5);
         break;
     default:
         return;
@@ -279,28 +256,13 @@ void MainWindow::addPoint2MeasureGraphs()
 {
     double key = 0;
     double value = 0;
-    if (isM0){
-        CU4SDM0V1_Data_t data;
-
-        data = mDriver->deviceData()->getValueSequence(nullptr, 5);
-        value =  static_cast<double>(data.Counts/mDriver->deviceParams()->getCurrentValue().Time_Const);
-        if (static_cast<double>(data.Voltage) > ui->sbTrigger->value()){ //триггер сработал
-            on_pbStop_clicked();
-            return;
-        }
-        key = static_cast<double>(data.Current)*1E6;
+    auto data = mDriver->data()->getValueSync(nullptr, 5);
+    value =  static_cast<double>(data.Counts/mDriver->params()->currentValue().Time_Const);
+    if (static_cast<double>(data.Voltage) > ui->sbTrigger->value()){ //триггер сработал
+        on_pbStop_clicked();
+        return;
     }
-    else{
-        CU4SDM1_Data_t data;
-
-        data = qobject_cast<cCu4SdM1Driver*>(mDriver)->deviceData()->getValueSequence(nullptr, 5);
-        value =  static_cast<double>(data.Counts/mDriver->deviceParams()->getCurrentValue().Time_Const);
-        if (static_cast<double>(data.Voltage) > ui->sbTrigger->value()){ //триггер сработал
-            on_pbStop_clicked();
-            return;
-        }
-        key = static_cast<double>(data.CurrentMonitor)*1E6;
-    }
+    key = static_cast<double>(data.Current)*1E6;
 
     if (ui->cbType->currentIndex() !=0 )
         key = mCurrentValue;
@@ -371,30 +333,32 @@ void MainWindow::enableControlsAtMeasure(bool value)
 
 void MainWindow::on_pbSetI_clicked()
 {
-    mDriver->current()->setValueSequence(static_cast<float>(ui->sbI->value()*1E-6), nullptr, 5);
+    mDriver->current()->setValueSync(static_cast<float>(ui->sbI->value()*1E-6), nullptr, 5);
 }
 
 void MainWindow::on_pbSetCmp_clicked()
 {
-    mDriver->cmpReferenceLevel()->setValueSequence(static_cast<float>(ui->sbCmp->value()), nullptr, 5);
+    mDriver->cmpReferenceLevel()->setValueSync(static_cast<float>(ui->sbCmp->value()), nullptr, 5);
 }
 
 void MainWindow::on_cbShort_clicked(bool checked)
 {
-    mDriver->setShortEnable(checked);
-    if (!mDriver->waitingAnswer()) qDebug()<<"can't set short";
+    bool ok = false;
+    mDriver->shortEnable()->setValueSync(checked, &ok);
+    if (!ok) qDebug()<<"can't set short";
 }
 
 void MainWindow::on_cbAmplifier_clicked(bool checked)
 {
-    mDriver->setAmpEnable(checked);
-    if (!mDriver->waitingAnswer()) qDebug()<<"can't set amplifier";
+    bool ok = false;
+    mDriver->amplifierEnable()->setValueSync(checked, &ok);
+    if (!ok) qDebug()<<"can't set amplifier";
 }
 
 void MainWindow::on_cbComparator_clicked(bool checked)
 {
     bool ok;
-    CU4SDM0_Status_t status = mDriver->deviceStatus()->getValueSequence(&ok);
+    CU4SDM0_Status_t status = mDriver->status()->getValueSync(&ok);
     if  (!ok){
         qDebug()<<"can't get Driver Status";
         return;
@@ -410,14 +374,14 @@ void MainWindow::on_cbComparator_clicked(bool checked)
         status.stCounterOn = false;
     }
     qDebug()<<"setted status:"<<status.Data;
-    mDriver->deviceStatus()->setValueSequence(status, &ok, 5);
+    mDriver->status()->setValueSync(status, &ok, 5);
     if (!ok) qDebug()<<"can't set device status";
 }
 
 void MainWindow::on_pbReadParams_clicked()
 {
     bool ok = false;
-    CU4SDM0V1_Param_t params = mDriver->deviceParams()->getValueSequence(&ok, 5);
+    auto params = mDriver->params()->getValueSync(&ok, 5);
     if (!ok){
         qDebug()<<"can't read params";
         return;
@@ -428,7 +392,7 @@ void MainWindow::on_pbReadParams_clicked()
 void MainWindow::on_pbSetParams_clicked()
 {
     mTimerCount_Interval = static_cast<int>(ui->sbTimeConst->value()*1000.0);
-    mDriver->timeConst()->setValueSequence(static_cast<float>(mTimerCount_Interval)/1000.0f, nullptr, 5);
+    mDriver->timeConst()->setValueSync(static_cast<float>(mTimerCount_Interval)/1000.0f, nullptr, 5);
     mTimer->setInterval(qMax(100, mTimerCount_Interval));
 }
 
@@ -451,21 +415,17 @@ void MainWindow::on_pbStart_clicked()
 
     // включаем закоротку
 
-    int trycount = 5;
-    while (trycount -- ){
-        mDriver->setShortEnable(true);
-        if (mDriver->waitingAnswer()) break;
-    }
+    mDriver->shortEnable()->setValueSync(true, nullptr, 5);
 
     // устанавливаем начальное значение
     switch (ui->cbType->currentIndex()) {
     case 0:
         //Bias
-        mDriver->current()->setValueSequence(static_cast<float>(mCurrentValue*1E-6), nullptr, 5);
+        mDriver->current()->setValueSync(static_cast<float>(mCurrentValue*1E-6), nullptr, 5);
         break;
     case 1:
         //Cmp  ref level
-        mDriver->cmpReferenceLevel()->setValueSequence(static_cast<float>(mCurrentValue), nullptr, 5);
+        mDriver->cmpReferenceLevel()->setValueSync(static_cast<float>(mCurrentValue), nullptr, 5);
         break;
     default:
         return;
@@ -478,20 +438,15 @@ void MainWindow::on_pbStart_clicked()
         qApp->processEvents();
 
     // раскорачиваем и далее уже как обычно.
-    trycount = 5;
-    while (trycount -- ){
-        mDriver->setShortEnable(false);
-        if (mDriver->waitingAnswer()) break;
-    }
+    mDriver->shortEnable()->setValueSync(false, nullptr, 5);
 
     // настроим постоянную времени
-    CU4SDM0V1_Param_t params = mDriver->deviceParams()->getValueSequence();
+    auto params = mDriver->params()->getValueSync();
     mTimer->setInterval(static_cast<int>(static_cast<double>(params.Time_Const)*2000.0));
 
-    CU4SDM0_Status_t status = mDriver->deviceStatus()->getValueSequence();
+    auto status = mDriver->status()->getValueSync();
     status.Data |= CU4SDM0V1_STATUS_COUNTER_WORKED;
-    mDriver->deviceStatus()->setValue(status);
-    mDriver->waitingAnswer();
+    mDriver->status()->setValueSync(status);
 
     disconnect(mTimer, nullptr, nullptr, nullptr);
 
@@ -529,7 +484,7 @@ void MainWindow::on_cbType_currentIndexChanged(int index)
 void MainWindow::on_pbGetSecretParams_clicked()
 {
     bool ok;
-    bool tmpBool = mDriver->PIDEnableStatus()->getValueSequence(&ok, 5);
+    bool tmpBool = mDriver->PIDEnableStatus()->getValueSync(&ok, 5);
     if (!ok){
         ui->lbSecretStatus->setText("Error at PIDEnableStatus()->getValueSequence");
         return;
@@ -542,7 +497,7 @@ void MainWindow::on_pbGetSecretParams_clicked()
 void MainWindow::on_pbSetSecretParams_clicked()
 {
     bool ok;
-    mDriver->PIDEnableStatus()->setValueSequence(ui->cbPID->isChecked(), &ok, 5);
+    mDriver->PIDEnableStatus()->setValueSync(ui->cbPID->isChecked(), &ok, 5);
     if (!ok){
         ui->lbSecretStatus->setText("Error at PIDEnableStatus()->setValueSequence");
         return;
@@ -565,16 +520,11 @@ void MainWindow::on_pbReading_clicked()
     mTimer->stop();
     disconnect(mTimer, nullptr, nullptr, nullptr);
     if (ui->pbReading->isChecked()){
-        auto driver = qobject_cast<cCu4SdM1Driver*>(mDriver);
-        if (driver){
-            mTimer->setInterval(500);
-            connect(mTimer, SIGNAL(timeout()), SLOT(updateSecureData()));
-            updateSecureData();
-            mTimer->start();
-        }
-        else ui->pbReading->setChecked(false);
+        mTimer->setInterval(500);
+        connect(mTimer, SIGNAL(timeout()), SLOT(updateSecureData()));
+        updateSecureData();
+        mTimer->start();
     }
-
 }
 
 void MainWindow::on_pbRecording_clicked()
@@ -595,21 +545,19 @@ void MainWindow::updateSecureData()
     static int i = 0;
     qDebug()<<i++;
     bool ok;
-    CU4SDM1_Data_t data = qobject_cast<cCu4SdM1Driver*>(mDriver)->deviceData()->getValueSequence(&ok);
+    auto data = mDriver->data()->getValueSync(&ok);
     if (ok){
-        ui->lbSecretStatus->setText(QString("I: %1 uA<br>U: %2 mV<br>Imon: %3 uA<br>Count: %4")
+        ui->lbSecretStatus->setText(QString("I: %1 uA<br>U: %2 mV<br>Count: %3")
                                     .arg(static_cast<double>(data.Current)*1e6, 6,'f', 1)
                                     .arg(static_cast<double>(data.Voltage)*1e3, 6, 'f', 2)
-                                    .arg(static_cast<double>(data.CurrentMonitor)*1e6, 6, 'f', 2)
                                     .arg(static_cast<double>(data.Counts), 6, 'f', 2));
         if (ui->pbRecording->isChecked()){
             QFile m_File(mFileName);
             m_File.open(QIODevice::WriteOnly | QIODevice::Append);
             QTextStream out(&m_File);
-            out<<QString("%1\t%2\t%3\t%4\r\n")
+            out<<QString("%1\t%2\t%3\r\n")
                  .arg(static_cast<double>(data.Current)*1e6, 6,'f', 1)
                  .arg(static_cast<double>(data.Voltage)*1e3, 6, 'f', 2)
-                 .arg(static_cast<double>(data.CurrentMonitor)*1e6, 6, 'f', 2)
                  .arg(static_cast<double>(data.Counts), 6, 'f', 2);
             m_File.close();
         }

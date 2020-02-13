@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include <QTimer>
-#include "Drivers/ccu4sdm0driver.h"
+#include "Drivers_V2/sspddriverm0.h"
 
 #ifdef FAKE
 #include "Interfaces/fiointerface.h"
@@ -80,13 +80,12 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    cCu4SdM0Driver *mDriver;
+    SspdDriverM0 *mDriver;
     IOInterface_t *mInterface;
     QTimer *mTimer;
     QString mLastTcpIpAddress;
     QString mFileName;
     int mTimerCount_Interval;
-    bool isM0{true};
     int mMode{};
     double mCurrentValue{};
 };

@@ -72,3 +72,20 @@ DriverCommand *CommonDriver::writeEeprom() const
 {
     return mWriteEeprom;
 }
+
+bool CommonDriver::getDeviceInfo()
+{
+    bool ok;
+    mDeviceType->getValueSync(&ok);
+    if (!ok) return false;
+    mModificationVersion->getValueSync(&ok);
+    if (!ok) return false;
+    mHardwareVersion->getValueSync(&ok);
+    if (!ok) return false;
+    mFirmwareVersion->getValueSync(&ok);
+    if (!ok) return false;
+    mDeviceDescription->getValueSync(&ok);
+    if (!ok) return false;
+    mUDID->getValueSync(&ok);
+    return ok;
+}
