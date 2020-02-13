@@ -6,7 +6,7 @@
 #include "Interfaces/curs485iointerface.h"
 #include "../qCustomLib/qCustomLib.h"
 #include "Server/servercommands.h"
-#include "Drivers/adriver.h"
+#include "Drivers_V2/commondriver.h"
 
 enum testType{
     TT_Type,
@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
         if (address > 31 || address < 0) address = 0;
     }
 
-    AbstractDriver driver;
+    CommonDriver driver;
     if (!mInterface)
         return 1;
 
@@ -131,19 +131,19 @@ int main(int argc, char *argv[])
         bool ok = false;
         switch (mTestType) {
         case TT_Type:
-            driver.getDeviceType()->getValueSequence(&ok);
+            driver.deviceType()->getValueSync(&ok);
             break;
         case TT_Description:
-            driver.getDeviceDescription()->getValueSequence(&ok);
+            driver.deviceDescription()->getValueSync(&ok);
             break;
         case TT_Firmware:
-            driver.getFirmwareVersion()->getValueSequence(&ok);
+            driver.firmwareVersion()->getValueSync(&ok);
             break;
         case TT_Hardware:
-            driver.getHardwareVersion()->getValueSequence(&ok);
+            driver.hardwareVersion()->getValueSync(&ok);
             break;
         case TT_Modification:
-            driver.getModificationVersion()->getValueSequence(&ok);
+            driver.modificationVersion()->getValueSync(&ok);
             break;
         }
         if (ok) successAtempts++;
