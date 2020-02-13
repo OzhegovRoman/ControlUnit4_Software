@@ -14,6 +14,7 @@
 
 using namespace cmd;
 
+// TODO: Удалить нафиг
 cuServer::cuServer(QObject *parent)
     : cuIODeviceImpl(parent)
     , mTcpServer(new QTcpServer(this))

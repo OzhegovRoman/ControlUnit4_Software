@@ -53,6 +53,8 @@ private:
     mutable int current_id_;
 };
 
+class TempDriverM0;
+
 class DriverProperty_p
 {
 public:
@@ -86,6 +88,7 @@ private:
     ServiceSignal *mSettedSignal;
 
     friend AbstractDriver_V2;
+    friend TempDriverM0; //к сожалению нужен доступ к побитному вводу выводу для получения температурной таблицы
 };
 
 class DriverCommand: protected DriverProperty_p

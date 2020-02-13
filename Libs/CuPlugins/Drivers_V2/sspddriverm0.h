@@ -42,6 +42,8 @@ public:
     DriverProperty<pair_t<float> > *currentDacCoeff() const;
     DriverProperty<pair_t<float> > *cmpReferenceCoeff() const;
 
+    DriverProperty<bool> *PIDEnableStatus() const;
+
 signals:
     void dataUpdated(CU4SDM0V1_Data_t);
     void paramsUpdated(CU4SDM0V1_Param_t);
@@ -51,6 +53,7 @@ private slots:
     void updateData(const CU4SDM0V1_Data_t &data);
     void updateStatus(const CU4SDM0_Status_t &status);
     void updateParams(const CU4SDM0V1_Param_t &params);
+    void updateEEPROM(const CU4SDM0V1_EEPROM_Const_t &eeprom);
 
 private:
     //DeviceData
@@ -83,8 +86,8 @@ private:
     DriverProperty<pair_t<float> > *mCurrentDacCoeff;
     DriverProperty<pair_t<float> > *mCmpReferenceCoeff;
 
-//    //PID Enable Status
-//    cuDeviceParam_settable<bool> *mPIDEnableStatus;
+    //PID Enable Status
+    DriverProperty<bool> *mPIDEnableStatus;
 
 };
 
