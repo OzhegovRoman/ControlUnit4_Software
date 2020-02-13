@@ -1,6 +1,6 @@
 #include "generalscpicommands.h"
 #include "../ctcpipserver.h"
-#include "Drivers/adriver.h"
+#include "Drivers_V2/commondriver.h"
 
 GeneralScpiCommands::GeneralScpiCommands(QObject * parent)
     : CommonScpiCommands(parent)
@@ -61,75 +61,74 @@ bool GeneralScpiCommands::executeCommand(QString command, QString params)
 
     command = strList[1]; //уточняем команду
 
-    AbstractDriver driver;
+    CommonDriver driver;
 
     driver.setIOInterface(executor()->interface());
     driver.setDevAddress(address);
 
 
     if (command == "INIT"){
-        driver.init();
-        if (driver.waitingAnswer()) executor()->prepareAnswer("OK\r\n");
-        else executor()->prepareAnswer("ERROR: Timeout\r\n");
+        bool ok = false;
+        driver.init()->executeSync(&ok);
+        executor()->prepareAnswer(ok ? "OK\r\n"
+                                     : "ERROR: Timeout\r\n");
         return true;
     }
     if (command == "PARK"){
-        driver.goToPark();
-        if (driver.waitingAnswer()) executor()->prepareAnswer("OK\r\n");
-        else executor()->prepareAnswer("ERROR: Timeout\r\n");
+        bool ok;
+        driver.shutDown()->executeSync(&ok);
+        executor()->prepareAnswer(ok ? "OK\r\n"
+                                     : "ERROR: Timeout\r\n");
         return true;
     }
     if (command == "LOFF"){
-        driver.listeningOff();
+        driver.silence()->execute();
         executor()->prepareAnswer("OK\r\n");
         return true;
     }
     if (command == "STAT?"){ //пока пустышка
-        driver.getStatus();
-        if (driver.waitingAnswer()) executor()->prepareAnswer("OK\r\n");
-        else executor()->prepareAnswer("ERROR: Timeout\r\n");
+        executor()->prepareAnswer("OK\r\n");
         return true;
     }
     if (command == "ERR?"){ //пока пустышка
-        driver.getLastError();
-        if (driver.waitingAnswer()) executor()->prepareAnswer("OK\r\n");
-        else executor()->prepareAnswer("ERROR: Timeout\r\n");
+        executor()->prepareAnswer("OK\r\n");
         return true;
     }
     if (command == "DID?"){
         executor()->prepareAnswer(QString("%1\r\n").arg(devInfo->UDID().toString()));
         return true;
     }
-        if (command == "DTYP?"){
-            executor()->prepareAnswer(QString("%1\r\n").arg(devInfo->type()));
-            return true;
-        }
-        if (command == "DDES?"){
-            executor()->prepareAnswer(QString("%1\r\n").arg(devInfo->description()));
-            return true;
-        }
-        if (command == "MODV?"){
-            executor()->prepareAnswer(QString("%1\r\n").arg(devInfo->modificationVersion()));
-            return true;
-        }
-        if (command == "HWV?"){
-            executor()->prepareAnswer(QString("%1\r\n").arg(devInfo->hardwareVersion()));
-            return true;
-        }
-        if (command == "FWV?"){
-            executor()->prepareAnswer(QString("%1\r\n").arg(devInfo->firmwareVersion()));
-            return true;
-        }
-        if (command == "BOOT"){
-            driver.rebootDevice();
-            executor()->prepareAnswer("OK\r\n");
-            return true;
-        }
-        if (command == "WEEP"){
-            driver.writeEeprom();
-            if (driver.waitingAnswer()) executor()->prepareAnswer("OK\r\n");
-            else executor()->prepareAnswer("ERROR: Timeout\r\n");
-            return true;
-        }
+    if (command == "DTYP?"){
+        executor()->prepareAnswer(QString("%1\r\n").arg(devInfo->type()));
+        return true;
+    }
+    if (command == "DDES?"){
+        executor()->prepareAnswer(QString("%1\r\n").arg(devInfo->description()));
+        return true;
+    }
+    if (command == "MODV?"){
+        executor()->prepareAnswer(QString("%1\r\n").arg(devInfo->modificationVersion()));
+        return true;
+    }
+    if (command == "HWV?"){
+        executor()->prepareAnswer(QString("%1\r\n").arg(devInfo->hardwareVersion()));
+        return true;
+    }
+    if (command == "FWV?"){
+        executor()->prepareAnswer(QString("%1\r\n").arg(devInfo->firmwareVersion()));
+        return true;
+    }
+    if (command == "BOOT"){
+        driver.reboot()->execute();
+        executor()->prepareAnswer("OK\r\n");
+        return true;
+    }
+    if (command == "WEEP"){
+        bool ok;
+        driver.writeEeprom()->executeSync(&ok);
+        executor()->prepareAnswer(ok ? "OK\r\n"
+                                     : "ERROR: Timeout\r\n");
+        return true;
+    }
     return false;
 }

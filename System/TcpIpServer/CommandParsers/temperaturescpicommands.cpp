@@ -1,6 +1,6 @@
 #include "temperaturescpicommands.h"
 #include "../ctcpipserver.h"
-#include "Drivers/ccu4tdm0driver.h"
+#include "Drivers_V2/tempdriverm0.h"
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QJsonArray>
@@ -74,7 +74,7 @@ bool TemperatureScpiCommands::executeCommand(QString command, QString params)
 
     command = strList[1]; //уточняем команду
 
-    cCu4TdM0Driver driver;
+    TempDriverM0 driver;
 
     driver.setIOInterface(executor()->interface());
     driver.setDevAddress(address);
@@ -82,7 +82,7 @@ bool TemperatureScpiCommands::executeCommand(QString command, QString params)
     processingAnswer answer = PA_None;
 
     if (command == "DATA?"){
-        CU4TDM0V1_Data_t data = driver.deviceData()->getValueSequence(&ok);
+        CU4TDM0V1_Data_t data = driver.data()->getValueSync(&ok);
         if (ok){
             QJsonObject jsonObj;
             jsonObj["Temperature"]          = static_cast<double>(data.Temperature);
@@ -100,7 +100,7 @@ bool TemperatureScpiCommands::executeCommand(QString command, QString params)
     }
 
     if (command == "TEMP?"){
-        double data = static_cast<double>(driver.temperature()->getValueSequence(&ok));
+        auto data = static_cast<double>(driver.temperature()->getValueSync(&ok));
         if (ok) {
             executor()->prepareAnswer(QString("%1\r\n").arg(data));
             return true;
@@ -109,7 +109,7 @@ bool TemperatureScpiCommands::executeCommand(QString command, QString params)
     }
 
     if (command == "PRES?"){
-        double data = static_cast<double>(driver.pressure()->getValueSequence(&ok));
+        auto data = static_cast<double>(driver.pressure()->getValueSync(&ok));
         if (ok) {
             executor()->prepareAnswer(QString("%1\r\n").arg(data));
             return true;
@@ -118,7 +118,7 @@ bool TemperatureScpiCommands::executeCommand(QString command, QString params)
     }
 
     if (command == "CURR?"){
-        double data = static_cast<double>(driver.tempSensorCurrent()->getValueSequence(&ok));
+        auto data = static_cast<double>(driver.tempSensorCurrent()->getValueSync(&ok));
         if (ok) {
             executor()->prepareAnswer(QString("%1\r\n").arg(data));
             return true;
@@ -128,15 +128,14 @@ bool TemperatureScpiCommands::executeCommand(QString command, QString params)
     if (command == "CURR"){
         float data = params.toFloat(&ok);
         if (ok) {
-            driver.tempSensorCurrent()->setValue(data);
-            if (driver.waitingAnswer()) answer = PA_Ok;
-            else answer = PA_TimeOut;
+            driver.tempSensorCurrent()->setValueSync(data, &ok);
+            answer = ok ? PA_Ok : PA_TimeOut;
         }
         else answer = PA_ErrorData;
     }
 
     if (command == "VOLT?"){
-        double data = static_cast<double>(driver.tempSensorVoltage()->getValueSequence(&ok));
+        double data = static_cast<double>(driver.tempSensorVoltage()->getValueSync(&ok));
         if (ok) {
             executor()->prepareAnswer(QString("%1\r\n").arg(data));
             return true;
@@ -145,7 +144,7 @@ bool TemperatureScpiCommands::executeCommand(QString command, QString params)
     }
 
     if (command == "PRVP?"){
-        double data = static_cast<double>(driver.pressSensorVoltageP()->getValueSequence(&ok));
+        double data = static_cast<double>(driver.pressSensorVoltageP()->getValueSync(&ok));
         if (ok) {
             executor()->prepareAnswer(QString("%1\r\n").arg(data));
             return true;
@@ -154,7 +153,7 @@ bool TemperatureScpiCommands::executeCommand(QString command, QString params)
     }
 
     if (command == "PRVN?"){
-        double data = static_cast<double>(driver.pressSensorVoltageN()->getValueSequence(&ok));
+        double data = static_cast<double>(driver.pressSensorVoltageN()->getValueSync(&ok));
         if (ok) {
             executor()->prepareAnswer(QString("%1\r\n").arg(data));
             return true;
@@ -163,7 +162,7 @@ bool TemperatureScpiCommands::executeCommand(QString command, QString params)
     }
 
     if (command == "THON?"){
-        bool data = driver.commutatorOn()->getValueSequence(&ok);
+        bool data = driver.commutator()->getValueSync(&ok);
         if (ok) {
             executor()->prepareAnswer(QString("%1\r\n").arg(data));
             return true;
@@ -173,15 +172,14 @@ bool TemperatureScpiCommands::executeCommand(QString command, QString params)
     if (command == "THON"){
         quint8 data = static_cast<quint8>(params.toInt(&ok));
         if (ok) {
-            driver.commutatorOn()->setValue(data);
-            if (driver.waitingAnswer()) answer = PA_Ok;
-            else answer = PA_TimeOut;
+            driver.commutator()->setValueSync(data, &ok);
+            answer = ok ? PA_Ok : PA_TimeOut;
         }
         else answer = PA_ErrorData;
     }
 
     if (command == "EEPR?"){
-        CU4TDM0V1_EEPROM_Const_t data = driver.eepromConst()->getValueSequence(&ok);
+        CU4TDM0V1_EEPROM_Const_t data = driver.eepromConst()->getValueSync(&ok);
         if (ok){
             QJsonObject jsonObj;
             QJsonArray value;
@@ -262,13 +260,13 @@ bool TemperatureScpiCommands::executeCommand(QString command, QString params)
         data.pressSensorVoltageN.first  = static_cast<float>(value[0].toDouble());
         data.pressSensorVoltageN.second = static_cast<float>(value[1].toDouble());
 
-        driver.eepromConst()->setValue(data);
-        if (driver.waitingAnswer()) answer = PA_Ok;
-        else answer = PA_TimeOut;
+        bool ok = false;
+        driver.eepromConst()->setValueSync(data, &ok);
+        answer = ok ? PA_Ok : PA_TimeOut;
     }
 
     if (command == "CADC?"){
-        pair_t<float> data = driver.tempSensorCurrentAdcCoeff()->getValueSequence(&ok);
+        pair_t<float> data = driver.tempSensorCurrentAdcCoeff()->getValueSync(&ok);
         if (ok){
             sendPairFloat(data);
             return true;
@@ -278,15 +276,14 @@ bool TemperatureScpiCommands::executeCommand(QString command, QString params)
     if (command == "CADC"){
         pair_t<float> data = pairFromJsonString(params, &ok);
         if (ok){
-            driver.tempSensorCurrentAdcCoeff()->setValue(data);
-            if (driver.waitingAnswer()) answer = PA_Ok;
-            else answer = PA_TimeOut;
+            driver.tempSensorCurrentAdcCoeff()->setValueSync(data, &ok);
+            answer = ok ? PA_Ok : PA_TimeOut;
         }
         else answer = PA_ErrorData;
     }
 
     if (command=="CDAC?"){
-        pair_t<float> data = driver.tempSensorCurrentDacCoeff()->getValueSequence(&ok);
+        pair_t<float> data = driver.tempSensorCurrentDacCoeff()->getValueSync(&ok);
         if (ok){
             sendPairFloat(data);
             return true;
@@ -296,15 +293,14 @@ bool TemperatureScpiCommands::executeCommand(QString command, QString params)
     if (command == "CDAC"){
         pair_t<float> data = pairFromJsonString(params, &ok);
         if (ok){
-            driver.tempSensorCurrentDacCoeff()->setValue(data);
-            if (driver.waitingAnswer()) answer = PA_Ok;
-            else answer = PA_TimeOut;
+            driver.tempSensorCurrentDacCoeff()->setValueSync(data, &ok);
+            answer = ok ? PA_Ok : PA_TimeOut;
         }
         else answer = PA_ErrorData;
     }
 
     if (command == "VADC?"){
-        pair_t<float> data = driver.tempSensorVoltageCoeff()->getValueSequence(&ok);
+        pair_t<float> data = driver.tempSensorVoltageCoeff()->getValueSync(&ok);
         if (ok){
             sendPairFloat(data);
             return true;
@@ -314,15 +310,14 @@ bool TemperatureScpiCommands::executeCommand(QString command, QString params)
     if (command == "VADC"){
         pair_t<float> data = pairFromJsonString(params, &ok);
         if (ok){
-            driver.tempSensorVoltageCoeff()->setValue(data);
-            if (driver.waitingAnswer()) answer = PA_Ok;
-            else answer = PA_TimeOut;
+            driver.tempSensorVoltageCoeff()->setValueSync(data, &ok);
+            answer = ok ? PA_Ok : PA_TimeOut;
         }
         else answer = PA_ErrorData;
     }
 
     if (command == "VPPC?"){
-        pair_t<float> data = driver.pressSensorVoltagePCoeff()->getValueSequence(&ok);
+        pair_t<float> data = driver.pressSensorVoltagePCoeff()->getValueSync(&ok);
         if (ok){
             sendPairFloat(data);
             return true;
@@ -332,15 +327,14 @@ bool TemperatureScpiCommands::executeCommand(QString command, QString params)
     if (command == "VPPC"){
         pair_t<float> data = pairFromJsonString(params, &ok);
         if (ok){
-            driver.pressSensorVoltagePCoeff()->setValue(data);
-            if (driver.waitingAnswer()) answer = PA_Ok;
-            else answer = PA_TimeOut;
+            driver.pressSensorVoltagePCoeff()->setValueSync(data, &ok);
+            answer = ok ? PA_Ok : PA_TimeOut;
         }
         else answer = PA_ErrorData;
     }
 
     if (command == "VPNC?"){
-        pair_t<float> data = driver.pressSensorVoltageNCoeff()->getValueSequence(&ok);
+        pair_t<float> data = driver.pressSensorVoltageNCoeff()->getValueSync(&ok);
         if (ok){
             sendPairFloat(data);
             return true;
@@ -350,15 +344,14 @@ bool TemperatureScpiCommands::executeCommand(QString command, QString params)
     if (command == "VPNC"){
         pair_t<float> data = pairFromJsonString(params, &ok);
         if (ok){
-            driver.pressSensorVoltageNCoeff()->setValue(data);
-            if (driver.waitingAnswer()) answer = PA_Ok;
-            else answer = PA_TimeOut;
+            driver.pressSensorVoltageNCoeff()->setValueSync(data, &ok);
+            answer = ok ? PA_Ok : PA_TimeOut;
         }
         else answer = PA_ErrorData;
     }
 
     if (command == "PRSC?"){
-        pair_t<float> data = driver.pressSensorCoeff()->getValueSequence(&ok);
+        pair_t<float> data = driver.pressSensorCoeff()->getValueSync(&ok);
         if (ok){
             sendPairFloat(data);
             return true;
@@ -368,9 +361,8 @@ bool TemperatureScpiCommands::executeCommand(QString command, QString params)
     if (command == "PRSC"){
         pair_t<float> data = pairFromJsonString(params, &ok);
         if (ok){
-            driver.pressSensorCoeff()->setValue(data);
-            if (driver.waitingAnswer()) answer = PA_Ok;
-            else answer = PA_TimeOut;
+            driver.pressSensorCoeff()->setValueSync(data, &ok);
+            answer = ok ? PA_Ok : PA_TimeOut;
         }
         else answer = PA_ErrorData;
     }
@@ -404,8 +396,8 @@ bool TemperatureScpiCommands::executeCommand(QString command, QString params)
             tempTable[i].Temperature    = static_cast<float>(value[0].toDouble());
             tempTable[i].Voltage        = static_cast<float>(value[1].toDouble());
         }
-        if (driver.waitingAnswer()) answer = PA_Ok;
-        else answer = PA_TimeOut;
+        bool ok = driver.sendTempTable();
+        answer = ok ? PA_Ok : PA_TimeOut;
     }
 
     switch (answer) {

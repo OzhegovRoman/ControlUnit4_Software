@@ -1,6 +1,6 @@
 #include "systemscpicommands.h"
 #include "../ctcpipserver.h"
-#include "Drivers/adriver.h"
+#include "cuiodevice.h"
 
 SystemScpiCommands::SystemScpiCommands(QObject *parent)
     : CommonScpiCommands(parent)

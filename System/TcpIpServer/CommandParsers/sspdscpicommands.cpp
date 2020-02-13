@@ -1,6 +1,6 @@
 #include "sspdscpicommands.h"
 #include "../ctcpipserver.h"
-#include "Drivers/ccu4sdm0driver.h"
+#include "Drivers_V2/sspddriverm0.h"
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QJsonArray>
@@ -104,14 +104,14 @@ bool SspdScpiCommands::executeCommand(QString command, QString params)
 
     command = strList[1]; //уточняем команду
 
-    cCu4SdM0Driver driver;
+    SspdDriverM0 driver;
 
     driver.setIOInterface(executor()->interface());
     driver.setDevAddress(address);
     processingAnswer answer = PA_None;
 
     if (command == "DATA?"){
-        CU4SDM0V1_Data_t data = driver.deviceData()->getValueSequence(&ok);
+        CU4SDM0V1_Data_t data = driver.data()->getValueSync(&ok);
         if (ok){
             QJsonObject jsonObj;
             jsonObj["Current"]  = static_cast<double>(data.Current);
@@ -126,7 +126,7 @@ bool SspdScpiCommands::executeCommand(QString command, QString params)
     }
 
     if (command == "CURR?"){
-        double data = static_cast<double>(driver.current()->getValueSequence(&ok));
+        double data = static_cast<double>(driver.current()->getValueSync(&ok));
         if (ok) {
             executor()->prepareAnswer(QString("%1\r\n").arg(data));
             return true;
@@ -136,15 +136,14 @@ bool SspdScpiCommands::executeCommand(QString command, QString params)
     if (command == "CURR"){
         float data = params.toFloat(&ok);
         if (ok) {
-            driver.current()->setValue(data);
-            if (driver.waitingAnswer()) answer = PA_Ok;
-            else answer = PA_TimeOut;
+            driver.current()->setValueSync(data, &ok);
+            answer = ok ? PA_Ok : PA_TimeOut;
         }
         else answer = PA_ErrorData;
     }
 
     if (command == "VOLT?"){
-        double data = static_cast<double>(driver.voltage()->getValueSequence(&ok));
+        double data = static_cast<double>(driver.voltage()->getValueSync(&ok));
         if (ok) {
             executor()->prepareAnswer(QString("%1\r\n").arg(data));
             return true;
@@ -153,7 +152,7 @@ bool SspdScpiCommands::executeCommand(QString command, QString params)
     }
 
     if (command == "COUN?"){
-        double data = static_cast<double>(driver.counts()->getValueSequence(&ok));
+        double data = static_cast<double>(driver.counts()->getValueSync(&ok));
         if (ok) {
             executor()->prepareAnswer(QString("%1\r\n").arg(data));
             return true;
@@ -162,7 +161,7 @@ bool SspdScpiCommands::executeCommand(QString command, QString params)
     }
 
     if (command == "STAT?"){
-        quint8 data = driver.deviceStatus()->getValueSequence(&ok).Data;
+        quint8 data = driver.status()->getValueSync(&ok).Data;
         if (ok) {
             executor()->prepareAnswer(QString("%1\r\n").arg(data));
             return true;
@@ -173,15 +172,14 @@ bool SspdScpiCommands::executeCommand(QString command, QString params)
         CU4SDM0_Status_t Status;
         Status.Data = static_cast<quint8>(params.toInt(&ok));
         if (ok) {
-            driver.deviceStatus()->setValue(Status);
-            if (driver.waitingAnswer()) answer = PA_Ok;
-            else answer = PA_TimeOut;
+            driver.status()->setValueSync(Status, &ok);
+            answer = ok ? PA_Ok : PA_TimeOut;
         }
         else answer = PA_ErrorData;
     }
 
     if (command  == "SHOR?"){
-        quint8 data = driver.deviceStatus()->getValueSequence(&ok,5).stShorted;
+        quint8 data = driver.status()->getValueSync(&ok).stShorted;
         if (ok) {
             executor()->prepareAnswer(QString("%1\r\n").arg(data));
             return true;
@@ -189,17 +187,16 @@ bool SspdScpiCommands::executeCommand(QString command, QString params)
         answer = PA_TimeOut;
     }
     if (command == "SHOR"){
-        quint8 data = static_cast<quint8>(params.toInt(&ok));
+        auto data = static_cast<bool>(params.toInt(&ok));
         if (ok) {
-            driver.setShortEnable(data);
-            if (driver.waitingAnswer()) answer = PA_Ok;
-            else answer = PA_TimeOut;
+            driver.shortEnable()->setValueSync(data, &ok);
+            answer = ok ? PA_Ok : PA_TimeOut;
         }
         else answer = PA_ErrorData;
     }
 
     if (command == "AMPE?"){
-        quint8 data = driver.deviceStatus()->getValueSequence(&ok,5).stAmplifierOn;
+        quint8 data = driver.status()->getValueSync(&ok).stAmplifierOn;
         if (ok) {
             executor()->prepareAnswer(QString("%1\r\n").arg(data));
             return true;
@@ -207,17 +204,16 @@ bool SspdScpiCommands::executeCommand(QString command, QString params)
         answer = PA_TimeOut;
     }
     if (command == "AMPE"){
-        quint8 data = static_cast<quint8>(params.toInt(&ok));
+        auto data = static_cast<bool>(params.toInt(&ok));
         if (ok) {
-            driver.setAmpEnable(data);
-            if (driver.waitingAnswer()) answer = PA_Ok;
-            else answer = PA_TimeOut;
+            driver.amplifierEnable()->setValueSync(data, &ok);
+            answer = ok ? PA_Ok : PA_TimeOut;
         }
         else answer = PA_ErrorData;
     }
 
     if (command == "RFKC?"){
-        quint8 data = driver.deviceStatus()->getValueSequence(&ok,5).stRfKeyToCmp;
+        quint8 data = driver.status()->getValueSync(&ok).stRfKeyToCmp;
         if (ok) {
             executor()->prepareAnswer(QString("%1\r\n").arg(data));
             return true;
@@ -225,17 +221,16 @@ bool SspdScpiCommands::executeCommand(QString command, QString params)
         answer = PA_TimeOut;
     }
     if (command == "RFKC"){
-        quint8 data = static_cast<quint8>(params.toInt(&ok));
+        auto data = static_cast<bool>(params.toInt(&ok));
         if (ok) {
-            driver.setRfKeyEnable(data);
-            if (driver.waitingAnswer()) answer = PA_Ok;
-            else answer = PA_TimeOut;
+            driver.rfKeyEnable()->setValueSync(data, &ok);
+            answer = ok ? PA_Ok : PA_TimeOut;
         }
         else answer = PA_ErrorData;
     }
 
     if (command == "CLE?"){
-        quint8 data = driver.deviceStatus()->getValueSequence(&ok,5).stComparatorOn;
+        quint8 data = driver.status()->getValueSync(&ok).stComparatorOn;
         if (ok) {
             executor()->prepareAnswer(QString("%1\r\n").arg(data));
             return true;
@@ -243,17 +238,16 @@ bool SspdScpiCommands::executeCommand(QString command, QString params)
         answer = PA_TimeOut;
     }
     if (command == "CLE"){
-        quint8 data = static_cast<quint8>(params.toInt(&ok));
+        auto data = static_cast<bool>(params.toInt(&ok));
         if (ok) {
-            driver.setCmpLatchEnable(data);
-            if (driver.waitingAnswer()) answer = PA_Ok;
-            else answer = PA_TimeOut;
+            driver.cmpLatchEnable()->setValueSync(data, &ok);
+            answer = ok ? PA_Ok : PA_TimeOut;
         }
         else answer = PA_ErrorData;
     }
 
     if (command == "COUE?"){
-        quint8 data = driver.deviceStatus()->getValueSequence(&ok,5).stCounterOn;
+        quint8 data = driver.status()->getValueSync(&ok).stCounterOn;
         if (ok) {
             executor()->prepareAnswer(QString("%1\r\n").arg(data));
             return true;
@@ -261,17 +255,16 @@ bool SspdScpiCommands::executeCommand(QString command, QString params)
         answer = PA_TimeOut;
     }
     if (command == "COUE"){
-        quint8 data = static_cast<quint8>(params.toInt(&ok));
+        auto data = static_cast<bool>(params.toInt(&ok));
         if (ok) {
-            driver.setCounterEnable(data);
-            if (driver.waitingAnswer()) answer = PA_Ok;
-            else answer = PA_TimeOut;
+            driver.counterEnable()->setValueSync(data, &ok);
+            answer = ok ? PA_Ok : PA_TimeOut;
         }
         else answer = PA_ErrorData;
     }
 
     if (command == "ARE?"){
-        quint8 data = driver.deviceStatus()->getValueSequence(&ok,5).stAutoResetOn;
+        quint8 data = driver.status()->getValueSync(&ok).stAutoResetOn;
         if (ok) {
             executor()->prepareAnswer(QString("%1\r\n").arg(data));
             return true;
@@ -279,11 +272,10 @@ bool SspdScpiCommands::executeCommand(QString command, QString params)
         answer = PA_TimeOut;
     }
     if (command == "ARE"){
-        quint8 data = static_cast<quint8>(params.toInt(&ok));
+        auto data = static_cast<bool>(params.toInt(&ok));
         if (ok) {
-            driver.setAutoResetEnable(data);
-            if (driver.waitingAnswer()) answer = PA_Ok;
-            else answer = PA_TimeOut;
+            driver.autoResetEnable()->setValueSync(data, &ok);
+            answer = ok ? PA_Ok : PA_TimeOut;
         }
         else answer = PA_ErrorData;
     }
@@ -298,12 +290,12 @@ bool SspdScpiCommands::executeCommand(QString command, QString params)
         data.AutoResetTimeOut   = static_cast<float>(jsonObj["AutoResetTimeOut"].toDouble());
         data.Cmp_Ref_Level      = static_cast<float>(jsonObj["Cmp_Ref_Level"].toDouble());
         data.Time_Const         = static_cast<float>(jsonObj["Time_Const"].toDouble());
-        driver.deviceParams()->setValue(data);
-        if (driver.waitingAnswer()) answer = PA_Ok;
-        else answer = PA_TimeOut;
+        bool ok = false;
+        driver.params()->setValueSync(data, &ok);
+        answer = ok ? PA_Ok : PA_TimeOut;
     }
     if (command == "PARA?"){
-        CU4SDM0V1_Param_t data = driver.deviceParams()->getValueSequence(&ok);
+        CU4SDM0V1_Param_t data = driver.params()->getValueSync(&ok);
         if (ok){
             QJsonObject jsonObj;
             jsonObj["AutoResetCounts"]      = static_cast<int>(data.AutoResetCounts);
@@ -319,7 +311,7 @@ bool SspdScpiCommands::executeCommand(QString command, QString params)
     }
 
     if (command == "CMPR?"){
-        double data = static_cast<double>(driver.cmpReferenceLevel()->getValueSequence(&ok));
+        double data = static_cast<double>(driver.cmpReferenceLevel()->getValueSync(&ok));
         if (ok) {
             executor()->prepareAnswer(QString("%1\r\n").arg(data));
             return true;
@@ -329,15 +321,14 @@ bool SspdScpiCommands::executeCommand(QString command, QString params)
     if (command == "CMPR"){
         float data = params.toFloat(&ok);
         if (ok) {
-            driver.cmpReferenceLevel()->setValue(data);
-            if (driver.waitingAnswer()) answer = PA_Ok;
-            else answer = PA_TimeOut;
+            driver.cmpReferenceLevel()->setValueSync(data, &ok);
+            answer = ok ? PA_Ok : PA_TimeOut;
         }
         else answer = PA_ErrorData;
     }
 
     if (command == "TIMC?"){
-        double data = static_cast<double>(driver.timeConst()->getValueSequence(&ok));
+        double data = static_cast<double>(driver.timeConst()->getValueSync(&ok));
         if (ok) {
             executor()->prepareAnswer(QString("%1\r\n").arg(data));
             return true;
@@ -347,15 +338,14 @@ bool SspdScpiCommands::executeCommand(QString command, QString params)
     if (command == "TIMC"){
         float data = params.toFloat(&ok);
         if (ok) {
-            driver.timeConst()->setValue(data);
-            if (driver.waitingAnswer()) answer = PA_Ok;
-            else answer = PA_TimeOut;
+            driver.timeConst()->setValueSync(data, &ok);
+            answer = ok ? PA_Ok : PA_TimeOut;
         }
         else answer = PA_ErrorData;
     }
 
     if (command == "ARTH?"){
-        double data = static_cast<double>(driver.autoResetThreshold()->getValueSequence(&ok));
+        double data = static_cast<double>(driver.autoResetThreshold()->getValueSync(&ok));
         if (ok) {
             executor()->prepareAnswer(QString("%1\r\n").arg(data));
             return true;
@@ -365,15 +355,14 @@ bool SspdScpiCommands::executeCommand(QString command, QString params)
     if (command == "ARTH"){
         float data = params.toFloat(&ok);
         if (ok) {
-            driver.autoResetThreshold()->setValue(data);
-            if (driver.waitingAnswer()) answer = PA_Ok;
-            else answer = PA_TimeOut;
+            driver.autoResetThreshold()->setValueSync(data, &ok);
+            answer = ok ? PA_Ok : PA_TimeOut;
         }
         else answer = PA_ErrorData;
     }
 
     if (command == "ARTO?"){
-        double data = static_cast<double>(driver.autoResetTimeOut()->getValueSequence(&ok));
+        double data = static_cast<double>(driver.autoResetTimeOut()->getValueSync(&ok));
         if (ok) {
             executor()->prepareAnswer(QString("%1\r\n").arg(data));
             return true;
@@ -383,15 +372,14 @@ bool SspdScpiCommands::executeCommand(QString command, QString params)
     if (command == "ARTO"){
         float data = params.toFloat(&ok);
         if (ok) {
-            driver.autoResetTimeOut()->setValue(data);
-            if (driver.waitingAnswer()) answer = PA_Ok;
-            else answer = PA_TimeOut;
+            driver.autoResetTimeOut()->setValueSync(data, &ok);
+            answer = ok ? PA_Ok : PA_TimeOut;
         }
         else answer = PA_ErrorData;
     }
 
     if (command == "ARCO?"){
-        double data = static_cast<double>(driver.autoResetAlarmsCounts()->getValueSequence(&ok));
+        double data = static_cast<double>(driver.autoResetAlarmsCounts()->getValueSync(&ok));
         if (ok) {
             executor()->prepareAnswer(QString("%1\r\n").arg(data));
             return true;
@@ -401,15 +389,14 @@ bool SspdScpiCommands::executeCommand(QString command, QString params)
     if (command == "ARCO"){
         unsigned int data = params.toUInt(&ok);
         if (ok) {
-            driver.autoResetAlarmsCounts()->setValue(data);
-            if (driver.waitingAnswer()) answer = PA_Ok;
-            else answer = PA_TimeOut;
+            driver.autoResetAlarmsCounts()->setValueSync(data, &ok);
+            answer = ok ? PA_Ok : PA_TimeOut;
         }
         else answer = PA_ErrorData;
     }
 
     if (command == "EEPR?"){
-        CU4SDM0V1_EEPROM_Const_t data = driver.eepromConst()->getValueSequence(&ok);
+        CU4SDM0V1_EEPROM_Const_t data = driver.eepromConst()->getValueSync(&ok);
         if (ok){
             QJsonObject jsonObj;
             QJsonArray value;
@@ -468,13 +455,13 @@ bool SspdScpiCommands::executeCommand(QString command, QString params)
         data.Cmp_Ref_DAC.first  = static_cast<float>(value[0].toDouble());
         data.Cmp_Ref_DAC.second = static_cast<float>(value[1].toDouble());
 
-        driver.eepromConst()->setValue(data);
-        if (driver.waitingAnswer()) answer = PA_Ok;
-        else answer = PA_TimeOut;
+        bool ok = false;
+        driver.eepromConst()->setValueSync(data, &ok);
+        answer = ok ? PA_Ok : PA_TimeOut;
     }
 
     if (command == "CADC?"){
-        pair_t<float> data = driver.currentAdcCoeff()->getValueSequence(&ok);
+        pair_t<float> data = driver.currentAdcCoeff()->getValueSync(&ok);
         if (ok){
             sendPairFloat(data);
             return true;
@@ -484,15 +471,14 @@ bool SspdScpiCommands::executeCommand(QString command, QString params)
     if (command == "CADC"){
         pair_t<float> data = pairFromJsonString(params, &ok);
         if (ok){
-            driver.currentAdcCoeff()->setValue(data);
-            if (driver.waitingAnswer()) answer = PA_Ok;
-            else answer = PA_TimeOut;
+            driver.currentAdcCoeff()->setValueSync(data, &ok);
+            answer = ok ? PA_Ok : PA_TimeOut;
         }
         else answer = PA_ErrorData;
     }
 
     if (command == "VADC?"){
-        pair_t<float> data = driver.voltageAdcCoeff()->getValueSequence(&ok);
+        pair_t<float> data = driver.voltageAdcCoeff()->getValueSync(&ok);
         if (ok){
             sendPairFloat(data);
             return true;
@@ -502,15 +488,14 @@ bool SspdScpiCommands::executeCommand(QString command, QString params)
     if (command == "VADC"){
         pair_t<float> data = pairFromJsonString(params, &ok);
         if (ok){
-            driver.voltageAdcCoeff()->setValue(data);
-            if (driver.waitingAnswer()) answer = PA_Ok;
-            else answer = PA_TimeOut;
+            driver.voltageAdcCoeff()->setValueSync(data, &ok);
+            answer = ok ? PA_Ok : PA_TimeOut;
         }
         else answer = PA_ErrorData;
     }
 
     if (command == "CDAC?"){
-        pair_t<float> data = driver.currentDacCoeff()->getValueSequence(&ok);
+        pair_t<float> data = driver.currentDacCoeff()->getValueSync(&ok);
         if (ok){
             sendPairFloat(data);
             return true;
@@ -520,15 +505,14 @@ bool SspdScpiCommands::executeCommand(QString command, QString params)
     if (command == "CDAC"){
         pair_t<float> data = pairFromJsonString(params, &ok);
         if (ok){
-            driver.currentDacCoeff()->setValue(data);
-            if (driver.waitingAnswer()) answer = PA_Ok;
-            else answer = PA_TimeOut;
+            driver.currentDacCoeff()->setValueSync(data, &ok);
+            answer = ok ? PA_Ok : PA_TimeOut;
         }
         else answer = PA_ErrorData;
     }
 
     if (command == "CMPC?"){
-        pair_t<float> data = driver.cmpReferenceCoeff()->getValueSequence(&ok);
+        pair_t<float> data = driver.cmpReferenceCoeff()->getValueSync(&ok);
         if (ok){
             sendPairFloat(data);
             return true;
@@ -538,15 +522,14 @@ bool SspdScpiCommands::executeCommand(QString command, QString params)
     if (command == "CMPC"){
         pair_t<float> data = pairFromJsonString(params, &ok);
         if (ok){
-            driver.cmpReferenceCoeff()->setValue(data);
-            if (driver.waitingAnswer()) answer = PA_Ok;
-            else answer = PA_TimeOut;
+            driver.cmpReferenceCoeff()->setValueSync(data, &ok);
+            answer = ok ? PA_Ok : PA_TimeOut;
         }
         else answer = PA_ErrorData;
     }
     
     if (command == "PIDS?"){
-        quint8 data = driver.PIDEnableStatus()->getValueSequence(&ok);
+        quint8 data = driver.PIDEnableStatus()->getValueSync(&ok);
         if (ok) {
             executor()->prepareAnswer(QString("%1\r\n").arg(data));
             return true;
@@ -556,9 +539,8 @@ bool SspdScpiCommands::executeCommand(QString command, QString params)
     if (command == "PIDS"){
         quint8 data = static_cast<quint8>(params.toInt(&ok));
         if (ok) {
-            driver.PIDEnableStatus()->setValueSequence(data);
-            if (driver.waitingAnswer()) answer = PA_Ok;
-            else answer = PA_TimeOut;
+            driver.PIDEnableStatus()->setValueSync(data, &ok);
+            answer = ok ? PA_Ok : PA_TimeOut;
         }
         else answer = PA_ErrorData;
     }

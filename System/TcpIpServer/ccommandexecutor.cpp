@@ -4,7 +4,7 @@
 #include <QSettings>
 #include "ctcpipserver.h"
 #include "Server/servercommands.h"
-#include "Drivers/adriver.h"
+#include "Drivers_V2/commondriver.h"
 #include "CommandParsers/commandparser.h"
 
 cCommandExecutor::cCommandExecutor(QObject *parent)
@@ -140,7 +140,7 @@ bool cCommandExecutor::checkDevice(const cDeviceInfo &info)
     if (!mInterface)
         return false;
 
-    AbstractDriver driver;
+    CommonDriver driver;
     driver.setIOInterface(mInterface);
     driver.setDevAddress(info.address());
 
@@ -150,7 +150,7 @@ bool cCommandExecutor::checkDevice(const cDeviceInfo &info)
     bool ok;
 
     cTcpIpServer::consoleWriteDebug(QString("Try to get UDID"));
-    cUDID UDID = driver.getUDID()->getValueSequence(&ok, 10); // крайне важная операция будем пробовать аж до 10 раз
+    cUDID UDID = driver.UDID()->getValueSync(&ok, 10); // крайне важная операция будем пробовать аж до 10 раз
     cTcpIpServer::consoleWriteDebug(QString("Result: %1").arg(ok ? "success" : "failed"));
     if (!ok) return false;
     cTcpIpServer::consoleWriteDebug(QString("UDID: %1").arg(UDID.toString()));
@@ -186,28 +186,28 @@ bool cCommandExecutor::addDevice(quint8 address)
     cTcpIpServer::consoleWriteDebug(QString("Add device with address %1").arg(address));
     mSettings->removeDeviceWithAddress(address);
 
-    AbstractDriver driver;
+    CommonDriver driver;
     driver.setIOInterface(mInterface);
     driver.setDevAddress(address);
     cDeviceInfo info;
     bool ok = false;
     info.setAddress(address);
-    info.setType(driver.getDeviceType()->getValueSequence(&ok, 5));
+    info.setType(driver.deviceType()->getValueSync(&ok, 5));
     if (!ok) return false;
 
-    info.setUDID(driver.getUDID()->getValueSequence(&ok,5));
+    info.setUDID(driver.UDID()->getValueSync(&ok,5));
     if (!ok) return false;
 
-    info.setModificationVersion(driver.getModificationVersion()->getValueSequence(&ok, 5));
+    info.setModificationVersion(driver.modificationVersion()->getValueSync(&ok, 5));
     if (!ok) return false;
 
-    info.setHardwareVersion(driver.getHardwareVersion()->getValueSequence(&ok, 5));
+    info.setHardwareVersion(driver.hardwareVersion()->getValueSync(&ok, 5));
     if (!ok) return false;
 
-    info.setFirmwareVersion(driver.getFirmwareVersion()->getValueSequence(&ok, 5));
+    info.setFirmwareVersion(driver.firmwareVersion()->getValueSync(&ok, 5));
     if (!ok) return false;
 
-    info.setDescription(driver.getDeviceDescription()->getValueSequence(&ok, 5));
+    info.setDescription(driver.deviceDescription()->getValueSync(&ok, 5));
     if (!ok) return false;
 
     mSettings->append(info);
