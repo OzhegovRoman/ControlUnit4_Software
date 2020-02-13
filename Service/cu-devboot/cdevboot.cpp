@@ -9,8 +9,9 @@
 #include <QSettings>
 #include <QThread>
 
-#include <Drivers/adriver.h>
+#include "Drivers_V2/commondriver.h"
 #include <Interfaces/curs485iointerface.h>
+
 #include "Bootloader/bootloader.h"
 #ifdef RASPBERRY_PI
 #include "../RaspPiMMap/rasppimmap.h"
@@ -287,16 +288,16 @@ void cDevBoot::enumerateDevice()
 {
     //автоопределение типа устросйтва
     qDebug()<<"Enumerate Devices";
-    AbstractDriver aDriver;
+    CommonDriver aDriver;
     cuRs485IOInterface ioInterface;
     ioInterface.setPortName(mPortName);
     aDriver.setIOInterface(&ioInterface);
-    aDriver.setDevAddress(mAddress);
+    aDriver.setDevAddress(static_cast<quint8>(mAddress));
     bool ok;
     QString tmpType;
 
     if (!mHotPlug) {
-        tmpType = aDriver.getDeviceType()->getValueSequence(&ok, 5);
+        tmpType = aDriver.deviceType()->getValueSync(&ok, 5);
         if (!ok){
             qDebug()<<"Fatal error!!! Can't connect to device!!!";
             exit(1);
@@ -404,7 +405,7 @@ void cDevBoot::disableAllDEvices()
 {
     qDebug()<<"";
     qDebug()<<"Disable all other devices:";
-    AbstractDriver aDriver;
+    CommonDriver aDriver;
     cuRs485IOInterface ioInterface;
     ioInterface.setPortName(mPortName);
     aDriver.setIOInterface(&ioInterface);
@@ -412,7 +413,7 @@ void cDevBoot::disableAllDEvices()
         for (quint8 i = 0; i < 32; ++i){
             if (i != mAddress){
                 aDriver.setDevAddress(i);
-                aDriver.listeningOff();
+                aDriver.silence()->execute();
                 fprintf(stderr, QString("\rProgress: %1%%").arg((j*31+i)*100/62).toLatin1().data());
                 QThread::msleep(50);
             }

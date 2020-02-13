@@ -1,6 +1,6 @@
 #include "bootloader.h"
 #include "QFileInfo"
-#include "Drivers/adriver.h"
+#include "Drivers_V2/commondriver.h"
 #include "Interfaces/curs485iointerface.h"
 #include "QElapsedTimer"
 #include "star_prc_structs.h"
@@ -97,12 +97,12 @@ QString Bootloader::getBootloaderInfo()
 void Bootloader::rebootDevice()
 {
     /// Создаем драйвер общего назначения и приделываем ему интерфейс
-    AbstractDriver driver;
+    CommonDriver driver;
     driver.setDevAddress(ANY_DEVICE_ADDRESS);
     cuRs485IOInterface interface;
     interface.setPortName(mPortName);
     driver.setIOInterface(&interface);
-    driver.rebootDevice();
+    driver.reboot()->execute();
 }
 
 bool Bootloader::initializeLoader()
@@ -168,7 +168,7 @@ void Bootloader::startApplication()
     }
 
     char buffer[10];
-    int numread =  mSerialPort->read(buffer, 2);
+    qint64 numread =  mSerialPort->read(buffer, 2);
     if (!((numread == 2) && (QString(buffer).indexOf("Ok") == 0))) {
         emit errorLoader(tr("Wrong answer from Bootloader"));
         emit loaderFinished();
