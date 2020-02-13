@@ -3,16 +3,15 @@
 
 #include <QObject>
 #include <QDialog>
-#include "Drivers/ccu4sdm0driver.h"
-#include "Drivers/ccu4tdm0driver.h"
+#include "Drivers_V2/sspddriverm0.h"
+#include "Drivers_V2/tempdriverm0.h"
 #include "cagilent34401avisainterface.h"
 
 typedef enum {
-    CU4SDM0,
-    CU4SDM1,
-    CU4TD,
-    UNKNOWN
-} tDriverType ;
+    dtSspdDriverM0,
+    dtTempDriverM0,
+    dtUnknown
+} CU4DriverType ;
 
 namespace Ui {
 class CalibrateDialog;
@@ -28,11 +27,11 @@ public:
 
     int exec() override;
 
-    AbstractDriver *driver() const;
-    void setDriver(AbstractDriver *driver);
+    CommonDriver *driver() const;
+    void setDriver(CommonDriver *driver);
 
-    tDriverType driverType() const;
-    void setDriverType(const tDriverType &driverType);
+    CU4DriverType driverType() const;
+    void setDriverType(const CU4DriverType &driverType);
 
 private slots:
     void on_pbStart_clicked();
@@ -42,8 +41,8 @@ private slots:
 
 private:
     Ui::CalibrateDialog *ui;
-    tDriverType mDriverType;
-    AbstractDriver *mDriver{nullptr};
+    CU4DriverType mDriverType;
+    CommonDriver *mDriver{nullptr};
     CU4SDM0V1_EEPROM_Const_t lastCU4SDEepromConst;
     CU4TDM0V1_EEPROM_Const_t lastCU4TDEepromConst;
     cAgilent34401aVisaInterface *agilent;

@@ -2,47 +2,34 @@
 #include "ui_startdialog.h"
 #include <QSettings>
 #include "Interfaces/cutcpsocketiointerface.h"
-#include "Drivers/adriver.h"
+#include "Drivers_V2/commondriver.h"
 #include "Server/servercommands.h"
 #include "QDebug"
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QElapsedTimer>
-#include <QSerialPortInfo>
-#include "Interfaces/curs485iointerface.h"
+#include <QInputDialog>
 #include "../qCustomLib/qCustomLib.h"
-
 
 StartDialog::StartDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::StartDialog)
-    
+
 {
     ui->setupUi(this);
 
     QSettings settings("Scontel", "ControlUnit4_Calibration");
-    ui->cbInterface->setCurrentIndex(settings.value("Protocol", 0).toInt());
-
     ui->sbDeviceAddress->setValue(settings.value("DeviceAddress",0).toInt());
 
-    on_cbInterface_activated(ui->cbInterface->currentIndex());
-
-    QStringList availableSerials;
-    foreach (QSerialPortInfo info, QSerialPortInfo::availablePorts()) {
-        availableSerials.append(info.portName());
-    }
-    ui->cbSerial->addItems(availableSerials);
-    QString lastPortName = settings.value("SerialPortName","ttyS0").toString();
-
-    int idx = availableSerials.indexOf(lastPortName);
-    if (idx >= 0) ui->cbSerial->setCurrentIndex(idx);
-
-    QStringList list = availableControlUnits();
-    ui->cbTcpIp->clear();
-    ui->cbTcpIp->addItems(list);
+    updateControlUnitList();
     QString LastTcpIpAddress = settings.value("TcpIpAddress","127.000.000.001").toString();
-    int i = list.indexOf(LastTcpIpAddress);
-    if (i>=0) ui->cbTcpIp->setCurrentIndex(i);
+    for (int i = 0; i < ui->cbTcpIp->count(); i++){
+        if (ui->cbTcpIp->itemText(i) == LastTcpIpAddress){
+            ui->cbTcpIp->setCurrentIndex(i);
+            break;
+        }
+    }
+
 }
 
 StartDialog::~StartDialog()
@@ -59,49 +46,28 @@ void StartDialog::on_buttonBox_accepted()
     bool ok;
 
     // создаем правильный интерфейс
-    switch (ui->cbInterface->currentIndex()) {
-    case 0:
-    {
-        // TcpIp
-        cuTcpSocketIOInterface *tmpInterface;
-        tmpInterface = new cuTcpSocketIOInterface(this);
-        tmpInterface->initialize();
+    // TcpIp
+    cuTcpSocketIOInterface *tmpInterface;
+    tmpInterface = new cuTcpSocketIOInterface(this);
+    tmpInterface->initialize();
 
-        tmpInterface->setAddress(convertToHostAddress(ui->cbTcpIp->currentText()));
-        tmpInterface->setPort(SERVER_TCPIP_PORT);
+    tmpInterface->setAddress(convertToHostAddress(ui->cbTcpIp->currentText()));
+    tmpInterface->setPort(SERVER_TCPIP_PORT);
 
-        mInterface = tmpInterface;
+    mInterface = tmpInterface;
 
-        QString answer = tmpInterface->tcpIpQuery("*IDN?", 100, &ok);
-        if (!((ok)&&(answer.contains("Scontel ControlUnit")))){
-            QMessageBox::warning(this,"Warning", "Can't find any device on this TcpIp address");
-            setEnabled(true);
-            return;
-        }
-
-        break;
-    }
-    case 1:
-    {
-        // Rs485
-        cuRs485IOInterface *tmpInterface = new cuRs485IOInterface(this);
-        tmpInterface->setPortName(ui->cbSerial->currentText());
-
-        mInterface = tmpInterface;
-
-        break;
-    }
-    default:
-        // ой беда,
-        reject();
+    QString answer = tmpInterface->tcpIpQuery("*IDN?", 100, &ok);
+    if (!((ok)&&(answer.contains("Scontel ControlUnit")))){
+        QMessageBox::warning(this,"Warning", "Can't find any device on this TcpIp address");
+        setEnabled(true);
         return;
     }
 
     // Далее определяем тип подключенного устройства
-    AbstractDriver driver;
+    CommonDriver driver;
     driver.setIOInterface(mInterface);
-    driver.setDevAddress(ui->sbDeviceAddress->value());
-    mDeviceType = driver.getDeviceType()->getValueSequence(&ok);
+    driver.setDevAddress(static_cast<quint8>(ui->sbDeviceAddress->value()));
+    mDeviceType = driver.deviceType()->getValueSync(&ok, 5);
     if (!ok || mDeviceType.isEmpty()){
         QMessageBox::warning(this,"Warning", "Wrong device address");
         setEnabled(true);
@@ -112,10 +78,8 @@ void StartDialog::on_buttonBox_accepted()
 
     // если все в порядке, сохраняем текущие данные и закрываем окошко
     QSettings settings("Scontel", "ControlUnit4_Calibration");
-    settings.setValue("Protocol",ui->cbInterface->currentIndex());
     settings.setValue("TcpIpAddress", ui->cbTcpIp->currentText());
     settings.setValue("DeviceAddress", ui->sbDeviceAddress->value());
-    settings.setValue("SerialPortName", ui->cbSerial->currentText());
     accept();
 }
 
@@ -134,8 +98,39 @@ cuIOInterfaceImpl *StartDialog::interface() const
     return mInterface;
 }
 
-void StartDialog::on_cbInterface_activated(int index)
+void StartDialog::on_cbTcpIp_currentIndexChanged(const QString &arg1)
 {
-    ui->stackedWidget->setCurrentIndex(index);
-    ui->lbProtocolspec->setText(index == 0 ? "Tcp/Ip address: " : "Port name:" );
+    if (arg1.contains("Update")){
+        updateControlUnitList();
+        ui->cbTcpIp->setCurrentIndex(0);
+    }
+    else if (arg1.contains("Manual")){
+
+        QSettings settings("Scontel", "ControlUnit4_Calibration");
+        QString LastTcpIpAddress = settings.value("TcpIpAddress","127.000.000.001").toString();
+
+        bool ok;
+        QString  str = QInputDialog::getText(this
+                                             , "TcpIp Addresss..."
+                                             , "Enter TcpIp Address manualy"
+                                             , QLineEdit::Normal
+                                             , LastTcpIpAddress
+                                             , &ok);
+        if (ok && !str.isEmpty()){
+            updateControlUnitList();
+            ui->cbTcpIp->insertItem(0, str);
+            ui->cbTcpIp->setCurrentIndex(0);
+        }
+    }
+}
+
+void StartDialog::updateControlUnitList()
+{
+    setDisabled(true);
+    qApp->processEvents();
+    QStringList list = availableControlUnits();
+    ui->cbTcpIp->clear();
+    ui->cbTcpIp->addItems(list);
+    ui->cbTcpIp->addItems(QStringList()<<"Update..."<<"Manual...");
+    setEnabled(true);
 }

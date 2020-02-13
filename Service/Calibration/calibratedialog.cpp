@@ -32,15 +32,11 @@ void CalibrateDialog::on_pbStart_clicked()
     QSettings settings("Scontel", "ControlUnit4_Calibration");
     settings.setValue("VisaName", ui->leVisaName->text());
     switch (mDriverType) {
-    case (tDriverType::CU4SDM0):
+    case (CU4DriverType::dtSspdDriverM0):
         settings.setValue("DriverType","CU4SDM0");
         settings.setValue("SspdDriver_M0_Mode",ui->cbMode->currentIndex());
         break;
-    case (tDriverType::CU4SDM1):
-        settings.setValue("DriverType","CU4SDM1");
-        settings.setValue("SspdDriver_M1_Mode",ui->cbMode->currentIndex());
-        break;
-    case (tDriverType::CU4TD):
+    case (CU4DriverType::dtTempDriverM0):
         settings.setValue("DriverType","CU4TD");
         settings.setValue("TempDriverMode",ui->cbMode->currentIndex());
         break;
@@ -69,32 +65,26 @@ void CalibrateDialog::on_pbStart_clicked()
 
     // настроим драйвер устройства
     switch (mDriverType) {
-    case(tDriverType::CU4SDM0):
+    case(CU4DriverType::dtSspdDriverM0):
     {
-        cCu4SdM0Driver *tmpDriver = qobject_cast<cCu4SdM0Driver*>(mDriver);
+        auto *tmpDriver = qobject_cast<SspdDriverM0*>(mDriver);
         if (!tmpDriver){ //ничего не получится
             return;
         }
         // отключаем PID
-        tmpDriver->PIDEnableStatus()->setValueSequence(false, nullptr, 5);
-        tmpDriver->setShortEnable(false);
-        tmpDriver->waitingAnswer();
+        tmpDriver->PIDEnableStatus()->setValueSync(false, nullptr, 5);
+        tmpDriver->shortEnable()->setValueSync(false, nullptr, 5);
         break;
     }
 
-        //TODO: реализация получения драйвера
-    case(tDriverType::CU4SDM1):
-        break;
-
-    case(tDriverType::CU4TD):
+    case(CU4DriverType::dtTempDriverM0):
     {
 
-        cCu4TdM0Driver *tmpDriver = qobject_cast<cCu4TdM0Driver*>(mDriver);
+        auto *tmpDriver = qobject_cast<TempDriverM0*>(mDriver);
         if (!tmpDriver){ //ничего не получится
             return;
         }
-        tmpDriver->commutatorTurnOn(true);
-        tmpDriver->waitingAnswer();
+        tmpDriver->commutator()->setValueSync(true, nullptr, 5);
         break;
     }
     default:
@@ -148,7 +138,7 @@ void CalibrateDialog::agilentCheckZero()
     // устанавливаем новые коэффициенты
     bool ok = false;
     switch (mDriverType) {
-    case tDriverType::CU4SDM0 :
+    case CU4DriverType::dtSspdDriverM0:
     {
         lastCU4SDEepromConst.Current_DAC.first = coeff.slope;
         lastCU4SDEepromConst.Current_DAC.second = coeff.intercept;
@@ -157,16 +147,13 @@ void CalibrateDialog::agilentCheckZero()
             tmpEepromConst.Voltage_ADC = emptyCoeff;
         else
             tmpEepromConst.Current_ADC = emptyCoeff;
-        qobject_cast<cCu4SdM0Driver*>(mDriver)->eepromConst()->setValueSequence(tmpEepromConst, &ok, 5);
+        qobject_cast<SspdDriverM0*>(mDriver)->eepromConst()->setValueSync(tmpEepromConst, &ok, 5);
 
         setCurrent(0);
 
         break;
     }
-        //TODO: реализовать поведение для нового драйвера
-    case tDriverType::CU4SDM1 :
-        break;
-    case tDriverType::CU4TD :
+    case CU4DriverType::dtTempDriverM0:
     {
         lastCU4TDEepromConst.tempSensorCurrentDac.first = coeff.slope;
         lastCU4TDEepromConst.tempSensorCurrentDac.second = coeff.intercept;
@@ -188,7 +175,7 @@ void CalibrateDialog::agilentCheckZero()
         default:
             break;
         }
-        qobject_cast<cCu4TdM0Driver*>(mDriver)->eepromConst()->setValueSequence(tmpEepromConst, &ok, 5);
+        qobject_cast<TempDriverM0*>(mDriver)->eepromConst()->setValueSync(tmpEepromConst, &ok, 5);
         setCurrent(1e-5f);
         break;
     }
@@ -206,20 +193,17 @@ void CalibrateDialog::agilentCheckZero()
     for (int i = 0; i < NPointCheck; ++i){
 
         switch (mDriverType) {
-        case tDriverType::CU4SDM0 :
+        case CU4DriverType::dtSspdDriverM0 :
         {
-            CU4SDM0V1_Data_t data = qobject_cast<cCu4SdM0Driver*>(mDriver)->deviceData()->getValueSequence(&ok, 5);
+            CU4SDM0V1_Data_t data = qobject_cast<SspdDriverM0*>(mDriver)->data()->getValueSync(&ok, 5);
             value += (ui->cbMode->currentIndex() == 0) ?
                         static_cast<double>(data.Voltage) :
                         static_cast<double>(data.Current);
             break;
         }
-            //TODO: реадлизовать поведение дра1йвера
-        case tDriverType::CU4SDM1 :
-            break;
-        case tDriverType::CU4TD :
+        case CU4DriverType::dtTempDriverM0:
         {
-            CU4TDM0V1_Data_t data = qobject_cast<cCu4TdM0Driver*>(mDriver)->deviceData()->getValueSequence(&ok, 5);
+            CU4TDM0V1_Data_t data = qobject_cast<TempDriverM0*>(mDriver)->data()->getValueSync(&ok, 5);
             switch (ui->cbMode->currentIndex()) {
             case 0:
                 value += static_cast<double>(data.PressSensorVoltageP);
@@ -251,7 +235,7 @@ void CalibrateDialog::agilentCheckZero()
     //Делаем правки
     QPointF  point;
     switch (mDriverType) {
-    case tDriverType::CU4SDM0 :
+    case CU4DriverType::dtSspdDriverM0:
     {
         // Делаем правку на ЦАП
         point = QPointF(agData, static_cast<double>(lastCU4SDEepromConst.Current_DAC.second));
@@ -270,17 +254,16 @@ void CalibrateDialog::agilentCheckZero()
         }
         else
             lastCU4SDEepromConst.Current_ADC = emptyCoeff;
-        qobject_cast<cCu4SdM0Driver*>(mDriver)->eepromConst()->setValueSequence(lastCU4SDEepromConst, &ok, 5);
+
+        auto* driver = qobject_cast<SspdDriverM0*>(mDriver);
+        driver->eepromConst()->setValueSync(lastCU4SDEepromConst, nullptr, 5);
 
         // включаем обратно PID регулятор
-        qobject_cast<cCu4SdM0Driver*>(mDriver)->PIDEnableStatus()->setValueSequence(true, nullptr, 5);
+        driver->PIDEnableStatus()->setValueSync(true, nullptr, 5);
         setCurrent(0);
         break;
     }
-        //TODO: реализовать
-    case tDriverType::CU4SDM1 :
-        break;
-    case tDriverType::CU4TD :
+    case CU4DriverType::dtTempDriverM0:
     {
         // Делаем правку на ЦАП
         point = QPointF(agData, static_cast<double>(lastCU4TDEepromConst.tempSensorCurrentDac.first * 1e-5f + lastCU4TDEepromConst.tempSensorCurrentDac.second));
@@ -313,7 +296,7 @@ void CalibrateDialog::agilentCheckZero()
         }
 
         // Ждем ответа
-        qobject_cast<cCu4TdM0Driver*>(mDriver)->eepromConst()->setValueSequence(lastCU4TDEepromConst, &ok, 5);
+        qobject_cast<TempDriverM0*>(mDriver)->eepromConst()->setValueSync(lastCU4TDEepromConst, &ok, 5);
         setCurrent(1e-5f);
         break;
     }
@@ -330,12 +313,12 @@ void CalibrateDialog::stopCalibration()
     stopFlag = true;
 }
 
-tDriverType CalibrateDialog::driverType() const
+CU4DriverType CalibrateDialog::driverType() const
 {
     return mDriverType;
 }
 
-void CalibrateDialog::setDriverType(const tDriverType &driverType)
+void CalibrateDialog::setDriverType(const CU4DriverType &driverType)
 {
     mDriverType = driverType;
 }
@@ -387,8 +370,8 @@ void CalibrateDialog::agilentPerform()
     qDebug()<<"Agilent perform";
     agilent->setVisaDeviceName(ui->leVisaName->text());
     // TODO: выбор режима для SDM1
-    if (((mDriverType == tDriverType::CU4SDM0) && (ui->cbMode->currentIndex() == 0)) ||
-            ((mDriverType == tDriverType::CU4TD) && (ui->cbMode->currentIndex() < 3)))
+    if (((mDriverType == CU4DriverType::dtSspdDriverM0) && (ui->cbMode->currentIndex() == 0)) ||
+            ((mDriverType == CU4DriverType::dtTempDriverM0) && (ui->cbMode->currentIndex() < 3)))
         agilent->setMode(cAgilent34401A::Mode_U_DC);
     else
         agilent->setMode(cAgilent34401A::Mode_I_DC);
@@ -403,31 +386,28 @@ void CalibrateDialog::eepromConstInitialize()
 
     //TODO: сделать на все случаи жизни
     switch (mDriverType){
-    case (tDriverType::CU4SDM0):
+    case (CU4DriverType::dtSspdDriverM0):
     {
-        cCu4SdM0Driver *driver = qobject_cast<cCu4SdM0Driver*>(mDriver);
+        auto * driver = qobject_cast<SspdDriverM0*>(mDriver);
         CU4SDM0V1_EEPROM_Const_t tmpEepromConst =
                 lastCU4SDEepromConst =
-                driver->eepromConst()->getValueSequence(&ok, 5);
+                driver->eepromConst()->getValueSync(&ok, 5);
         if (ok){
             messagePerform("EEPROM Const received");
             tmpEepromConst.Current_ADC =
                     tmpEepromConst.Current_DAC =
                     tmpEepromConst.Voltage_ADC = emptyCoeff;
             ok = false;
-            driver->eepromConst()->setValueSequence(tmpEepromConst, &ok, 5);
+            driver->eepromConst()->setValueSync(tmpEepromConst, &ok, 5);
         }
         break;
     }
-        // реализовать
-    case (tDriverType::CU4SDM1):
-        break;
-    case (tDriverType::CU4TD):
+    case (CU4DriverType::dtTempDriverM0):
     {
-        cCu4TdM0Driver *driver = qobject_cast<cCu4TdM0Driver*>(mDriver);
+        auto *driver = qobject_cast<TempDriverM0*>(mDriver);
         CU4TDM0V1_EEPROM_Const_t tmpEepromConst =
                 lastCU4TDEepromConst =
-                driver->eepromConst()->getValueSequence(&ok, 5);
+                driver->eepromConst()->getValueSync(&ok, 5);
         if (ok){
             messagePerform("EEPROM Const received");
             tmpEepromConst.pressSensorVoltageP =
@@ -436,7 +416,7 @@ void CalibrateDialog::eepromConstInitialize()
                     tmpEepromConst.tempSensorCurrentDac =
                     tmpEepromConst.tempSensorVoltage = emptyCoeff;
             ok = false;
-            driver->eepromConst()->setValueSequence(tmpEepromConst, &ok, 5);
+            driver->eepromConst()->setValueSync(tmpEepromConst, &ok, 5);
         }
         break;
     }
@@ -454,21 +434,15 @@ void CalibrateDialog::eepromConstInitialize()
 void CalibrateDialog::setCurrent(float value)
 {
     // устанавливаем 0 и ждем 2 секунды
-    bool ok;
     switch (mDriverType) {
-    case tDriverType::CU4SDM0:
+    case CU4DriverType::dtSspdDriverM0:
     {
-        qobject_cast<cCu4SdM0Driver*>(mDriver)->current()->setValueSequence(value, &ok, 5);
+        qobject_cast<SspdDriverM0*>(mDriver)->current()->setValueSync(value, nullptr, 5);
         break;
     }
-        //TODO: реализовать
-    case tDriverType::CU4SDM1:
+    case CU4DriverType::dtTempDriverM0:
     {
-        break;
-    }
-    case tDriverType::CU4TD:
-    {
-        qobject_cast<cCu4TdM0Driver*>(mDriver)->tempSensorCurrent()->setValueSequence(value, &ok, 5);
+        qobject_cast<TempDriverM0*>(mDriver)->tempSensorCurrent()->setValueSync(value, nullptr, 5);
         break;
     }
     default:
@@ -506,17 +480,13 @@ void CalibrateDialog::calibrationFirstStep()
         y[1].append(agData);
 
         switch (mDriverType) {
-        case tDriverType::CU4SDM0: {
-            CU4SDM0V1_Data_t data = qobject_cast<cCu4SdM0Driver*>(mDriver)->deviceData()->getValueSequence(&ok, 5);
+        case CU4DriverType::dtSspdDriverM0: {
+            CU4SDM0V1_Data_t data = qobject_cast<SspdDriverM0*>(mDriver)->data()->getValueSync(&ok, 5);
             x[1].append((ui->cbMode->currentIndex() == 0) ? data.Voltage : data.Current);
             break;
         }
-            // TODO: реализовать
-        case tDriverType::CU4SDM1: {
-            break;
-        }
-        case tDriverType::CU4TD: {
-            CU4TDM0V1_Data_t data = qobject_cast<cCu4TdM0Driver*>(mDriver)->deviceData()->getValueSequence(&ok, 5);
+        case CU4DriverType::dtTempDriverM0: {
+            CU4TDM0V1_Data_t data = qobject_cast<TempDriverM0*>(mDriver)->data()->getValueSync(&ok, 5);
             switch (ui->cbMode->currentIndex()) {
             case 0:
                 x[1].append(data.PressSensorVoltageP);
@@ -576,12 +546,12 @@ void CalibrateDialog::sleep(int msec)
     }
 }
 
-AbstractDriver *CalibrateDialog::driver() const
+CommonDriver *CalibrateDialog::driver() const
 {
     return mDriver;
 }
 
-void CalibrateDialog::setDriver(AbstractDriver *driver)
+void CalibrateDialog::setDriver(CommonDriver *driver)
 {
     mDriver = driver;
 }
@@ -598,14 +568,11 @@ int CalibrateDialog::exec()
     QString oldDriverType = settings.value("DriverType",QString()).toString();
     int currentIndex = 0;
     switch (mDriverType) {
-    case (tDriverType::CU4SDM0):
+    case (CU4DriverType::dtSspdDriverM0):
         modeList<<"U mode"<<"I mode";
         if (oldDriverType == "CU4SDM0") currentIndex = settings.value("SspdDriverMode",0).toInt();
         break;
-        //TODO: реализовать
-    case (tDriverType::CU4SDM1):
-        break;
-    case (tDriverType::CU4TD):
+    case (CU4DriverType::dtTempDriverM0):
         modeList<<"PressSensorVoltageP"<<"PressSensorVoltageN"<<"TempSensorVoltage"<<"TempSensorCurrent";
         if (oldDriverType == "CU4TD") currentIndex = settings.value("TempDriverMode",0).toInt();
         break;

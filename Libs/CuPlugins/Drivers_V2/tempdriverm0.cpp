@@ -140,7 +140,7 @@ TempDriverM0::~TempDriverM0()
     delete mTempTableProperty;
 }
 
-DriverPropertyReadOnly<CU4TDM0V1_Data_t> *TempDriverM0::deviceData() const
+DriverPropertyReadOnly<CU4TDM0V1_Data_t> *TempDriverM0::data() const
 {
     return mDeviceData;
 }

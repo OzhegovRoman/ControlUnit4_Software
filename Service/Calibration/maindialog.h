@@ -3,8 +3,8 @@
 
 #include <QDialog>
 #include "Interfaces/cuiointerfaceimpl.h"
-#include "Drivers/ccu4sdm0driver.h"
-#include "Drivers/ccu4tdm0driver.h"
+#include "Drivers_V2/sspddriverm0.h"
+#include "Drivers_V2/tempdriverm0.h"
 #include "savedialog.h"
 #include "opendialog.h"
 #include "calibratedialog.h"
@@ -41,8 +41,8 @@ private slots:
 
 private:
     Ui::MainDialog *ui;
-    tDriverType mDriverType;
-    AbstractDriver *mDriver;
+    CU4DriverType mDriverType;
+    CommonDriver *mDriver;
     cuIOInterfaceImpl *mInterface;
     int mDeviceAddress;
     SaveDialog *mSaveDialog;

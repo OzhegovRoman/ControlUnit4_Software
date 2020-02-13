@@ -14,7 +14,7 @@ public:
     ~TempDriverM0();
 
     //DeviceData
-    DriverPropertyReadOnly<CU4TDM0V1_Data_t> *deviceData() const;
+    DriverPropertyReadOnly<CU4TDM0V1_Data_t> *data() const;
 
     DriverPropertyReadOnly<float> *temperature() const;
     DriverPropertyReadOnly<float> *pressure() const;

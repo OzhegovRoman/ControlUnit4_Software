@@ -14,7 +14,7 @@ class SaveDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit SaveDialog(QWidget *parent = 0);
+    explicit SaveDialog(QWidget *parent = nullptr);
     ~SaveDialog();
 
     void setJsonData(const QJsonObject &jsonData);
