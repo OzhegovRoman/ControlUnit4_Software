@@ -2,7 +2,7 @@
 #include <QElapsedTimer>
 #include <QRegExp>
 #include <QSettings>
-#include "Drivers/adriver.h"
+#include "Drivers_V2/commondriver.h"
 #include "Interfaces/curs485iointerface.h"
 #include "Interfaces/cutcpsocketiointerface.h"
 #include "../qCustomLib/qCustomLib.h"
@@ -65,24 +65,24 @@ bool cDevMngr::addDevice(int address)
 
     cuRs485IOInterface mInterface;
     mInterface.setPortName(portName());
-    AbstractDriver driver;
+    CommonDriver driver;
     driver.setIOInterface(&mInterface);
     driver.setDevAddress(static_cast<quint8>(address));
 
     deviceInfo newDevice;
     newDevice.devAddress = static_cast<quint8>(address);
     bool ok = false;
-    newDevice.devType = driver.getDeviceType()->getValueSequence(&ok, 5);
+    newDevice.devType = driver.deviceType()->getValueSync(&ok, 5);
     if (ok)
-        newDevice.devUDID = driver.getUDID()->getValueSequence(&ok, 5);
+        newDevice.devUDID = driver.UDID()->getValueSync(&ok, 5);
     if (ok)
-        newDevice.devModVersion = driver.getModificationVersion()->getValueSequence(&ok, 5);
+        newDevice.devModVersion = driver.modificationVersion()->getValueSync(&ok, 5);
     if (ok)
-        newDevice.devHwVersion = driver.getHardwareVersion()->getValueSequence(&ok, 5);
+        newDevice.devHwVersion = driver.hardwareVersion()->getValueSync(&ok, 5);
     if (ok)
-        newDevice.devFwVersion = driver.getFirmwareVersion()->getValueSequence(&ok, 5);
+        newDevice.devFwVersion = driver.firmwareVersion()->getValueSync(&ok, 5);
     if (ok)
-        newDevice.devDescription = driver.getDeviceDescription()->getValueSequence(&ok, 5);
+        newDevice.devDescription = driver.deviceDescription()->getValueSync(&ok, 5);
     if (ok)
         mDevList.append(newDevice);
 
@@ -108,7 +108,6 @@ void cDevMngr::initializeDeviceList()
     mDevList.clear();
 
     for (int i = 0; i < size; ++i) {
-        deviceInfo tmpInfo;
         deviceInfo device;
         settings.setArrayIndex(i);
         device.devAddress = static_cast<quint8>(settings.value("devAddress", 255).toInt());
@@ -253,11 +252,11 @@ void cDevMngr::run()
             mInterface = pInterface;
         }
 
-        AbstractDriver driver;
+        CommonDriver driver;
         driver.setIOInterface(mInterface);
         driver.setDevAddress(static_cast<quint8>(address));
 
-        reader->write(driver.getDeviceDescription()->getValueSequence(nullptr, 5));
+        reader->write(driver.deviceDescription()->getValueSync(nullptr, 5));
 
         mInterface->deleteLater();
         reader->newCommand();

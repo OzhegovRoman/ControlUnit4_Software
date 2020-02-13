@@ -28,8 +28,6 @@ public:
     };
     cDevMngr();
 
-//    Commands processCommand(QString command);
-
     QString portName() const;
     void setPortName(const QString &portName);
 
