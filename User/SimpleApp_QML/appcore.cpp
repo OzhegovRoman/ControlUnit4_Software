@@ -19,8 +19,8 @@ AppCore::AppCore(QObject *parent)
     , mTempData(nullptr)
     , mSspdData(nullptr)
     , mInterface(new cuTcpSocketIOInterface(this))
-    , mTempDriver(new cCu4TdM0Driver(this))
-    , mSspdDriver(new cCu4SdM0Driver(this))
+    , mTempDriver(new TempDriverM0(this))
+    , mSspdDriver(new SspdDriverM0(this))
 {
 
 }
@@ -101,7 +101,7 @@ void AppCore::getTemperatureDriverData(quint8 address)
 
     //Получаем данные и отсылаем их назад
     bool ok = false;
-    CU4TDM0V1_Data_t data = mTempDriver->deviceData()->getValueSequence(&ok, 5);
+    auto data = mTempDriver->data()->getValueSync(&ok, 5);
     if (!mTempData || !ok)
         return;
     mTempData->setTemperature(static_cast<double>(data.Temperature));
@@ -117,7 +117,7 @@ void AppCore::connectTemperatureSensor(quint8 address, bool state)
     mTempDriver->setIOInterface(mInterface);
     //connect - disconnect
     bool ok;
-    mTempDriver->commutatorOn()->setValueSequence(state, &ok, 5);
+    mTempDriver->commutator()->setValueSync(state, &ok, 5);
     if (!mTempData || !ok)
         return;
     mTempData->setConnected(state);
@@ -130,7 +130,7 @@ void AppCore::getSspdDriverData(quint8 address)
     mSspdDriver->setIOInterface(mInterface);
     //реализация получения новых данных
     bool ok = false;
-    CU4SDM0V1_Data_t sspdData = mSspdDriver->deviceData()->getValueSequence(&ok, 5);
+    auto sspdData = mSspdDriver->data()->getValueSync(&ok, 5);
 
     if (!mSspdData || !ok)
         return;
@@ -153,13 +153,10 @@ void AppCore::getSspdDriverParameters(quint8 address)
     mSspdDriver->setIOInterface(mInterface);
     //реализация получения новых данных
     bool ok = false;
-    CU4SDM0V1_Param_t sspdParams = mSspdDriver->deviceParams()->getValueSequence(&ok, 5);
+    auto sspdParams = mSspdDriver->params()->getValueSync(&ok, 5);
 
     if (!mSspdData || !ok)
         return;
-
-//    mSspdDriver->cmpReferenceLevel()->setValueSequence(static_cast<float>(QRandomGenerator::global()->generateDouble()*1000));
-//    qDebug()<<mSspdDriver->cmpReferenceLevel()->getValueSequence(nullptr,5);
 
     mSspdData->setData(mSspdData->getIndexByName("cmp"), static_cast<double>(sspdParams.Cmp_Ref_Level) * 1000.0);
     mSspdData->setData(mSspdData->getIndexByName("counter_timeOut"), static_cast<double>(sspdParams.Time_Const));
@@ -175,34 +172,34 @@ void AppCore::setNewData(int dataListIndex, double value)
 
     // будем считать что драйвер уже готов, иначе то как
     if (name == "current")
-        mSspdDriver->current()->setValueSequence(static_cast<float>(value * 1e-6), nullptr, 5);
+        mSspdDriver->current()->setValueSync(static_cast<float>(value * 1e-6), nullptr, 5);
 
     if (name == "short")
-        mSspdDriver->setShortEnable(value>0.01);
+        mSspdDriver->shortEnable()->setValueSync(value > 0.01, nullptr, 5);
 
     if (name == "amplifier")
-        mSspdDriver->setAmpEnable(value>0.01);
+        mSspdDriver->amplifierEnable()->setValueSync(value>0.01, nullptr, 5);
 
     if (name == "cmp_on"){
-        CU4SDM0_Status_t status = mSspdDriver->deviceStatus()->getCurrentValue();
+        auto status = mSspdDriver->status()->currentValue();
         status.stCounterOn =
                 status.stRfKeyToCmp =
                 status.stCounterOn = value < 0.01 ? 0 : 1;
-        mSspdDriver->deviceStatus()->setValueSequence(status, nullptr, 5);
+        mSspdDriver->status()->setValueSync(status, nullptr, 5);
     }
 
     if (name == "autoreset_on")
-        mSspdDriver->setAutoResetEnable(value>0.01);
+        mSspdDriver->autoResetEnable()->setValueSync(value>0.01, nullptr, 5);
 
     if (name == "cmp")
-        mSspdDriver->cmpReferenceLevel()->setValueSequence(static_cast<float>(value/1000), nullptr, 5);
+        mSspdDriver->cmpReferenceLevel()->setValueSync(static_cast<float>(value/1000), nullptr, 5);
 
     if (name == "counter_timeOut")
-        mSspdDriver->timeConst()->setValueSequence(static_cast<float>(value), nullptr, 5);
+        mSspdDriver->timeConst()->setValueSync(static_cast<float>(value), nullptr, 5);
     if (name == "threshold")
-        mSspdDriver->autoResetThreshold()->setValueSequence(static_cast<float>(value), nullptr, 5);
+        mSspdDriver->autoResetThreshold()->setValueSync(static_cast<float>(value), nullptr, 5);
     if (name == "timeOut")
-        mSspdDriver->autoResetTimeOut()->setValueSequence(static_cast<float>(value), nullptr, 5);
+        mSspdDriver->autoResetTimeOut()->setValueSync(static_cast<float>(value), nullptr, 5);
 }
 
 int AppCore::getCurrentAddress() const

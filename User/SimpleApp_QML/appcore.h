@@ -4,8 +4,8 @@
 #include <QObject>
 #include <QQmlEngine>
 #include <QJSEngine>
-#include "Drivers/ccu4sdm0driver.h"
-#include "Drivers/ccu4tdm0driver.h"
+#include "Drivers_V2/sspddriverm0.h"
+#include "Drivers_V2/tempdriverm0.h"
 
 class DeviceList;
 class TemperatureData;
@@ -65,8 +65,8 @@ private:
     SspdData * mSspdData;
     int mCurrentAddress;
     cuTcpSocketIOInterface *mInterface;
-    cCu4TdM0Driver *mTempDriver;
-    cCu4SdM0Driver *mSspdDriver;
+    TempDriverM0 *mTempDriver;
+    SspdDriverM0 *mSspdDriver;
 };
 
 static QObject *appCoreProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
