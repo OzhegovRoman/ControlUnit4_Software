@@ -7,6 +7,7 @@
 #include <QtNetwork>
 #include <QNetworkProxy>
 #include <QNetworkInterface>
+#include <QInputDialog>
 
 #include "Server/servercommands.h"
 
@@ -32,12 +33,14 @@ TcpIpAddressDialog::TcpIpAddressDialog(QWidget *parent) :
 
     on_cbType_activated(ui->cbType->currentIndex());
 
-    QStringList list = availableControlUnits();
-    ui->cbTcpIp->clear();
-    ui->cbTcpIp->addItems(list);
+    updateControlUnitList();
     QString LastTcpIpAddress = settings.value("TcpIpAddress","127.000.000.001").toString();
-    int i = list.indexOf(LastTcpIpAddress);
-    if (i>=0) ui->cbTcpIp->setCurrentIndex(i);
+    for (int i = 0; i < ui->cbTcpIp->count(); i++){
+        if (ui->cbTcpIp->itemText(i) == LastTcpIpAddress){
+            ui->cbTcpIp->setCurrentIndex(i);
+            break;
+        }
+    }
 }
 
 TcpIpAddressDialog::~TcpIpAddressDialog()
@@ -70,9 +73,57 @@ void TcpIpAddressDialog::accept()
     QDialog::accept();
 }
 
+void TcpIpAddressDialog::updateControlUnitList()
+{
+    setDisabled(true);
+    qApp->processEvents();
+    QStringList list = availableControlUnits();
+    ui->cbTcpIp->clear();
+    ui->cbTcpIp->addItems(list);
+    ui->cbTcpIp->addItems(QStringList()<<"Update..."<<"Manual...");
+    setEnabled(true);
+}
+
 void TcpIpAddressDialog::on_cbType_activated(int index)
 {
     bool isSerialPort = index == 1;
     ui->stackedWidget->setCurrentIndex(ui->cbType->currentIndex());
     ui->lbProtocolspecs->setText(isSerialPort ? "Port name:" : "TcpIp address:");
+}
+
+void TcpIpAddressDialog::on_cbTcpIp_currentIndexChanged(const QString &arg1)
+{
+    if (arg1.contains("Update")){
+        updateControlUnitList();
+        ui->cbTcpIp->setCurrentIndex(0);
+    }
+    else if (arg1.contains("Manual")){
+
+        QSettings settings("Scontel", "ControlUnit4_Calibration");
+        QString LastTcpIpAddress = settings.value("TcpIpAddress","127.000.000.001").toString();
+
+        bool ok;
+        QString  str = QInputDialog::getText(this
+                                             , "TcpIp Addresss..."
+                                             , "Enter TcpIp Address manualy"
+                                             , QLineEdit::Normal
+                                             , LastTcpIpAddress
+                                             , &ok);
+        if (ok && !str.isEmpty()){
+            updateControlUnitList();
+
+            ok = false;
+            for (int i = 0; i < ui->cbTcpIp->count(); i++){
+                if (ui->cbTcpIp->itemText(i) == str){
+                    ui->cbTcpIp->setCurrentIndex(i);
+                    ok = true;
+                    break;
+                }
+            }
+            if (!ok){
+                ui->cbTcpIp->insertItem(0, str);
+                ui->cbTcpIp->setCurrentIndex(0);
+            }
+        }
+    }
 }

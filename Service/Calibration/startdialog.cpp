@@ -128,8 +128,8 @@ void StartDialog::on_cbTcpIp_currentIndexChanged(const QString &arg1)
                 }
             }
             if (!ok){
-            ui->cbTcpIp->insertItem(0, str);
-            ui->cbTcpIp->setCurrentIndex(0);
+                ui->cbTcpIp->insertItem(0, str);
+                ui->cbTcpIp->setCurrentIndex(0);
             }
         }
     }
