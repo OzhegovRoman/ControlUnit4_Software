@@ -36,7 +36,7 @@ void AllChannelsDataModel::initialize(const QString& info)
                 QStringList strL2 = x.split("=");
                 if (strL2.count() == 2){
                     if (strL2[0] == "address")
-                        tmpDeviceInfo.devAddress = strL2[1].toInt();
+                        tmpDeviceInfo.devAddress = static_cast<quint8>(strL2[1].toUShort());
                     if (strL2[0] == "type")
                         tmpDeviceInfo.isSspd = strL2[1].contains("CU4SD");
                 }
@@ -61,7 +61,7 @@ QVariant AllChannelsDataModel::data(const QModelIndex &index, int role) const
         }
     }
     else{
-        if ((std::isnan(devices[idx].temperature)) || (devices[idx].temperature == 0)){
+        if ((std::isnan(devices[idx].temperature)) || (qAbs(devices[idx].temperature) < 1e-5)){
             if (role == Qt::DisplayRole)
                 return QString("Not connected");
             if (role == Qt::BackgroundRole)
@@ -88,8 +88,8 @@ QVariant AllChannelsDataModel::headerData(int section, Qt::Orientation orientati
 
 bool AllChannelsDataModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    Q_UNUSED(index);
-    Q_UNUSED(value);
+    Q_UNUSED(index)
+    Q_UNUSED(value)
     if (role == Qt::EditRole){
         qDebug()<<"setData";
     }

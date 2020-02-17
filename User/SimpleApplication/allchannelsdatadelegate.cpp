@@ -10,7 +10,7 @@ AllChannelsDataDelegate::AllChannelsDataDelegate(QObject *parent):
 
 QWidget *AllChannelsDataDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    Q_UNUSED(option);
+    Q_UNUSED(option)
     qDebug()<<"create Editor";
     auto *widget = new EditWidget(parent);
     widget->setCurrent(model->devices[index.row()].current*1e6);

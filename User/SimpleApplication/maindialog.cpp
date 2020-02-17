@@ -5,7 +5,6 @@
 #include <QSettings>
 #include "Interfaces/curs485iointerface.h"
 #include "../qCustomLib/qCustomLib.h"
-//#include <QWindow>
 
 MainDialog::MainDialog(QWidget *parent)
     : QDialog(parent)
@@ -145,7 +144,7 @@ void MainDialog::msgReceived(quint8 address, quint8 command, quint8 dataLength, 
     switch (command) {
     case CMD_SERVER_GET_DEVICE_LIST:
         qDebug()<<"CMD_SERVER_GET_DEVICE_LIST";
-        QString answer = QString(QByteArray((const char*)data, dataLength));
+        QString answer = QString(QByteArray(reinterpret_cast<char*>(data), dataLength));
         qDebug()<<"Answer: "<<answer;
         createUI(answer);
         break;
@@ -185,11 +184,11 @@ bool MainDialog::createUI(const QString& deviceList)
         QStringList lList = str.split(':');
         if (lList.size() == 3){ //должно быть описание устройства
             //первое значение DevX - X порядковый номер
-            int add = lList[1].split('=')[1].toInt();
+            quint8 add = static_cast<quint8>(lList[1].split('=')[1].toInt());
             QString type = lList[2].split('=')[1];
             if (type.contains("CU4SD")){
                 //данное устройство - SspdDriver
-                mSdDrivers.append(new cCu4SdM0Driver(this));
+                mSdDrivers.append(new SspdDriverM0(this));
                 int i = mSdDrivers.size()-1;
                 mSdDrivers[i]->setDevAddress(add);
                 ui->listWidget->addItem(QString("Sspd Driver\nAddress: %1").arg(add));
@@ -201,7 +200,7 @@ bool MainDialog::createUI(const QString& deviceList)
             }
             else if (type.contains("CU4TD")){
                 //данное устройство - TempDriver
-                mTdDrivers.append(new cCu4TdM0Driver(this));
+                mTdDrivers.append(new TempDriverM0(this));
                 int i = mTdDrivers.size()-1;
                 mTdDrivers[i]->setDevAddress(add);
                 ui->listWidget->addItem(QString("Temperature\nAddress: %1").arg(add));

@@ -1,8 +1,8 @@
 #include "allchannels.h"
 #include "ui_allchannels.h"
 #include <QDebug>
-#include <Drivers/ccu4sdm0driver.h>
-#include <Drivers/ccu4tdm0driver.h>
+#include <Drivers_V2/sspddriverm0.h>
+#include <Drivers_V2/tempdriverm0.h>
 #include <QSettings>
 #include <QDir>
 #include <QDateTime>
@@ -48,17 +48,17 @@ void AllChannels::updateWidget()
     // опрос всех устройств
     for (int idx = 0; idx < model->devices.count(); ++idx){
         if (model->devices[idx].isSspd){
-            cCu4SdM0Driver driver;
+            SspdDriverM0 driver;
             driver.setIOInterface(mInterface);
             driver.setDevAddress(model->devices[idx].devAddress);
             bool ok;
-            CU4SDM0V1_Data_t data = driver.deviceData()->getValueSequence(&ok, 5);
+            CU4SDM0V1_Data_t data = driver.data()->getValueSync(&ok, 5);
             if (ok){
-                model->devices[idx].current = data.Current;
-                model->devices[idx].voltage = data.Voltage;
+                model->devices[idx].current = static_cast<double>(data.Current);
+                model->devices[idx].voltage = static_cast<double>(data.Voltage);
                 model->devices[idx].isShorted = data.Status.stShorted;
                 if (data.Status.stAutoResetOn && ui->cbLogEnable->isChecked()){
-                    CU4SDM0V1_Param_t param = driver.deviceParams()->getValueSequence(&ok, 5);
+                    auto param = driver.params()->getValueSync(&ok, 5);
                     if (ok && (param.AutoResetCounts != model->devices[idx].triggerCount)){
                         QFile m_File(QString("%1\\TriggerLog.txt").arg(ui->leLogPath->text()));
                         m_File.open(QIODevice::ReadWrite | QIODevice::Append);
@@ -77,12 +77,12 @@ void AllChannels::updateWidget()
 
         }
         else{
-            cCu4TdM0Driver driver;
+            TempDriverM0 driver;
             driver.setIOInterface(mInterface);
             driver.setDevAddress(model->devices[idx].devAddress);
-            CU4TDM0V1_Data_t data = driver.deviceData()->getValueSequence(nullptr, 5);
-            model->devices[idx].temperature = data.Temperature;
-            if (!data.CommutatorOn) driver.commutatorOn()->setValueSequence(true, nullptr, 5);
+            CU4TDM0V1_Data_t data = driver.data()->getValueSync(nullptr, 5);
+            model->devices[idx].temperature = static_cast<double>(data.Temperature);
+            if (!data.CommutatorOn) driver.commutator()->setValueSync(true, nullptr, 5);
         }
     }
 

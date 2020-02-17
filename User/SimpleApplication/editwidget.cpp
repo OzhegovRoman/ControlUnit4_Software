@@ -1,7 +1,7 @@
 #include "editwidget.h"
 #include "ui_editwidget.h"
 #include "QDoubleValidator"
-#include "Drivers/ccu4sdm0driver.h"
+#include "Drivers_V2/sspddriverm0.h"
 #include <QDebug>
 
 EditWidget::EditWidget(QWidget *parent) :
@@ -46,10 +46,10 @@ void EditWidget::setInterface(cuIOInterface *value)
 void EditWidget::on_pushButton_clicked(bool checked)
 {
     qDebug()<<checked<<index;
-    cCu4SdM0Driver driver;
+    SspdDriverM0 driver;
     driver.setIOInterface(interface);
     driver.setDevAddress(static_cast<quint8>(index));
-    driver.setShortEnable(checked);
+    driver.shortEnable()->setValueSync(checked);
 }
 
 void EditWidget::setIndex(int value)
@@ -59,8 +59,8 @@ void EditWidget::setIndex(int value)
 
 void EditWidget::on_doubleSpinBox_editingFinished()
 {
-    cCu4SdM0Driver driver;
+    SspdDriverM0 driver;
     driver.setIOInterface(interface);
-    driver.setDevAddress(index);
-    driver.current()->setValueSequence(ui->doubleSpinBox->value()*1E-6, nullptr, 5);
+    driver.setDevAddress(static_cast<quint8>(index));
+    driver.current()->setValueSync(static_cast<float>(ui->doubleSpinBox->value() * 1E-6), nullptr, 5);
 }

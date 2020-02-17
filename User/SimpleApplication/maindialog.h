@@ -3,8 +3,8 @@
 
 #include <QDialog>
 #include <QTimer>
-#include "Drivers/ccu4sdm0driver.h"
-#include "Drivers/ccu4tdm0driver.h"
+#include "Drivers_V2/sspddriverm0.h"
+#include "Drivers_V2/tempdriverm0.h"
 #include "Interfaces/cutcpsocketiointerface.h"
 #include "Server/servercommands.h"
 
@@ -47,8 +47,8 @@ private slots:
 
 private:
     Ui::MainDialog *ui;
-    QVector<cCu4TdM0Driver*> mTdDrivers;
-    QVector<cCu4SdM0Driver*> mSdDrivers;
+    QVector<TempDriverM0*> mTdDrivers;
+    QVector<SspdDriverM0*> mSdDrivers;
     cuIOInterface *mInterface;
     bool mWaiting{};
     int lastWidgetIndex{-1};

@@ -2,7 +2,7 @@
 #define SSPDWIDGET_H
 
 #include <QWidget>
-#include "Drivers/ccu4sdm0driver.h"
+#include "Drivers_V2/sspddriverm0.h"
 
 namespace Ui {
 class SspdWidget;
@@ -17,7 +17,7 @@ public:
     ~SspdWidget() override;
 
     void updateWidget();
-    void setDriver(cCu4SdM0Driver *driver);
+    void setDriver(SspdDriverM0 *driver);
     void openWidget();
     void closeWidget();
 
@@ -27,7 +27,7 @@ signals:
     void dataUpdated(CU4SDM0V1_Data_t data);
 private:
     Ui::SspdWidget *ui;
-    cCu4SdM0Driver *mDriver{nullptr};
+    SspdDriverM0 *mDriver{nullptr};
 private slots:
     void updateData(CU4SDM0V1_Data_t data);
     void paramsUpdated(CU4SDM0V1_Param_t params);

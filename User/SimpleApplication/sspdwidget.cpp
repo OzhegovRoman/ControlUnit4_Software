@@ -20,13 +20,12 @@ void SspdWidget::updateWidget()
 {
     qDebug()<<"Update widget";
     bool ok = false;
-    CU4SDM0V1_Data_t data;
-    data = mDriver->deviceData()->getValueSequence(&ok, 5);
+    auto data = mDriver->data()->getValueSync(&ok, 5);
     if (ok)
         updateData(data);
 }
 
-void SspdWidget::setDriver(cCu4SdM0Driver *driver)
+void SspdWidget::setDriver(SspdDriverM0 *driver)
 {
     mDriver = driver;
 }
@@ -36,9 +35,8 @@ void SspdWidget::openWidget()
     qDebug()<<"Open widget";
     updateWidget();
     bool ok = false;
-    CU4SDM0V1_Param_t params;
     qDebug()<<"try to update params";
-        params = mDriver->deviceParams()->getValueSequence(&ok, 5);
+    auto params = mDriver->params()->getValueSync(&ok, 5);
     if (ok)
         paramsUpdated(params);
 }
@@ -52,8 +50,8 @@ void SspdWidget::updateData(CU4SDM0V1_Data_t data)
 {
     qDebug()<<"data Updated";
     ui->lbData->setText(QString("I: %1 uA<br>U: %2 mV")
-                        .arg(data.Current*1e6, 6,'f', 1)
-                        .arg(data.Voltage*1e3, 6, 'f', 2));
+                        .arg(static_cast<double>(data.Current) * 1e6, 6,'f', 1)
+                        .arg(static_cast<double>(data.Voltage) * 1e3, 6, 'f', 2));
 
     ui->cbAmplifier->setChecked(data.Status.stAmplifierOn);
     ui->cbShort->setChecked(data.Status.stShorted);
@@ -64,58 +62,56 @@ void SspdWidget::updateData(CU4SDM0V1_Data_t data)
 void SspdWidget::paramsUpdated(CU4SDM0V1_Param_t params)
 {
     qDebug()<<"paramsUpdated();";
-    ui->dsbTimeOut->setValue(params.AutoResetTimeOut);
-    ui->dsbThreshold->setValue(params.AutoResetThreshold);
+    ui->dsbTimeOut->setValue(static_cast<double>(params.AutoResetTimeOut));
+    ui->dsbThreshold->setValue(static_cast<double>(params.AutoResetThreshold));
 }
 
 void SspdWidget::on_cbShort_clicked(bool checked)
 {
-    mDriver->setShortEnable(checked);
-    mDriver->waitingAnswer();
+    mDriver->shortEnable()->setValueSync(checked, nullptr, 5);
 }
 
 void SspdWidget::on_cbAmplifier_clicked(bool checked)
 {
-    mDriver->setAmpEnable(checked);
-    mDriver->waitingAnswer();
+    mDriver->amplifierEnable()->setValueSync(checked, nullptr, 5);
 }
 
 void SspdWidget::on_cbComparator_clicked(bool checked)
 {
     bool ok;
-    CU4SDM0_Status_t status = mDriver->deviceStatus()->getValueSequence(&ok);
+    auto status = mDriver->status()->getValueSync(&ok, 5);
     if  (!ok){
         qDebug()<<"can't get Driver Status";
         return;
     }
     status.stComparatorOn = status.stRfKeyToCmp = status.stCounterOn = (checked) ? 1: 0;
-    mDriver->deviceStatus()->setValue(status);
-    if (!mDriver->waitingAnswer()) qDebug()<<"can't set device status";
+    mDriver->status()->setValueSync(status, &ok, 5);
+    if (!ok) qDebug()<<"can't set device status";
 }
 
 void SspdWidget::on_pbSetI_clicked()
 {
-    mDriver->current()->setValue(ui->sbI->value()*1E-6);
-    if (!mDriver->waitingAnswer()) qDebug()<<"can't set Current";
+    bool ok = false;
+    mDriver->current()->setValueSync(static_cast<float>(ui->sbI->value() * 1E-6), &ok, 5);
+    if (!ok) qDebug()<<"can't set Current";
 }
 
 void SspdWidget::on_pbSetCmp_clicked()
 {
-    mDriver->cmpReferenceLevel()->setValue(ui->sbCmp->value());
-    if (!mDriver->waitingAnswer()) qDebug()<<"can't set cmp level";
+    bool ok = false;
+    mDriver->cmpReferenceLevel()->setValueSync(static_cast<float>(ui->sbCmp->value()), &ok, 5);
+    if (!ok) qDebug()<<"can't set cmp level";
 }
 
 void SspdWidget::on_cbAutoreset_clicked(bool checked)
 {
-    mDriver->setAutoResetEnable(checked);
-    mDriver->waitingAnswer();
-
+    mDriver->autoResetEnable()->setValueSync(checked, nullptr, 5);
 }
 
 void SspdWidget::on_pbSetParams_clicked()
 {
-    CU4SDM0V1_Param_t params = mDriver->deviceParams()->getCurrentValue();
-    params.AutoResetThreshold = ui->dsbThreshold->value();
-    params.AutoResetTimeOut = ui->dsbTimeOut->value();
-    mDriver->deviceParams()->setValueSequence(params, nullptr, 5);
+    auto params = mDriver->params()->currentValue();
+    params.AutoResetThreshold = static_cast<float>(ui->dsbThreshold->value());
+    params.AutoResetTimeOut = static_cast<float>(ui->dsbTimeOut->value());
+    mDriver->params()->setValueSync(params, nullptr, 5);
 }

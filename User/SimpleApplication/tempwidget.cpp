@@ -16,24 +16,24 @@ TempWidget::~TempWidget()
 void TempWidget::updateWidget()
 {
     bool ok;
-    CU4TDM0V1_Data_t data = mDriver->deviceData()->getValueSequence(&ok);
+    auto data = mDriver->data()->getValueSync(&ok, 5);
     if (ok) dataUpDated(data);
 }
 
 void TempWidget::openWidget()
 {
-    mDriver->commutatorTurnOn(true);
+    mDriver->commutator()->setValueSync(true, nullptr, 2);
     mClosed = false;
     updateWidget();
 }
 
 void TempWidget::closeWidget()
 {
-    mDriver->commutatorTurnOn(false);
+    mDriver->commutator()->setValueSync(false, nullptr, 2);
     mClosed = true;
 }
 
-void TempWidget::setDriver(cCu4TdM0Driver *driver)
+void TempWidget::setDriver(TempDriverM0 *driver)
 {
     mDriver = driver;
 }
@@ -41,14 +41,13 @@ void TempWidget::setDriver(cCu4TdM0Driver *driver)
 void TempWidget::dataUpDated(CU4TDM0V1_Data_t data)
 {
     QString tmpstr;
-    if (data.Temperature == 0) tmpstr = "Sensor not connected";
-    else tmpstr = QString("%1 K").arg(data.Temperature, 4, 'f', 2);
+    if (qAbs(static_cast<double>(data.Temperature)) < 1e-5) tmpstr = "Sensor not connected";
+    else tmpstr = QString("%1 K").arg(static_cast<double>(data.Temperature), 4, 'f', 2);
     ui->lbData->setText(QString("<h2>T: %1</h2><h3>P: %2 mbar<br>Temp sensor voltage: %3 V<br>Press sensor Voltage: %4 mV</h3>")
                         .arg(tmpstr)
-                        .arg(data.Pressure,5,'f',1)
-                        .arg(data.TempSensorVoltage,4,'f',3)
-                        .arg((data.PressSensorVoltageP-data.PressSensorVoltageN)*1000.0, 5, 'f', 2));
+                        .arg(static_cast<double>(data.Pressure), 5, 'f', 1)
+                        .arg(static_cast<double>(data.TempSensorVoltage), 4, 'f', 3)
+                        .arg(static_cast<double>(data.PressSensorVoltageP-data.PressSensorVoltageN) * 1000.0, 5, 'f', 2));
     if (!(mClosed || data.CommutatorOn))
-        mDriver->commutatorTurnOn(true);
+        mDriver->commutator()->setValueSync(true, nullptr, 2);
 }
-
