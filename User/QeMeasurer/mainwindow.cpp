@@ -36,8 +36,14 @@ MainWindow::MainWindow(QWidget *parent) :
     mInterface->setPortName("ttyAMA0");
 #endif
 
-    on_tbUpdateAdresses_clicked();
+    updateControlUnitList();
 
+    for (int i = 0; i < ui->cbTcpIpAddress->count(); i++){
+        if (ui->cbTcpIpAddress->itemText(i) == mLastTcpIpAddress){
+            ui->cbTcpIpAddress->setCurrentIndex(i);
+            break;
+        }
+    }
     mTimer->setSingleShot(true);
 
     ui->wCounterPlot->addGraph();
@@ -505,16 +511,6 @@ void MainWindow::on_pbSetSecretParams_clicked()
     ui->lbSecretStatus->setText("Success");
 }
 
-void MainWindow::on_tbUpdateAdresses_clicked()
-{
-    QStringList list = availableControlUnits();
-    ui->cbTcpIpAddress->clear();
-    ui->cbTcpIpAddress->addItems(list);
-    int i = list.indexOf(mLastTcpIpAddress);
-    if (i>=0) ui->cbTcpIpAddress->setCurrentIndex(i);
-
-}
-
 void MainWindow::on_pbReading_clicked()
 {
     mTimer->stop();
@@ -565,4 +561,52 @@ void MainWindow::updateSecureData()
     else qDebug()<<"error at getting data";
 
     mTimer->start();
+}
+
+void MainWindow::updateControlUnitList()
+{
+    setDisabled(true);
+    qApp->processEvents();
+    QStringList list = availableControlUnits();
+    ui->cbTcpIpAddress->clear();
+    ui->cbTcpIpAddress->addItems(list);
+    ui->cbTcpIpAddress->addItems(QStringList()<<"Update..."<<"Manual...");
+    setEnabled(true);
+}
+
+void MainWindow::on_cbTcpIpAddress_currentIndexChanged(const QString &arg1)
+{
+    if (arg1.contains("Update")){
+        updateControlUnitList();
+        ui->cbTcpIpAddress->setCurrentIndex(0);
+    }
+    else if (arg1.contains("Manual")){
+
+        QSettings settings("Scontel", "ControlUnit4_Calibration");
+        QString LastTcpIpAddress = settings.value("TcpIpAddress","127.000.000.001").toString();
+
+        bool ok;
+        QString  str = QInputDialog::getText(this
+                                             , "TcpIp Addresss..."
+                                             , "Enter TcpIp Address manualy"
+                                             , QLineEdit::Normal
+                                             , LastTcpIpAddress
+                                             , &ok);
+        if (ok && !str.isEmpty()){
+            updateControlUnitList();
+
+            ok = false;
+            for (int i = 0; i < ui->cbTcpIpAddress->count(); i++){
+                if (ui->cbTcpIpAddress->itemText(i) == str){
+                    ui->cbTcpIpAddress->setCurrentIndex(i);
+                    ok = true;
+                    break;
+                }
+            }
+            if (!ok){
+                ui->cbTcpIpAddress->insertItem(0, str);
+                ui->cbTcpIpAddress->setCurrentIndex(0);
+            }
+        }
+    }
 }

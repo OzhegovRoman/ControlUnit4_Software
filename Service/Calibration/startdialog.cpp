@@ -118,8 +118,19 @@ void StartDialog::on_cbTcpIp_currentIndexChanged(const QString &arg1)
                                              , &ok);
         if (ok && !str.isEmpty()){
             updateControlUnitList();
+
+            ok = false;
+            for (int i = 0; i < ui->cbTcpIp->count(); i++){
+                if (ui->cbTcpIp->itemText(i) == str){
+                    ui->cbTcpIp->setCurrentIndex(i);
+                    ok = true;
+                    break;
+                }
+            }
+            if (!ok){
             ui->cbTcpIp->insertItem(0, str);
             ui->cbTcpIp->setCurrentIndex(0);
+            }
         }
     }
 }

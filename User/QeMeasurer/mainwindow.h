@@ -72,11 +72,13 @@ private slots:
     void on_cbType_currentIndexChanged(int index);
     void on_pbGetSecretParams_clicked();
     void on_pbSetSecretParams_clicked();
-    void on_tbUpdateAdresses_clicked();
     void on_pbReading_clicked();
     void on_pbRecording_clicked();
 
     void updateSecureData();
+    void updateControlUnitList();
+
+    void on_cbTcpIpAddress_currentIndexChanged(const QString &arg1);
 
 private:
     Ui::MainWindow *ui;
