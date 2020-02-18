@@ -3,7 +3,7 @@
 #include <QDebug>
 
 #include "Interfaces/curs485iointerface.h"
-#include "Server/servercommands.h"
+#include "servercommands.h"
 #include "../qCustomLib/qCustomLib.h"
 
 #include <QSettings>
