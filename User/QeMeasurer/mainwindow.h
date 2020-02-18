@@ -78,7 +78,7 @@ private slots:
     void updateSecureData();
     void updateControlUnitList();
 
-    void on_cbTcpIpAddress_currentIndexChanged(const QString &arg1);
+    void on_cbTcpIpAddress_activated(const QString &arg1);
 
 private:
     Ui::MainWindow *ui;

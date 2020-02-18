@@ -12,14 +12,23 @@ Item {
     property int normalTextSize: dp(24)
     property int smallTextSize: dp(18)
 
+    //property stringList CUList: []
+
     Component.onCompleted:
         tcpIpAddressText.text = appcore.lastIpAddress
 
     signal clicked;
+    signal updateControlUnitList;
 
     onClicked: {
         console.log("connect");
         connectToIpAddress(tcpIpAddress);
+    }
+
+    onUpdateControlUnitList: {
+        console.log("update list");
+        deviceListDialog.open();
+        updateControlUnitsList();
     }
 
     TcpIpValidator {
@@ -64,5 +73,29 @@ Item {
             horizontalCenter: tcpIpAddressText.horizontalCenter
         }
         onClicked: parent.clicked()
+    }
+
+    Button{
+        id: buttonSearch
+        text: qsTr("Search...")
+        autoRepeat: false;
+        font.pixelSize: normalTextSize
+        anchors {
+            top: buttonConnect.bottom
+            topMargin: smallTextSize * 0.5
+            horizontalCenter:  tcpIpAddressText.horizontalCenter
+        }
+        onClicked: parent.updateControlUnitList();
+    }
+
+    Drawer {
+        id: deviceListDialog
+        dragMargin: 0
+        height: parent.height*0.8;
+        width: parent.width;
+        edge: Qt.BottomEdge
+        Text{
+            text:"test"
+        }
     }
 }

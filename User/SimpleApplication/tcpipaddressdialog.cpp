@@ -91,7 +91,7 @@ void TcpIpAddressDialog::on_cbType_activated(int index)
     ui->lbProtocolspecs->setText(isSerialPort ? "Port name:" : "TcpIp address:");
 }
 
-void TcpIpAddressDialog::on_cbTcpIp_currentIndexChanged(const QString &arg1)
+void TcpIpAddressDialog::on_cbTcpIp_activated(const QString &arg1)
 {
     if (arg1.contains("Update")){
         updateControlUnitList();

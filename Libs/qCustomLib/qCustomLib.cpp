@@ -34,23 +34,17 @@ QStringList availableControlUnits()
     }
 
     QObject::connect(server, &QTcpServer::newConnection, [=, &server, &answer](){
-        qDebug()<<"new connection";
         QTcpSocket* socket = server->nextPendingConnection();
-        qDebug()<<"connection done";
-
         socket->setProxy(QNetworkProxy::NoProxy);
         bool ok = socket->waitForReadyRead(100);
-        qDebug()<<"ok"<<ok;
         if (ok){
             QByteArray ba = socket->readAll();
-            qDebug()<<ba;
             answer.append(QString(ba).split(";"));
         }
         socket->deleteLater();
     });
 
     qDebug()<<"before udpSocket create";
-    QThread::msleep(1000);
     QUdpSocket udpSocket;
     udpSocket.setProxy(QNetworkProxy::NoProxy);
     QString tcpipAddresses;
@@ -61,18 +55,17 @@ QStringList availableControlUnits()
 
     QByteArray datagram = QByteArray(tcpipAddresses.toLocal8Bit());
     udpSocket.writeDatagram(datagram, QHostAddress::Broadcast, SERVER_TCPIP_PORT + 1);
-    qDebug()<<udpSocket.bytesToWrite();
     QElapsedTimer timer;
     timer.start();
     while (timer.elapsed()<500)
         qApp->processEvents();
 
-    qDebug()<<udpSocket.bytesToWrite();
+    qDebug()<<"waiting for answers";
 
     server->deleteLater();
+
     // подчищаем все лишнее
     // заменяем собственные адреса на localhost
-
     for (QStringList::iterator i = answer.begin(); i < answer.end();){
         if ((*i).isEmpty() || (QHostAddress(*i) == QHostAddress::LocalHost))
             i = answer.erase(i);
@@ -98,6 +91,8 @@ QStringList availableControlUnits()
     // LocalHost меняем на 127.0.0.1
     int i = answer.indexOf("localhost");
     if (i>=0) answer[i] = "127.0.0.1";
+
+    qDebug()<<answer;
     return answer;
 }
 

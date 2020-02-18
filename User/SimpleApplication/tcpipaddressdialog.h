@@ -28,7 +28,7 @@ public:
 private slots:
     void on_cbType_activated(int index);
 
-    void on_cbTcpIp_currentIndexChanged(const QString &arg1);
+    void on_cbTcpIp_activated(const QString &arg1);
 
 private:
     Ui::TcpIpAddressDialog *ui;

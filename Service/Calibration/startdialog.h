@@ -23,8 +23,8 @@ public:
 
 private slots:
     void on_buttonBox_accepted();
-    void on_cbTcpIp_currentIndexChanged(const QString &arg1);
     void updateControlUnitList();
+    void on_cbTcpIp_activated(const QString &arg1);
 
 private:
     Ui::StartDialog *ui;

@@ -9,6 +9,7 @@ CppApplication {
     condition: project.isWindows || project.isAndroid
 
     Depends { name: "Qt.core" }
+    Depends { name: "Qt.widgets"}
     Depends { name: "Qt.quick" }
     Depends { name: "CuPlugins" }
     Depends { name: "qCustomLib" }

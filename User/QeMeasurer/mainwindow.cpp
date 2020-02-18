@@ -36,7 +36,9 @@ MainWindow::MainWindow(QWidget *parent) :
     mInterface->setPortName("ttyAMA0");
 #endif
 
+    qDebug()<<"test_01";
     updateControlUnitList();
+    qDebug()<<"test_02";
 
     for (int i = 0; i < ui->cbTcpIpAddress->count(); i++){
         if (ui->cbTcpIpAddress->itemText(i) == mLastTcpIpAddress){
@@ -568,14 +570,19 @@ void MainWindow::updateControlUnitList()
     setDisabled(true);
     qApp->processEvents();
     QStringList list = availableControlUnits();
+    qDebug()<<"test1";
     ui->cbTcpIpAddress->clear();
-    ui->cbTcpIpAddress->addItems(list);
+    if (!list.isEmpty())
+        ui->cbTcpIpAddress->addItems(list);
     ui->cbTcpIpAddress->addItems(QStringList()<<"Update..."<<"Manual...");
+    qDebug()<<"test2";
+
     setEnabled(true);
 }
 
-void MainWindow::on_cbTcpIpAddress_currentIndexChanged(const QString &arg1)
+void MainWindow::on_cbTcpIpAddress_activated(const QString &arg1)
 {
+    qDebug()<<"activated";
     if (arg1.contains("Update")){
         updateControlUnitList();
         ui->cbTcpIpAddress->setCurrentIndex(0);

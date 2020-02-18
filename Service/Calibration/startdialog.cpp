@@ -98,7 +98,18 @@ cuIOInterfaceImpl *StartDialog::interface() const
     return mInterface;
 }
 
-void StartDialog::on_cbTcpIp_currentIndexChanged(const QString &arg1)
+void StartDialog::updateControlUnitList()
+{
+    setDisabled(true);
+    qApp->processEvents();
+    QStringList list = availableControlUnits();
+    ui->cbTcpIp->clear();
+    ui->cbTcpIp->addItems(list);
+    ui->cbTcpIp->addItems(QStringList()<<"Update..."<<"Manual...");
+    setEnabled(true);
+}
+
+void StartDialog::on_cbTcpIp_activated(const QString &arg1)
 {
     if (arg1.contains("Update")){
         updateControlUnitList();
@@ -133,15 +144,4 @@ void StartDialog::on_cbTcpIp_currentIndexChanged(const QString &arg1)
             }
         }
     }
-}
-
-void StartDialog::updateControlUnitList()
-{
-    setDisabled(true);
-    qApp->processEvents();
-    QStringList list = availableControlUnits();
-    ui->cbTcpIp->clear();
-    ui->cbTcpIp->addItems(list);
-    ui->cbTcpIp->addItems(QStringList()<<"Update..."<<"Manual...");
-    setEnabled(true);
 }

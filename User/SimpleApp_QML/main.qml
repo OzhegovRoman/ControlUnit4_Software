@@ -54,6 +54,10 @@ ApplicationWindow {
         rootItem.state = "tcpIpConnectScreen"
     }
 
+    function updateControlUnitsList(){
+        console.log("updateControlUnitsList");
+    }
+
     Item {
         id: rootItem
         anchors.fill: parent
