@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QTimer>
+#include <QVector>
 #include "../cuiodeviceimpl.h"
 
 class DriverProperty_p;

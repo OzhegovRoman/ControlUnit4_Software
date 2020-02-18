@@ -13,8 +13,8 @@
 #include "../FTDI/libraries/FT_GC/FT_GC.h"
 #include "../FTDI/libraries/FT_GC/FT801/FT801Impl.h"
 
-#include "Drivers/ccu4sdm0driver.h"
-#include "Drivers/ccu4tdm0driver.h"
+#include "Drivers_V2/sspddriverm0.h"
+#include "Drivers_V2/tempdriverm0.h"
 #include "Interfaces/cutcpsocketiointerface.h"
 #include "Server/servercommands.h"
 #include <QElapsedTimer>
@@ -83,7 +83,7 @@ private:
     int mButtonTag, mLastButtonTag;
     int mCurrentIndex;
 
-    QVector<AbstractDriver*> mDrivers;
+    QVector<CommonDriver*> mDrivers;
     cuIOInterface *mInterface;
 
     QTimer *mWorkerTimer;

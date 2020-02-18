@@ -2,9 +2,6 @@
 #include <unistd.h>
 #include <QDebug>
 
-#include "Drivers/ccu4sdm0driver.h"
-#include "Drivers/ccu4tdm0driver.h"
-#include "Interfaces/cutcpsocketiointerface.h"
 #include "Interfaces/curs485iointerface.h"
 #include "Server/servercommands.h"
 #include "../qCustomLib/qCustomLib.h"
@@ -135,7 +132,6 @@ bool cDisplay::isFT801founded()
     if (tmp != FT801_CHIPID){
         qDebug()<<"Critical error!!! There is no any FT801 based display";
         exit(1);
-        return false;
     }
     return true;
 }
@@ -149,12 +145,12 @@ void cDisplay::displaySetUp()
 
     QSettings settings("Scontel", "embeddedDisplay");
 
-    FTImpl.Write32(REG_CTOUCH_TRANSFORM_A,settings.value("TransformA", 4294942054).toLongLong());
-    FTImpl.Write32(REG_CTOUCH_TRANSFORM_B,settings.value("TransformB", 520).toLongLong());
-    FTImpl.Write32(REG_CTOUCH_TRANSFORM_C,settings.value("TransformC", 31452914).toLongLong());
-    FTImpl.Write32(REG_CTOUCH_TRANSFORM_D,settings.value("TransformD", 405).toLongLong());
-    FTImpl.Write32(REG_CTOUCH_TRANSFORM_E,settings.value("TransformE", 4294941440).toLongLong());
-    FTImpl.Write32(REG_CTOUCH_TRANSFORM_F,settings.value("TransformF", 18322989).toLongLong());
+    FTImpl.Write32(REG_CTOUCH_TRANSFORM_A,settings.value("TransformA", 4294942054).toUInt());
+    FTImpl.Write32(REG_CTOUCH_TRANSFORM_B,settings.value("TransformB", 520).toUInt());
+    FTImpl.Write32(REG_CTOUCH_TRANSFORM_C,settings.value("TransformC", 31452914).toUInt());
+    FTImpl.Write32(REG_CTOUCH_TRANSFORM_D,settings.value("TransformD", 405).toUInt());
+    FTImpl.Write32(REG_CTOUCH_TRANSFORM_E,settings.value("TransformE", 4294941440).toUInt());
+    FTImpl.Write32(REG_CTOUCH_TRANSFORM_F,settings.value("TransformF", 18322989).toUInt());
 
     FTImpl.DLStart();
     FTImpl.Finish();
@@ -266,15 +262,15 @@ void cDisplay::createUi(QString deviceList)
             QString type = lList[2].split('=')[1];
             if (type.contains("CU4SD")){
                 //данное устройство - SspdDriver
-                mDrivers.append(new cCu4SdM0Driver(this));
+                mDrivers.append(new SspdDriverM0(this));
             }
             else if (type.contains("CU4TD"))
                 //данное устройство - TempDriver
-                mDrivers.append(new cCu4TdM0Driver(this));
+                mDrivers.append(new TempDriverM0(this));
             int i = mDrivers.size()-1;
-            mDrivers[i]->setDevAddress(add);
+            mDrivers[i]->setDevAddress(static_cast<quint8>(add));
             mDrivers[i]->setIOInterface(mInterface);
-            mDrivers[i]->getDeviceType()->getValueSequence();
+            mDrivers[i]->deviceType()->getValueSync(nullptr, 5);
         }
     }
     nextPrevModule(true);
@@ -282,7 +278,7 @@ void cDisplay::createUi(QString deviceList)
 
 void cDisplay::show_TempWidget()
 {
-    cCu4TdM0Driver *tmpDriver = static_cast<cCu4TdM0Driver*>(mDrivers[mCurrentIndex]);
+    auto *tmpDriver = static_cast<TempDriverM0*>(mDrivers[mCurrentIndex]);
 
     showTitle("Temperature",tmpDriver->devAddress());
 
@@ -299,9 +295,9 @@ void cDisplay::show_TempWidget()
     FTImpl.End();
 
     FTImpl.ColorRGB(255, 255, 255);
-    if (tmpDriver->deviceData()->getCurrentValue().Temperature!= 0)
+    if (qAbs(static_cast<double>(tmpDriver->temperature()->currentValue())) > 1e-5)
         FTImpl.Cmd_Text(240,160,31, 1536, QString("T: %1 K").
-                        arg(tmpDriver->deviceData()->getCurrentValue().Temperature,4,'f',2).
+                        arg(static_cast<double>(tmpDriver->temperature()->currentValue()), 4, 'f', 2).
                         toLatin1().data());
     else
         FTImpl.Cmd_Text(240,160,31, 1536, QString("N/C").toLatin1().data());
@@ -317,8 +313,8 @@ void cDisplay::show_TempWidget()
 
 void cDisplay::show_SspdWidget()
 {
-    cCu4SdM0Driver *tmpDriver = static_cast<cCu4SdM0Driver*>(mDrivers[mCurrentIndex]);
-    CU4SDM0V1_Data_t data = tmpDriver->deviceData()->getCurrentValue();
+    auto *tmpDriver = static_cast<SspdDriverM0*>(mDrivers[mCurrentIndex]);
+    auto data = tmpDriver->data()->currentValue();
 
     FTImpl.TagMask(1);
     FTImpl.Tag(BT_SspdData);
@@ -378,11 +374,11 @@ void cDisplay::show_SspdWidget()
     FTImpl.ColorRGB(255, 255, 255);
     FTImpl.Cmd_Text(18, 89, 30, 0, "I:");
     FTImpl.Cmd_Text(176, 89, 30, 0, "uA");
-    FTImpl.Cmd_Text(64, 89, 30, 0, QString("%1").arg(data.Current*1e6, 6,'f', 1).toLatin1().data());
+    FTImpl.Cmd_Text(64, 89, 30, 0, QString("%1").arg(static_cast<double>(data.Current) * 1e6, 6,'f', 1).toLatin1().data());
 
     FTImpl.Cmd_Text(18, 144, 30, 0, "U:");
     FTImpl.Cmd_Text(176,144, 30, 0, "mV");
-    FTImpl.Cmd_Text(64, 144, 30, 0, QString("%1").arg(data.Voltage*1e3, 6,'f', 1).toLatin1().data());
+    FTImpl.Cmd_Text(64, 144, 30, 0, QString("%1").arg(static_cast<double>(data.Voltage) * 1e3, 6,'f', 1).toLatin1().data());
 
     tmpBool = !data.Status.stComparatorOn;
     FTImpl.Cmd_FGColor(0x525252);
@@ -394,7 +390,7 @@ void cDisplay::show_SspdWidget()
     FTImpl.TagMask(0);
 
     FTImpl.Cmd_Text(189,231,29, 1024, "mV");
-    float tmpF = tmpDriver->deviceParams()->getCurrentValue().Cmp_Ref_Level*1e3;
+    double tmpF = static_cast<double>(tmpDriver->params()->currentValue().Cmp_Ref_Level) * 1e3;
     FTImpl.Cmd_Text(179,231,29, 3072, QString("%1").arg(tmpF, 3,'f', 0).toLatin1().data());
 
     FTImpl.Cmd_FGColor(0x2b2b2b);
@@ -462,16 +458,16 @@ void cDisplay::nextPrevModule(bool next)
     if (mDrivers.size() == 0) return;
     if (mCurrentIndex!=-1){
         //если термометр то выключить
-        if (mDrivers[mCurrentIndex]->getDeviceType()->getCurrentValue().contains("CU4TD")){
-            static_cast<cCu4TdM0Driver*>(mDrivers[mCurrentIndex])->commutatorTurnOn(false);
+        if (mDrivers[mCurrentIndex]->deviceType()->currentValue().contains("CU4TD")){
+            static_cast<TempDriverM0*>(mDrivers[mCurrentIndex])->commutator()->setValueSync(false, nullptr, 5);
         }
 
     }
     mCurrentIndex = (mCurrentIndex + (next ? (1): mDrivers.size()-1)) % mDrivers.size();
 
     //если термометр то включить
-    if (mDrivers[mCurrentIndex]->getDeviceType()->getCurrentValue().contains("CU4TD")){
-        static_cast<cCu4TdM0Driver*>(mDrivers[mCurrentIndex])->commutatorTurnOn(true);
+    if (mDrivers[mCurrentIndex]->deviceType()->currentValue().contains("CU4TD")){
+        static_cast<TempDriverM0*>(mDrivers[mCurrentIndex])->commutator()->setValueSync(true, nullptr, 5);
     }
     mInited = false;
     showSpinner();
@@ -553,7 +549,7 @@ void cDisplay::buttonProcess()
             break;
         }
         default:{
-            QString str = mDrivers[mCurrentIndex]->getDeviceType()->getCurrentValue();
+            QString str = mDrivers[mCurrentIndex]->deviceType()->currentValue();
             if (str.contains("CU4SD"))
                 sspdButtonProcess();
             break;
@@ -564,29 +560,26 @@ void cDisplay::buttonProcess()
 
 void cDisplay::sspdButtonProcess()
 {
-    cCu4SdM0Driver *tmpDriver = static_cast<cCu4SdM0Driver*>(mDrivers[mCurrentIndex]);
-    tmpDriver->setDriverTimeOut(100);
-    CU4SDM0V1_Data_t data = tmpDriver->deviceData()->getCurrentValue();
+    auto *tmpDriver = static_cast<SspdDriverM0*>(mDrivers[mCurrentIndex]);
+    tmpDriver->setTimeOut(100);
+    auto data = tmpDriver->data()->currentValue();
     bool ok = true;
     switch (mLastButtonTag) {
 
     case BT_Short:{
-        tmpDriver->setShortEnable(!data.Status.stShorted);
-        tmpDriver->waitingAnswer();
-        tmpDriver->deviceData()->getValueSequence(&ok, 5);
+        tmpDriver->shortEnable()->setValueSync(!data.Status.stShorted, nullptr, 5);
+        tmpDriver->data()->getValueSync(&ok, 5);
         break;
     }
     case BT_Amp:{
-        tmpDriver->setAmpEnable(!data.Status.stAmplifierOn);
-        tmpDriver->waitingAnswer();
-        tmpDriver->deviceData()->getValueSequence(&ok, 5);
+        tmpDriver->amplifierEnable()->setValueSync(!data.Status.stAmplifierOn, nullptr, 5);
+        tmpDriver->data()->getValueSync(&ok, 5);
         break;
     }
     case BT_Cmp:{
         data.Status.stComparatorOn = data.Status.stRfKeyToCmp = data.Status.stCounterOn = !data.Status.stComparatorOn;
-        tmpDriver->deviceStatus()->setValue(data.Status);
-        tmpDriver->waitingAnswer();
-        tmpDriver->deviceData()->getValueSequence(&ok, 5);
+        tmpDriver->status()->setValueSync(data.Status, nullptr, 5);
+        tmpDriver->data()->getValueSync(&ok, 5);
         break;
     }
     case BT_SspdData:
@@ -609,42 +602,30 @@ void cDisplay::sspdButtonProcess()
         break;
     case BT_Plus:{
         if (mSspdData){
-            float tmp = tmpDriver->current()->isUnsettedPreviously() ?
-                        tmpDriver->current()->getCurrentValue() :
-                        tmpDriver->current()->lastSettedValue();
-            tmp += 1E-7*pow(10,mSspdButtonIndex);
-            tmpDriver->current()->setValue(tmp);
-            tmpDriver->waitingAnswer();
+            float tmp = tmpDriver->current()->currentValue();
+            tmp += static_cast<float>(1E-7 * pow(10, mSspdButtonIndex));
+            tmpDriver->current()->setValueSync(tmp, nullptr, 5);
             tmpDriver->current()->setCurrentValue(tmp);
         }
         else {
-            float tmp = tmpDriver->cmpReferenceLevel()->isUnsettedPreviously() ?
-                        tmpDriver->cmpReferenceLevel()->getCurrentValue() :
-                        tmpDriver->cmpReferenceLevel()->lastSettedValue();
-            tmp += 1e-4*pow(10,mSspdButtonIndex);
-            tmpDriver->cmpReferenceLevel()->setValue(tmp);
-            tmpDriver->waitingAnswer();
+            float tmp = tmpDriver->cmpReferenceLevel()->currentValue();
+            tmp += static_cast<float>(1e-4 * pow(10, mSspdButtonIndex));
+            tmpDriver->cmpReferenceLevel()->setValueSync(tmp, nullptr, 5);
             tmpDriver->cmpReferenceLevel()->setCurrentValue(tmp);
         }
         break;
     }
     case BT_Minus:{
         if (mSspdData){
-            float tmp = tmpDriver->current()->isUnsettedPreviously() ?
-                        tmpDriver->current()->getCurrentValue() :
-                        tmpDriver->current()->lastSettedValue();
-            tmp -= 1E-7*pow(10,mSspdButtonIndex);
-            tmpDriver->current()->setValue(tmp);
-            tmpDriver->waitingAnswer();
+            float tmp = tmpDriver->current()->currentValue();
+            tmp -= static_cast<float>(1E-7 * pow(10, mSspdButtonIndex));
+            tmpDriver->current()->setValueSync(tmp, nullptr, 5);
             tmpDriver->current()->setCurrentValue(tmp);
         }
         else {
-            float tmp = tmpDriver->cmpReferenceLevel()->isUnsettedPreviously() ?
-                        tmpDriver->cmpReferenceLevel()->getCurrentValue() :
-                        tmpDriver->cmpReferenceLevel()->lastSettedValue();
-            tmp -= 1e-4*pow(10,mSspdButtonIndex);
-            tmpDriver->cmpReferenceLevel()->setValue(tmp);
-            tmpDriver->waitingAnswer();
+            float tmp = tmpDriver->cmpReferenceLevel()->currentValue();
+            tmp -= static_cast<float>(1e-4 * pow(10,mSspdButtonIndex));
+            tmpDriver->cmpReferenceLevel()->setValueSync(tmp, nullptr, 5);
             tmpDriver->cmpReferenceLevel()->setCurrentValue(tmp);
         }
         break;
@@ -661,7 +642,7 @@ void cDisplay::displayUpdate()
 {
     FTImpl.DLStart();
 
-    QString str = mDrivers[mCurrentIndex]->getDeviceType()->getCurrentValue();
+    QString str = mDrivers[mCurrentIndex]->deviceType()->currentValue();
     if (str.contains("CU4TD")){
         show_TempWidget();
     }
@@ -692,18 +673,18 @@ void cDisplay::workerTimeOut()
     if (mPowerMode == pmNormal) {
 
         bool ok = true;
-        QString str = mDrivers[mCurrentIndex]->getDeviceType()->getCurrentValue();
-        mDrivers[mCurrentIndex]->setDriverTimeOut(100);
+        QString str = mDrivers[mCurrentIndex]->deviceType()->currentValue();
+        mDrivers[mCurrentIndex]->setTimeOut(100);
         if (str.contains("CU4TD")){
-            cCu4TdM0Driver* mDriver = static_cast<cCu4TdM0Driver*>(mDrivers[mCurrentIndex]);
-            CU4TDM0V1_Data_t data = mDriver->deviceData()->getValueSequence(&ok, 5);
+            auto* mDriver = static_cast<TempDriverM0*>(mDrivers[mCurrentIndex]);
+            auto data = mDriver->data()->getValueSync(&ok, 5);
             if ((ok) && (!data.CommutatorOn))
-                    mDriver->commutatorTurnOn(true);
+                    mDriver->commutator()->setValueSync(true, nullptr, 5);
         }
         if (str.contains("CU4SD")){
-            static_cast<cCu4SdM0Driver*>(mDrivers[mCurrentIndex])->deviceData()->getValueSequence(&ok, 5);
+            static_cast<SspdDriverM0*>(mDrivers[mCurrentIndex])->data()->getValueSync(&ok, 5);
             if (ok)
-                static_cast<cCu4SdM0Driver*>(mDrivers[mCurrentIndex])->deviceParams()->getValueSequence(&ok, 5);
+                static_cast<SspdDriverM0*>(mDrivers[mCurrentIndex])->params()->getValueSync(&ok, 5);
         }
 
         if (ok)
