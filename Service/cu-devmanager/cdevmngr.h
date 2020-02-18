@@ -3,7 +3,7 @@
 
 #include <QString>
 #include <QList>
-#include "Server/cuserver.h"
+#include "Server/servercommands.h"
 #include "consolereader.h"
 
 class cDevMngr

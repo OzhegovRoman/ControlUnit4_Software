@@ -11,4 +11,17 @@
 #define CMD_SERVER_ADD_DEVICE       2
 #define CMD_SERVER_SAVE_DEVICE_LIST 3
 
+#include <QObject>
+#include "../cudid.h"
+
+struct deviceInfo {
+    quint8  devAddress;
+    QString devType;
+    cUDID   devUDID;
+    QString devModVersion;
+    QString devHwVersion;
+    QString devFwVersion;
+    QString devDescription;
+};
+
 #endif // SERVERCOMMANDS_H
