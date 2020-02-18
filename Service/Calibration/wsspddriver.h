@@ -2,7 +2,7 @@
 #define WSSPDDRIVER_H
 
 #include <QWidget>
-#include "Drivers_V2/sspddriverm0.h"
+#include "Drivers/sspddriverm0.h"
 
 namespace Ui {
 class wSspdDriver;

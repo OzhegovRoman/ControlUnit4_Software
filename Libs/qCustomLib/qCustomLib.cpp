@@ -1,6 +1,6 @@
 #include "qCustomLib.h"
 #include <QtNetwork>
-#include "../CuPlugins/Server/servercommands.h"
+#include "../StarProtocol/servercommands.h"
 
 #include <QObject>
 #include <QElapsedTimer>

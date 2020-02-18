@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include <QTimer>
-#include "Drivers_V2/sspddriverm0.h"
+#include "Drivers/sspddriverm0.h"
 
 #ifdef FAKE
 #include "Interfaces/fiointerface.h"
@@ -20,7 +20,7 @@
 
 #ifdef TCPIP_SOCKET_INTERFACE
 #include "Interfaces/cutcpsocketiointerface.h"
-#include "Server/servercommands.h"
+#include "servercommands.h"
 #endif
 
 

@@ -3,8 +3,8 @@
 
 #include <QObject>
 #include <QDialog>
-#include "Drivers_V2/sspddriverm0.h"
-#include "Drivers_V2/tempdriverm0.h"
+#include "Drivers/sspddriverm0.h"
+#include "Drivers/tempdriverm0.h"
 #include "cagilent34401avisainterface.h"
 
 typedef enum {

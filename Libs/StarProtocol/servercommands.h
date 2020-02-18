@@ -12,7 +12,7 @@
 #define CMD_SERVER_SAVE_DEVICE_LIST 3
 
 #include <QObject>
-#include "../cudid.h"
+#include "../CuPlugins/cudid.h"
 
 struct deviceInfo {
     quint8  devAddress;

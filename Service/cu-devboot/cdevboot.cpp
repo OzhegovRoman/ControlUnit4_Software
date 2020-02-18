@@ -9,7 +9,7 @@
 #include <QSettings>
 #include <QThread>
 
-#include "Drivers_V2/commondriver.h"
+#include "Drivers/commondriver.h"
 #include <Interfaces/curs485iointerface.h>
 
 #include "Bootloader/bootloader.h"

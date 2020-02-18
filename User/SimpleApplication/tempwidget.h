@@ -2,7 +2,7 @@
 #define TEMPWIDGET_H
 
 #include <QWidget>
-#include "Drivers_V2/tempdriverm0.h"
+#include "Drivers/tempdriverm0.h"
 
 namespace Ui {
 class TempWidget;

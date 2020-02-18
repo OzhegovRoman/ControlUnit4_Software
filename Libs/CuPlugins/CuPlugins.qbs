@@ -2,7 +2,7 @@ import qbs
 
 StaticLibrary {
     files: [
-        "Drivers_V2/driverproperty.qmodel",
+        "Drivers/driverproperty.qmodel",
     ]
 
     name: "CuPlugins"
@@ -55,15 +55,6 @@ StaticLibrary {
     Group {
         name: "Interfaces"
         prefix: "Interfaces/**/"
-        files: [
-            "*.cpp",
-            "*.h"
-        ]
-    }
-
-    Group {
-        name: "Server"
-        prefix: "Server/**/"
         files: [
             "*.cpp",
             "*.h"

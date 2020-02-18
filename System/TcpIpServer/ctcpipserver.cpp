@@ -10,7 +10,7 @@
 #include "ccommandexecutor.h"
 #include <QThread>
 #include <QCoreApplication>
-#include "Server/servercommands.h"
+#include "servercommands.h"
 
 bool cTcpIpServer::mDebugInfoEnable = false;
 bool cTcpIpServer::mErrorInfoEnable = false;

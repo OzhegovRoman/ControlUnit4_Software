@@ -3,8 +3,8 @@
 #include <QCoreApplication>
 #include <QSettings>
 #include "ctcpipserver.h"
-#include "Server/servercommands.h"
-#include "Drivers_V2/commondriver.h"
+#include "servercommands.h"
+#include "Drivers/commondriver.h"
 #include "CommandParsers/commandparser.h"
 
 cCommandExecutor::cCommandExecutor(QObject *parent)

@@ -2,8 +2,8 @@
 #include "ui_startdialog.h"
 #include <QSettings>
 #include "Interfaces/cutcpsocketiointerface.h"
-#include "Drivers_V2/commondriver.h"
-#include "Server/servercommands.h"
+#include "Drivers/commondriver.h"
+#include "servercommands.h"
 #include "QDebug"
 #include <QMessageBox>
 #include <QFileDialog>

@@ -1,6 +1,6 @@
 #include "sspdscpicommands.h"
 #include "../ctcpipserver.h"
-#include "Drivers_V2/sspddriverm0.h"
+#include "Drivers/sspddriverm0.h"
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QJsonArray>

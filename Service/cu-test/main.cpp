@@ -5,8 +5,8 @@
 #include "Interfaces/cutcpsocketiointerface.h"
 #include "Interfaces/curs485iointerface.h"
 #include "../qCustomLib/qCustomLib.h"
-#include "Server/servercommands.h"
-#include "Drivers_V2/commondriver.h"
+#include "../StarProtocol/servercommands.h"
+#include "Drivers/commondriver.h"
 
 enum testType{
     TT_Type,

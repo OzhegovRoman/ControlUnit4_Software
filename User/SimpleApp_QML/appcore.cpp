@@ -10,7 +10,7 @@
 #include "sspddata.h"
 #include "Interfaces/cutcpsocketiointerface.h"
 #include "../qCustomLib/qCustomLib.h"
-#include "Server/servercommands.h"
+#include "servercommands.h"
 
 AppCore::AppCore(QObject *parent)
     : QObject(parent)

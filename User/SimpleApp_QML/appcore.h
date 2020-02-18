@@ -4,8 +4,8 @@
 #include <QObject>
 #include <QQmlEngine>
 #include <QJSEngine>
-#include "Drivers_V2/sspddriverm0.h"
-#include "Drivers_V2/tempdriverm0.h"
+#include "Drivers/sspddriverm0.h"
+#include "Drivers/tempdriverm0.h"
 
 class DeviceList;
 class TemperatureData;

@@ -3,10 +3,10 @@
 
 #include <QDialog>
 #include <QTimer>
-#include "Drivers_V2/sspddriverm0.h"
-#include "Drivers_V2/tempdriverm0.h"
+#include "Drivers/sspddriverm0.h"
+#include "Drivers/tempdriverm0.h"
 #include "Interfaces/cutcpsocketiointerface.h"
-#include "Server/servercommands.h"
+#include "servercommands.h"
 
 using cInterface = cuTcpSocketIOInterface;
 

@@ -13,10 +13,10 @@
 #include "../FTDI/libraries/FT_GC/FT_GC.h"
 #include "../FTDI/libraries/FT_GC/FT801/FT801Impl.h"
 
-#include "Drivers_V2/sspddriverm0.h"
-#include "Drivers_V2/tempdriverm0.h"
+#include "Drivers/sspddriverm0.h"
+#include "Drivers/tempdriverm0.h"
 #include "Interfaces/cutcpsocketiointerface.h"
-#include "Server/servercommands.h"
+#include "servercommands.h"
 #include <QElapsedTimer>
 
 #define WelcomeScreenTime       6000 //6000

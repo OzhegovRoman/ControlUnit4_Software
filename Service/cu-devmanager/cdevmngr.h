@@ -3,7 +3,7 @@
 
 #include <QString>
 #include <QList>
-#include "Server/servercommands.h"
+#include "../StarProtocol/servercommands.h"
 #include "consolereader.h"
 
 class cDevMngr

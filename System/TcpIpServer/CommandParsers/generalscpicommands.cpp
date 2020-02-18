@@ -1,6 +1,6 @@
 #include "generalscpicommands.h"
 #include "../ctcpipserver.h"
-#include "Drivers_V2/commondriver.h"
+#include "Drivers/commondriver.h"
 
 GeneralScpiCommands::GeneralScpiCommands(QObject * parent)
     : CommonScpiCommands(parent)

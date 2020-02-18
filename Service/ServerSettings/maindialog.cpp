@@ -1,6 +1,6 @@
 #include "maindialog.h"
 #include "ui_maindialog.h"
-#include "Server/servercommands.h"
+#include "../StarProtocol/servercommands.h"
 #include <QInputDialog>
 #include <QSettings>
 #include "../qCustomLib/qCustomLib.h"

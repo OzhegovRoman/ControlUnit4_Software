@@ -1,7 +1,7 @@
 #include "editwidget.h"
 #include "ui_editwidget.h"
 #include "QDoubleValidator"
-#include "Drivers_V2/sspddriverm0.h"
+#include "Drivers/sspddriverm0.h"
 #include <QDebug>
 
 EditWidget::EditWidget(QWidget *parent) :

@@ -1,8 +1,8 @@
 #include "allchannels.h"
 #include "ui_allchannels.h"
 #include <QDebug>
-#include <Drivers_V2/sspddriverm0.h>
-#include <Drivers_V2/tempdriverm0.h>
+#include <Drivers/sspddriverm0.h>
+#include <Drivers/tempdriverm0.h>
 #include <QSettings>
 #include <QDir>
 #include <QDateTime>

@@ -9,7 +9,7 @@
 #include <QNetworkInterface>
 #include <QInputDialog>
 
-#include "Server/servercommands.h"
+#include "servercommands.h"
 
 TcpIpAddressDialog::TcpIpAddressDialog(QWidget *parent) :
     QDialog(parent),

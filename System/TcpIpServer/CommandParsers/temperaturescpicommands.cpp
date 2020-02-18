@@ -1,6 +1,6 @@
 #include "temperaturescpicommands.h"
 #include "../ctcpipserver.h"
-#include "Drivers_V2/tempdriverm0.h"
+#include "Drivers/tempdriverm0.h"
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QJsonArray>

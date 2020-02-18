@@ -3,8 +3,8 @@
 
 #include <QDialog>
 #include "Interfaces/cuiointerfaceimpl.h"
-#include "Drivers_V2/sspddriverm0.h"
-#include "Drivers_V2/tempdriverm0.h"
+#include "Drivers/sspddriverm0.h"
+#include "Drivers/tempdriverm0.h"
 #include "savedialog.h"
 #include "opendialog.h"
 #include "calibratedialog.h"
