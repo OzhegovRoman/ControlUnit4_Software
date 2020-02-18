@@ -41,9 +41,7 @@ void DeviceList::removeAll()
 {
     while (mItems.size() > 0) {
         emit preItemRemoved(0);
-
         mItems.removeAt(0);
-
         emit postItemRemoved();
     }
 }

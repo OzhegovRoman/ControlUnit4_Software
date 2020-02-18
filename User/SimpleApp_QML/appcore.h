@@ -21,6 +21,7 @@ class AppCore : public QObject
     Q_PROPERTY(TemperatureData *mTempData READ getTempData WRITE setTempData)
     Q_PROPERTY(SspdData *mSspdData READ getSspdData WRITE setSspdData)
     Q_PROPERTY(int currentAddress WRITE setCurrentAddress)
+    Q_PROPERTY(QStringList controlUnits READ controlUnits WRITE setControlUnits NOTIFY controlUnitsListChanged)
 
 public:
     explicit AppCore(QObject *parent = nullptr);
@@ -33,6 +34,8 @@ public:
     DeviceList *devList() const;
     void setDevList(DeviceList *devList);
 
+    QStringList controlUnits() const;
+
     TemperatureData *getTempData() const;
     void setTempData(TemperatureData *tempData);
 
@@ -42,11 +45,14 @@ public:
     int getCurrentAddress() const;
     void setCurrentAddress(int currentAddress);
 
+    void setControlUnits(const QStringList &controlUnitsList);
+
 signals:
     void reconnectEnableChanged();
     void lastIpAddressChanged();
     void connectionApply();
     void connectionReject();
+    void controlUnitsListChanged();
 
 public slots:
     Q_INVOKABLE void coreConnectToDefaultIpAddress();
@@ -55,6 +61,7 @@ public slots:
     Q_INVOKABLE void connectTemperatureSensor(quint8 address, bool state);
     Q_INVOKABLE void getSspdDriverData(quint8 address);
     Q_INVOKABLE void getSspdDriverParameters(quint8 address);
+    Q_INVOKABLE void updateControlUnitsList();
 
     void setNewData(int dataListIndex, double value);
 
@@ -67,6 +74,7 @@ private:
     cuTcpSocketIOInterface *mInterface;
     TempDriverM0 *mTempDriver;
     SspdDriverM0 *mSspdDriver;
+    QStringList mControlUnitsList;
 };
 
 static QObject *appCoreProvider(QQmlEngine *engine, QJSEngine *scriptEngine)

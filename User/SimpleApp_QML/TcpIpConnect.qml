@@ -27,8 +27,9 @@ Item {
 
     onUpdateControlUnitList: {
         console.log("update list");
-        deviceListDialog.open();
-        updateControlUnitsList();
+        appcore.controlUnits = [];
+        controlUnitListDialog.open();
+        appcore.updateControlUnitsList();
     }
 
     TcpIpValidator {
@@ -89,13 +90,73 @@ Item {
     }
 
     Drawer {
-        id: deviceListDialog
+        id: controlUnitListDialog
         dragMargin: 0
-        height: parent.height*0.8;
+        height: (cuDevList.count*3 + 1.6)*normalTextSize
         width: parent.width;
         edge: Qt.BottomEdge
-        Text{
-            text:"test"
+        clip: true
+        Text {
+            id: textTitle
+            text:"Available Control units:"
+            font.pixelSize: normalTextSize
+            anchors{
+                horizontalCenter: parent.horizontalCenter
+                top: parent.top
+                topMargin: normalTextSize * 0.2
+            }
+
         }
+        Item {
+            width: parent.width
+            anchors {
+                top: textTitle.bottom
+                topMargin: normalTextSize * 0.2
+                bottom: parent.bottom
+            }
+            Component{
+                id: cuDelegate
+                Item {
+                    id: cuListItem
+                    height: normalTextSize * 3
+                    width: parent.width
+
+                    Rectangle {
+                        id: cuListItemButton
+                        anchors {
+                            fill: parent
+                            margins: normalTextSize * 0.2
+                        }
+                        color: "whitesmoke"
+                    }
+
+                    Text {
+                        id: typeText
+                        text: modelData
+                        anchors {
+                            horizontalCenter: cuListItemButton.horizontalCenter
+                            verticalCenter: cuListItemButton.verticalCenter
+                        }
+                        font.pixelSize: normalTextSize
+                    }
+
+                    MouseArea{
+                        anchors.fill: cuListItem
+                        onClicked: {
+                            tcpIpAddressText.text = modelData;
+                            controlUnitListDialog.close();
+                            tcpIpConnectForm.clicked();
+                        }
+                    }
+                }
+            }
+            ListView {
+                id: cuDevList
+                anchors.fill: parent
+                model: appcore.controlUnits
+                delegate: cuDelegate
+            }
+        }
+
     }
 }

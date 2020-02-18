@@ -22,7 +22,6 @@ public:
     explicit SspdData(QObject *parent = nullptr);
     QVector<SspdDataItem> items() const;
 
-
     int getIndexByName(QString name);
 
 signals:

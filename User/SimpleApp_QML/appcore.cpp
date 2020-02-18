@@ -22,7 +22,9 @@ AppCore::AppCore(QObject *parent)
     , mTempDriver(new TempDriverM0(this))
     , mSspdDriver(new SspdDriverM0(this))
 {
-
+    mControlUnitsList.append("test1");
+    mControlUnitsList.append("test2");
+    qDebug()<<mControlUnitsList;
 }
 
 static bool sReconnectEnableFlag;
@@ -164,6 +166,13 @@ void AppCore::getSspdDriverParameters(quint8 address)
     mSspdData->setData(mSspdData->getIndexByName("timeOut"), static_cast<double>(sspdParams.AutoResetTimeOut));
 }
 
+void AppCore::updateControlUnitsList()
+{
+    mControlUnitsList.clear();
+    mControlUnitsList = availableControlUnits();
+    emit controlUnitsListChanged();
+}
+
 void AppCore::setNewData(int dataListIndex, double value)
 {
     if (!mSspdData || dataListIndex < 0 || dataListIndex >= mSspdData->items().size())
@@ -200,6 +209,13 @@ void AppCore::setNewData(int dataListIndex, double value)
         mSspdDriver->autoResetThreshold()->setValueSync(static_cast<float>(value), nullptr, 5);
     if (name == "timeOut")
         mSspdDriver->autoResetTimeOut()->setValueSync(static_cast<float>(value), nullptr, 5);
+}
+
+void AppCore::setControlUnits(const QStringList &controlUnitsList)
+{
+    qDebug()<<"setControlUnits";
+    mControlUnitsList = controlUnitsList;
+    emit controlUnitsListChanged();
 }
 
 int AppCore::getCurrentAddress() const
@@ -247,6 +263,11 @@ DeviceList *AppCore::devList() const
 void AppCore::setDevList(DeviceList *devList)
 {
     mDevList = devList;
+}
+
+QStringList AppCore::controlUnits() const
+{
+    return mControlUnitsList;
 }
 
 QString AppCore::lastIpAddress() const
