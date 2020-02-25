@@ -8,26 +8,34 @@ StaticLibrary{
     Depends { name: "cpp"}
     Depends { name: "Qt.core" }
 
-    cpp.defines: [
-        "WIN32"
-    ]
+    Properties{
+        condition: project.target === "win_x86"
+        cpp.defines: "WIN32"
+        cpp.includePaths: [
+            "../GPIB/",
+            "../VISA/"
+        ]
 
-    cpp.includePaths: [
-        "../GPIB/",
-        "../VISA/"
-    ]
+        cpp.libraryPaths: [
+            "../GPIB/",
+        ]
 
-    cpp.libraryPaths: [
-        "../GPIB/",
-    ]
+        cpp.staticLibraries: "gpib"
+    }
 
-    cpp.staticLibraries: "gpib"
-
+    Properties{
+        condition: project.target === "win_x86_64"
+        cpp.defines: "WIN64"
+        cpp.includePaths: [
+            "../VISA/"
+        ]
+    }
     Group{
         name: "Source"
         files: [
             "*.cpp",
             "*.h",
         ]
+        excludeFiles: project.target === "win_x86_64" ? "*gpib*":"---"
     }
 }

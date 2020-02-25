@@ -5,7 +5,11 @@ cAgilent34401aVisaInterface::cAgilent34401aVisaInterface():
     mVisaInited{false}
 {
     // инитим прямо тут
+#ifdef WIN32
     QLibrary lib("visa32");
+#elif WIN64
+    QLibrary lib("visa64");
+#endif
     if (lib.load())
         mVisaInited = true;
    qDebug()<<"mVisaInited"<<mVisaInited;
