@@ -2,7 +2,7 @@ import qbs
 
 QtApplication {
     consoleApplication: true
-    condition: !project.isAndroid
+    condition: project.target !== "android"
     name: "cu-test"
 
     cpp.includePaths: [
@@ -12,7 +12,7 @@ QtApplication {
     Depends { name: "CuPlugins" }
     Depends {
         name: "RaspPiMMap"
-        condition: !project.isWindows
+        required: false
     }
     Depends {
         name: "Qt";
@@ -42,7 +42,7 @@ QtApplication {
 
     property stringList commonDefines: ["VERSION=\""+project.softwareVersion+"\""]
     Properties{
-        condition: qbs.architecture.contains("arm");
+        condition: project.target === "raspberryPi"
         cpp.defines: commonDefines.concat("RASPBERRY_PI");
         cpp.driverFlags: [
             "-fPIE",
@@ -58,7 +58,7 @@ QtApplication {
     cpp.defines: commonDefines;
 
     Group {
-        condition: qbs.architecture.contains("arm")
+        condition: project.target === "raspberryPi"
         fileTagsFilter: "application"
         qbs.install: true
         qbs.installPrefix: "/home/pi"

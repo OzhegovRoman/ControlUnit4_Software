@@ -3,7 +3,7 @@ import qbs.File
 import qbs.Process
 
 CppApplication{
-    condition: !(project.isWindows || project.isAndroid)
+    condition: project.target === "raspberryPi"
     name: "cu-embeddeddisplay"
     type: ["application","deployData"]
 
@@ -43,10 +43,7 @@ CppApplication{
     ]
 
     // зависимости для сборки под RaspberryPi
-    Properties{
-        condition: qbs.architecture.contains("arm")
-        cpp.defines: outer.concat(["VERSION=\""+project.softwareVersion+"\""])
-    }
+    cpp.defines: outer.concat(["VERSION=\""+project.softwareVersion+"\""])
 
     Group {
         name: "Source"
@@ -58,7 +55,6 @@ CppApplication{
     }
     // деплой проекта для raspberryPi
     Group {
-        condition: qbs.architecture.contains("arm")
         fileTagsFilter: "application"
         qbs.install: true
         qbs.installPrefix: "/home/pi"

@@ -1,7 +1,7 @@
 import qbs
 
 QtApplication {
-    condition: !project.isAndroid
+    condition: project.target !== "android"
     name: "cu-devmngr"
     consoleApplication: true
 
@@ -21,14 +21,9 @@ QtApplication {
     }
 
     Depends { name: "qCustomLib" }
-    Properties{
-        condition: !project.isWindows
-        Depends {
-            name: "RaspPiMMap"
-        }
-        cpp.dynamicLibraries:[
-            "wiringPi"
-        ]
+    Depends {
+        name: "RaspPiMMap"
+        required: false
     }
 
     cpp.cxxLanguageVersion: "c++14"
@@ -49,7 +44,7 @@ QtApplication {
 
     property stringList commonDefines: ["VERSION=\""+project.softwareVersion+"\""]
     Properties{
-        condition: qbs.architecture.contains("arm");
+        condition: project.target === "raspberryPi"
         cpp.defines: commonDefines.concat("RASPBERRY_PI");
         cpp.driverFlags: [
             "-fPIE",
@@ -63,7 +58,7 @@ QtApplication {
     cpp.defines: commonDefines;
 
     Group {
-        condition: qbs.architecture.contains("arm")
+        condition: project.target === "raspberryPi"
         fileTagsFilter: "application"
         qbs.install: true
         qbs.installPrefix: "/home/pi"

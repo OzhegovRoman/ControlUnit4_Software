@@ -6,7 +6,7 @@ StaticLibrary{
 
     Depends { name: "cpp"}
 
-    condition: !(project.isWindows || project.isAndroid)
+    condition: project.target === "raspberryPi"
     cpp.cxxLanguageVersion: "c++14"
     Depends { name: "Qt.core" }
     Group{

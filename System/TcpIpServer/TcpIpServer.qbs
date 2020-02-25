@@ -1,7 +1,7 @@
 import qbs
 
 CppApplication{
-    condition: !(project.isAndroid) // только под RaspberryPi || Windows
+    condition: project.target !== "android"// только под RaspberryPi || Windows
     name: "cu-tcpipserver"
     consoleApplication: true
 
@@ -35,7 +35,7 @@ CppApplication{
     
     Depends {
         name: "RaspPiMMap"
-        condition: !qbs.targetOS.contains("windows")
+        required: false
     }
     
     Depends {
@@ -58,7 +58,7 @@ CppApplication{
     }
 
     Group {
-        condition: qbs.architecture.contains("arm")
+        condition: project.target === "raspberryPi"
         fileTagsFilter: "application"
         qbs.install: true
         qbs.installPrefix: "/home/pi"
@@ -66,7 +66,7 @@ CppApplication{
     }
 
     Properties {
-        condition: qbs.architecture.contains("arm")
+        condition: project.target === "raspberryPi"
         cpp.driverFlags: [
             "-fPIE",
             "-pie"

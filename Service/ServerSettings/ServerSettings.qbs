@@ -5,7 +5,8 @@ import qbs.TextFile
 
 
 QtApplication {
-    condition: project.isWindows
+    condition: (project.target === "win_x86") ||
+               (project.target === "win_x86_64")
     name: "cu-serverconf"
     consoleApplication: false
     cpp.cxxLanguageVersion: "c++14"

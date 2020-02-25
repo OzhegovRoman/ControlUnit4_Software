@@ -3,7 +3,8 @@ import qbs.TextFile
 import qbs.File
 
 CppApplication{
-    condition: project.isWindows
+    condition: (project.target === "win_x86") ||
+               (project.target === "win_x86_64")
     name: "cu-devcalibration"
     consoleApplication: false
 
@@ -73,18 +74,5 @@ CppApplication{
             "*.ui",
         ]
     }
-
-    // пока это не готово для кросс компиляции, поскольку непонятно, что делать с визой и gpib,
-    // но я уже занес это все
-    property stringList commonDefines: ["VERSION=\""+project.softwareVersion+"\""]
-    Properties{
-        condition: qbs.architecture.contains("arm");
-        cpp.defines: commonDefines.concat("RASPBERRY_PI");
-        cpp.linkerFlags:[
-            "-z",
-            "relro"
-        ]
-    }
-    cpp.defines: commonDefines;
-
+    cpp.defines: ["VERSION=\""+project.softwareVersion+"\""];
 }

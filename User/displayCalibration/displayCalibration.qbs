@@ -3,7 +3,7 @@ import qbs.File
 import qbs.Process
 
 CppApplication{
-    condition: !(project.isWindows || project.isAndroid)
+    condition: project.target === "raspberryPi"
     name: "cu-displaycalibration"
     type: ["application","deployData"]
 
@@ -19,8 +19,8 @@ CppApplication{
     Depends { name: "CuPlugins" }
     Depends { name: "RaspPiMMap" }
     cpp.dynamicLibraries:[
-            "wiringPi"
-        ]
+        "wiringPi"
+    ]
 
     Depends {
         name: "Qt";
@@ -41,12 +41,7 @@ CppApplication{
 
 
     // зависимости для сборки под RaspberryPi
-    Properties{
-        condition: !project.isWindows
-        cpp.defines: outer.concat(
-            "VERSION=\""+project.softwareVersion+"\""
-        )
-    }
+    cpp.defines: outer.concat("VERSION=\""+project.softwareVersion+"\"")
 
     Group {
         name: "Source"
@@ -58,7 +53,6 @@ CppApplication{
     }
     // деплой проекта для raspberryPi
     Group {
-        condition: !project.isWindows
         fileTagsFilter: "application"
         qbs.install: true
         qbs.installPrefix: "/home/pi"

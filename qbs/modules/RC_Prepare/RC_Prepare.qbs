@@ -7,7 +7,8 @@ Module {
     property string description:    ""
     property string internalName:   ""
     Rule {
-        condition: project.isWindows
+        condition: project.target === "win_x86" ||
+                   project.target === "win_x86_64"
         inputs: "RC_TMPL"
         alwaysRun: true
         Artifact {

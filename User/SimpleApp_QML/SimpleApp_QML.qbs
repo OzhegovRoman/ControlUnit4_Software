@@ -6,7 +6,9 @@ CppApplication {
     name: "cu-simpleapp_qml"
     consoleApplication: false
 
-    condition: project.isWindows || project.isAndroid
+    condition: project.target === "win_x86"     ||
+               project.target === "win_x86_64"  ||
+               project.target === "android"
 
     Depends { name: "Qt.core" }
     Depends { name: "Qt.widgets"}
@@ -55,7 +57,7 @@ CppApplication {
 
     // деплой проекта для raspberryPi
     Group {
-        condition: !(project.isWindows || project.isAndroid)
+        condition: project.target === "raspberryPi"
         fileTagsFilter: "application"
         qbs.install: true
         qbs.installDir: "/home/pi/Software"

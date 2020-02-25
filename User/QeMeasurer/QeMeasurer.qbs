@@ -18,6 +18,7 @@ CppApplication{
     RC_Prepare.outputFileName:  name
     RC_Prepare.description:     "Quantum efficiecy measurement application"
     RC_Prepare.internalName:    "QEMeasurer"
+
     Group {
         name: "Resources_tmp"
         fileTags: "RC_TMPL"
@@ -32,7 +33,7 @@ CppApplication{
     Depends { name: "qCustomLib" }
     Depends {
         name: "RaspPiMMap"
-        condition: !qbs.targetOS.contains("windows")
+        required: false
     }
 
 
@@ -63,7 +64,7 @@ CppApplication{
     }
 
     Properties {
-        condition: qbs.architecture.contains("arm")
+        condition: project.target === "raspberryPi"
         cpp.driverFlags: [
             "-fPIE",
             "-pie"
@@ -76,7 +77,7 @@ CppApplication{
 
     // деплой проекта для raspberryPi
     Group {
-        condition: !(project.isWindows || project.isAndroid)
+        condition: project.target === "raspberryPi"
         fileTagsFilter: "application"
         qbs.install: true
         qbs.installPrefix: "/home/pi"

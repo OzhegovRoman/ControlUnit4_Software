@@ -8,6 +8,8 @@ Project {
     property string company: "Scontel"
     property string productName: "Scontel's ControlUnit software"
 
+    property string target: "win_x86"
+
     // Настройки сборки
     property bool buildAll:         false
     property bool buildLibraries:   true
@@ -16,11 +18,6 @@ Project {
     property bool buildUser:        true
 
     qbsSearchPaths: "qbs"
-
-    property bool isWindows:        true
-    property bool isAndroid:        false
-    property bool isRaspberryPi:    false
-    property bool isLinux:          false
 
     references: [
         "Libs/Libs.qbs",

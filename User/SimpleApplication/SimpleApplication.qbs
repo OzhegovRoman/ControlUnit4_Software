@@ -31,7 +31,7 @@ CppApplication{
 
     Depends {
         name: "RaspPiMMap"
-        condition: !(project.isWindows || project.isAndroid)
+        required: false
     }
 
     Depends {
@@ -50,18 +50,6 @@ CppApplication{
     cpp.defines: [
         "VERSION=\""+project.softwareVersion+"\""
     ]
-
-    Properties {
-        condition: qbs.architecture.contains("arm")
-        cpp.driverFlags: [
-            "-fPIE",
-            "-pie"
-        ]
-        cpp.linkerFlags:[
-            "-z",
-            "relro"
-        ]
-    }
 
     Group {
         name: "Forms"
@@ -91,9 +79,21 @@ CppApplication{
         ]
     }
 
+    Properties {
+        condition: project.target === "raspberryPi"
+        cpp.driverFlags: [
+            "-fPIE",
+            "-pie"
+        ]
+        cpp.linkerFlags:[
+            "-z",
+            "relro"
+        ]
+    }
+
     // деплой проекта для raspberryPi
     Group {
-        condition: !(project.isWindows || project.isAndroid)
+        condition: project.target === "raspberryPi"
         fileTagsFilter: "application"
         qbs.install: true
         qbs.installPrefix: "/home/pi"

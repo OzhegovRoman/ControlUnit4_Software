@@ -1,6 +1,7 @@
 import qbs
 
 StaticLibrary {
+
     files: [
         "Drivers/driverproperty.qmodel",
     ]
@@ -25,7 +26,7 @@ StaticLibrary {
     Depends {name: "StarProtocol"}
     Depends {
         name: "RaspPiMMap"
-        condition: project.isRaspberryPi
+        condition: project.target === "raspberryPi"
     }
 
     Group {
@@ -37,7 +38,7 @@ StaticLibrary {
     }
 
     Properties{
-        condition: project.isRaspberryPi
+        condition: project.target === "raspberryPi"
         cpp.defines:  [
             "RASPBERRY_PI"
         ]
