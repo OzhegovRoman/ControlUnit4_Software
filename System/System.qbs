@@ -1,7 +1,7 @@
 import qbs
 
 Project {
-    condition: buildSystem || buildAll
+    condition: project.SoftwareEnableList.contains("System") || buildAll
     references: [
         "TcpIpServer/TcpIpServer.qbs",
     ]

@@ -1,7 +1,7 @@
 import qbs
 
 Project {
-    condition:  buildLibraries || buildAll
+    condition:  project.SoftwareEnableList.contains("Libs") || buildAll
     references: [
         "StarProtocol/StarProtocol.qbs",
         "CuPlugins/CuPlugins.qbs",

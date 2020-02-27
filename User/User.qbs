@@ -1,7 +1,7 @@
 import qbs
 
 Project {
-    condition: buildUser || buildAll
+    condition: project.SoftwareEnableList.contains("User") || buildAll
     references: [
         "QeMeasurer/QeMeasurer.qbs",
         "SimpleApplication/SimpleApplication.qbs",

@@ -12,10 +12,13 @@ Project {
 
     // Настройки сборки
     property bool buildAll:         false
-    property bool buildLibraries:   true
-    property bool buildService:     true
-    property bool buildSystem:      false
-    property bool buildUser:        true
+
+    property stringList SoftwareEnableList: [
+        "Libs",
+        "Service",
+        "System",
+        "User"
+    ]
 
     qbsSearchPaths: "qbs"
 

@@ -1,7 +1,7 @@
 import qbs
 
 Project {
-    condition: buildService || buildAll
+    condition: project.SoftwareEnableList.contains("Service") || buildAll
     references: [
         "Calibration/Calibration.qbs",
         "cu-devboot/cu-devboot.qbs",
