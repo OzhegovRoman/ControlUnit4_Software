@@ -3,7 +3,7 @@
 #include <QCoreApplication>
 #include <QSettings>
 #include "ctcpipserver.h"
-#include "servercommands.h"
+#include "../StarProtocol/servercommands.h"
 #include "Drivers/commondriver.h"
 #include "CommandParsers/commandparser.h"
 

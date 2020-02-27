@@ -41,7 +41,10 @@ CppApplication{
 
 
     // зависимости для сборки под RaspberryPi
-    cpp.defines: outer.concat("VERSION=\""+project.softwareVersion+"\"")
+    Properties{
+        cpp.defines:
+            outer.concat("VERSION=\""+project.softwareVersion+"\"")
+    }
 
     Group {
         name: "Source"

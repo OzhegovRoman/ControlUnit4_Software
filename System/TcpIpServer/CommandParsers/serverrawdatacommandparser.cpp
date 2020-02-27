@@ -1,6 +1,6 @@
 #include "serverrawdatacommandparser.h"
 #include "../ctcpipserver.h"
-#include "servercommands.h"
+#include "../StarProtocol/servercommands.h"
 #include "cuiodevice.h"
 
 ServerRawDataCommandParser::ServerRawDataCommandParser(QObject *parent)

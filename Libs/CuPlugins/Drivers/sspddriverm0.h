@@ -4,7 +4,7 @@
 #include <QObject>
 #include "commondriver.h"
 #include "driverproperty.h"
-#include "star_prc_structs.h"
+#include "../StarProtocol/star_prc_structs.h"
 
 class SspdDriverM0 : public CommonDriver
 {
