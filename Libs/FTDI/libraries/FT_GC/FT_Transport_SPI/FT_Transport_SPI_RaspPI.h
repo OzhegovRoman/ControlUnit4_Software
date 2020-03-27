@@ -20,8 +20,8 @@
 *
 */
 
-#ifndef _FT_TRANSPORT_SPI_H_
-#define _FT_TRANSPORT_SPI_H_
+#ifndef _FT_TRANSPORT_SPI_RASPI_H_
+#define _FT_TRANSPORT_SPI_RASPI_H_
 
 #include </home/roman/raspi/sysroot/usr/local/include/wiringPiSPI.h>
 #include </home/roman/raspi/sysroot/usr/local/include/wiringPi.h>
@@ -244,5 +244,5 @@ public:
 };
 
 
-#endif /* _FT_TRANSPORT_SPI_H_ */
+#endif /* _FT_TRANSPORT_SPI_RASPI_H_ */
 

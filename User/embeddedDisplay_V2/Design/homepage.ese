@@ -1,0 +1,40 @@
+{
+    "content": [
+    ],
+    "coprocessor": [
+        "CLEAR(1, 1, 1)",
+        "CMD_GRADIENT(464, 73, 0x3E3E3E, 464, 283, 0x000000)",
+        "COLOR_RGB(130, 130, 130)",
+        "LINE_WIDTH(16)",
+        "BEGIN(LINES)",
+        "VERTEX2II(0, 68, 0, 0)",
+        "VERTEX2II(480, 68, 0, 0)",
+        "END()",
+        "COLOR_RGB(0,0,0)",
+        "BEGIN(LINES)",
+        "VERTEX2II(0, 66, 0, 0)",
+        "VERTEX2II(480, 66, 0, 0)",
+        "END()",
+        "COLOR_RGB(255, 255, 255)",
+        "CMD_TEXT(240, 24, 31, OPT_CENTER, \"Scontel's Control Unit\")",
+        "CMD_TEXT(240, 57, 26, OPT_CENTER, \"Available units list:\")",
+        "",
+        "CMD_FGCOLOR(0xFF7514)",
+        "CMD_BGCOLOR(0x783508)",
+        "CMD_SCROLLBAR(442, 91, 32, 160, OPT_FLAT, 3, 10, 20)",
+        ""
+    ],
+    "displayList": [
+        ""
+    ],
+    "project": {
+        "device": 2049
+    },
+    "registers": {
+        "hSize": 480,
+        "macro": [
+            ""
+        ],
+        "vSize": 272
+    }
+}

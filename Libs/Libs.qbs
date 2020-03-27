@@ -9,6 +9,7 @@ Project {
         "LineRegression/LineRegression.qbs",
         "qCustomPlot/qCustomPlot.qbs",
         "RaspPiMMap/RaspPiMMap.qbs",
-        "qCustomLib/qCustomLib.qbs"
+        "qCustomLib/qCustomLib.qbs",
+        "FTDI/FTDI.qbs"
     ]
 }

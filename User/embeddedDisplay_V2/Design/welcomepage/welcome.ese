@@ -1,0 +1,46 @@
+{
+    "content": [
+        {
+            "converter": "Image",
+            "dataCompressed": true,
+            "dataStorage": "Embedded",
+            "destName": "images/LOGO_converted",
+            "imageFormat": 0,
+            "memoryAddress": 0,
+            "memoryLoaded": true,
+            "sourcePath": "resources/LOGO_converted.png"
+        }
+    ],
+    "coprocessor": [
+        "CLEAR(1, 1, 1)",
+        "",
+        "Cmd_Gradient(240, 79, 0xFEFFFF, 240, 240, 0xA5A5A5);",
+        "",
+        "BITMAP_HANDLE(0)",
+        "BITMAP_SOURCE(0)",
+        "BITMAP_LAYOUT(ARGB1555, 960, 272)",
+        "BITMAP_SIZE(NEAREST, BORDER, BORDER, 480, 272)",
+        "",
+        "BEGIN(BITMAPS)",
+        "VERTEX2II(0, 0, 0, 0)",
+        "END()",
+        "COLOR_RGB(218, 131, 0)",
+        "Cmd_FGColor(0xC8510B)",
+        "Cmd_BGColor(0x783508);",
+        "CMD_PROGRESS(30, 240, 420, 18, 0, 26, 100)",
+        ""
+    ],
+    "displayList": [
+        ""
+    ],
+    "project": {
+        "device": 2069
+    },
+    "registers": {
+        "hSize": 480,
+        "macro": [
+            ""
+        ],
+        "vSize": 272
+    }
+}

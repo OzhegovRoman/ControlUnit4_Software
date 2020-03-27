@@ -679,7 +679,7 @@ void cDisplay::workerTimeOut()
             auto* mDriver = static_cast<TempDriverM0*>(mDrivers[mCurrentIndex]);
             auto data = mDriver->data()->getValueSync(&ok, 5);
             if ((ok) && (!data.CommutatorOn))
-                    mDriver->commutator()->setValueSync(true, nullptr, 5);
+                mDriver->commutator()->setValueSync(true, nullptr, 5);
         }
         if (str.contains("CU4SD")){
             static_cast<SspdDriverM0*>(mDrivers[mCurrentIndex])->data()->getValueSync(&ok, 5);

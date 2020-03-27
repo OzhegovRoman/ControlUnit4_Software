@@ -67,7 +67,7 @@ class FT800Impl : public FT_GC<FT_Trans>
 	uint8_t SetIntMask(uint8_t IntMask);
 	//void AssignCBFunptr(void *CBFunPtr);//api to register callback function from application using interrupt mechanism
 	//api to set the resistive touch sensor parameters
-	void SetTouch(uint8_t AdcMode,uint16_t Charge,uint8_t Settle,uint16_t Oversample, uint16_t RZTreshold);
+    void SetTouch(uint8_t AdcMode,uint16_t Charge,uint8_t Settle, uint16_t Oversample, uint16_t RZTreshold);
 };
 
 

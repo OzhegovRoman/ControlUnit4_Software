@@ -1,0 +1,77 @@
+{
+    "content": [
+    ],
+    "coprocessor": [
+        "CLEAR(1, 1, 1)",
+        "CMD_GRADIENT(464, 73, 0x3E3E3E, 464, 283, 0x000000)",
+        "COLOR_RGB(130, 130, 130)",
+        "",
+        "LINE_WIDTH(16)",
+        "BEGIN(LINES)",
+        "VERTEX2II(0, 68, 0, 0)",
+        "VERTEX2II(480, 68, 0, 0)",
+        "END()",
+        "COLOR_RGB(0,0,0)",
+        "BEGIN(LINES)",
+        "VERTEX2II(0, 66, 0, 0)",
+        "VERTEX2II(480, 66, 0, 0)",
+        "END()",
+        "",
+        "COLOR_RGB(255, 255, 255)",
+        "CMD_TEXT(268, 33, 31, OPT_CENTER, \"Counter level, mV\")",
+        "",
+        "CMD_FGCOLOR(0xC8510B)",
+        "CMD_BGCOLOR(0x783508)",
+        "CMD_KEYS(10, 132, 460, 40, 29, 'y', \"12345\")",
+        "CMD_KEYS(10, 178, 459, 40, 29, '8', \"67890\")",
+        "CMD_KEYS(10, 224, 273, 40, 29, 'y', \"<.-\")",
+        "CMD_FGCOLOR(0x1DCC37)",
+        "CMD_BUTTON(288, 224, 182, 40, 29, 0, \"Ok\")",
+        "",
+        "LINE_WIDTH(32)",
+        "COLOR_RGB(255, 255, 255)",
+        "BEGIN(LINES)",
+        "VERTEX2II(30, 32, 0, 0)",
+        "VERTEX2II(58, 32, 0, 0)",
+        "END()",
+        "BEGIN(LINES)",
+        "VERTEX2II(26, 32, 0, 0)",
+        "VERTEX2II(40, 18, 0, 0)",
+        "END()",
+        "BEGIN(LINES)",
+        "VERTEX2II(26, 32, 0, 0)",
+        "VERTEX2II(40, 46, 0, 0)",
+        "END()",
+        "",
+        "LINE_WIDTH(40)",
+        "",
+        "COLOR_RGB(102, 85, 102)",
+        "BEGIN(RECTS)",
+        "VERTEX2II(12, 84, 0, 0)",
+        "VERTEX2II(468, 124, 0, 0)",
+        "End()",
+        "",
+        "COLOR_RGB(0, 0, 0)",
+        "BEGIN(RECTS)",
+        "VERTEX2II(10, 82, 0, 0)",
+        "VERTEX2II(466, 122, 0, 0)",
+        "End()",
+        "",
+        "COLOR_RGB(255,255,255); ",
+        "CMD_TEXT(240, 102, 30, OPT_CENTER, \"28.3\")",
+        ""
+    ],
+    "displayList": [
+        ""
+    ],
+    "project": {
+        "device": 2049
+    },
+    "registers": {
+        "hSize": 480,
+        "macro": [
+            ""
+        ],
+        "vSize": 272
+    }
+}

@@ -49,11 +49,13 @@ QString cuTcpSocketIOInterface::tcpIpQuery(QString query, int TimeOut, bool *ok)
 {
     QElapsedTimer debugTimer;
     debugTimer.start();
-    *ok = true;
+    if (ok)
+        *ok = true;
 
     if (!initialize()) {
         qDebug()<<"Something wrong";
-        *ok = false;
+        if (ok)
+            *ok = false;
         return QString();
     }
 
