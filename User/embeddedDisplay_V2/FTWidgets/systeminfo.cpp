@@ -21,13 +21,13 @@ void SystemInfo::setup()
 
     ft801()->TagMask(1);
     ft801()->Tag(BT_Back);
-    ft801()->Cmd_Button(17, 8, 48, 48, 27, 0, "Button");
+    ft801()->Cmd_Button(17, 8, 48, 48, 27, 0, "");
     ft801()->TagMask(0);
 
     ft801()->Cmd_Gradient(464, 73, 0x3E3E3E, 464, 283, 0x000000);
-    ft801()->ColorRGB(130, 130, 130);
-
     ft801()->LineWidth(16);
+
+    ft801()->ColorRGB(130, 130, 130);
     ft801()->Begin(FT_LINES);
     ft801()->Vertex2ii(0, 68, 0, 0);
     ft801()->Vertex2ii(480, 68, 0, 0);
@@ -42,7 +42,7 @@ void SystemInfo::setup()
     ft801()->Cmd_Text(240, 32, 31, FT_OPT_CENTER, "System Info");
 
     ft801()->LineWidth(32);
-    ft801()->ColorRGB(255, 255, 255);;
+    ft801()->ColorRGB(255, 255, 255);
     ft801()->Begin(FT_LINES);
     ft801()->Vertex2ii(30, 32, 0, 0);
     ft801()->Vertex2ii(58, 32, 0, 0);

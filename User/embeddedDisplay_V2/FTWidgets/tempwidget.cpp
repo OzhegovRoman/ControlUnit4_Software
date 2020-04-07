@@ -108,11 +108,11 @@ void TempWidget::loop()
 
         mUpdateFlag = false;
 
-        ft801()->DLStart();
-        ft801()->Cmd_Append(100000L, dlOffset);
-
         if (mDriver == nullptr)
             return;
+
+        ft801()->DLStart();
+        ft801()->Cmd_Append(100000L, dlOffset);
 
         bool isConnected = qAbs(static_cast<double>(mDriver->temperature()->currentValue())) > 1e-5;
         QString tempStr;

@@ -31,7 +31,6 @@ cTcpIpServer::~cTcpIpServer()
 void cTcpIpServer::initialize()
 {
 
-
     udpSocket->bind(SERVER_TCPIP_PORT + 1, QUdpSocket::ShareAddress);
     connect(udpSocket, &QUdpSocket::readyRead, [=](){
         QByteArray datagram;

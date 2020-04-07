@@ -4,7 +4,7 @@
 #include <QObject>
 #include "ftwidget.h"
 
-class InputWidget : public QObject
+class InputWidget
 {
 public:
     enum {

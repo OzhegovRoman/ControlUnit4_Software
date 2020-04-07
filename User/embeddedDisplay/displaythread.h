@@ -128,6 +128,8 @@ private:
 signals:
     void quitSignal();
 
+
+
 public slots:
 private slots:
     void workerTimeOut();
