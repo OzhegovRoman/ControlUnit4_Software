@@ -59,6 +59,7 @@ int main(int argc, char *argv[])
 
         device0->setAddress(0);
         device0->setLightOn(true);
+
         DeviceInfo *info = device0->deviceInfo();
 
 
@@ -75,6 +76,7 @@ int main(int argc, char *argv[])
         device1->installFakeInterface(tmpInterface);
         device1->setAddress(1);
         device1->setLightOn(false);
+
         info = device1->deviceInfo();
 
         info->setModificationVersion("1");
