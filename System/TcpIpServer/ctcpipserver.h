@@ -3,7 +3,6 @@
 
 #include <QTcpServer>
 
-class cuIOInterface;
 class cCommandExecutor;
 class QUdpSocket;
 

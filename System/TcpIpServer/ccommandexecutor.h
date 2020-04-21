@@ -9,35 +9,6 @@
 class cuIOInterface;
 class cAbstractCommandParser;
 
-class Command
-{
-public:
-    Command(QObject *process = nullptr, QByteArray data = QByteArray())
-        : mProcess(process)
-        , mData(data)
-    {}
-    QObject *process() const
-    {
-        return mProcess;
-    }
-    void setProcess(QObject *process)
-    {
-        mProcess = process;
-    }
-
-    QByteArray data() const
-    {
-        return mData;
-    }
-    void setData(const QByteArray &value)
-    {
-        mData = value;
-    }
-private:
-    QObject *mProcess;
-    QByteArray mData;
-};
-
 class cCommandExecutor : public QObject
 {
     Q_OBJECT
@@ -70,12 +41,12 @@ private slots:
     void process();
 
 private:
-    bool mStopFlag;
     cuIOInterface *mInterface;
     QTimer *processTimer;
-    QList<Command> cmdList;
+    QList<QPair <QObject*, QByteArray> > cmdList;
     SettingsProvider *mSettings;
     QList<cAbstractCommandParser*> parsers;
+    bool mStopFlag;
 
     void initialize();
     bool checkDevice(const cDeviceInfo &info);

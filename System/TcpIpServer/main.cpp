@@ -7,8 +7,8 @@
 #include "ccommandexecutor.h"
 
 #ifdef FAKE_DEVICES
-#include "../../../Libs/FakeDevicesLib/fakesspddevice.h"
-#include "../../../Libs/FakeDevicesLib/fiointerface.h"
+#include "fakesspddevice.h"
+#include "fiointerface.h"
 #endif
 
 int main(int argc, char *argv[])
@@ -50,42 +50,43 @@ int main(int argc, char *argv[])
     parser.process(a);
     cuIOInterface *mInterface = nullptr;
 
+
 #ifdef FAKE_DEVICES
     if (parser.isSet(fakeOptions)) {
+        qDebug()<<"emulation mode";
         FakeIOInterface *tmpInterface = new FakeIOInterface();
+
         mInterface = tmpInterface;
-        FakeSspdDevice *device0 = new FakeSspdDevice();
+
+        FakeSspdDevice * device0 = new FakeSspdDevice();
         device0->installFakeInterface(tmpInterface);
 
         device0->setAddress(0);
         device0->setLightOn(true);
 
-        DeviceInfo *info = device0->deviceInfo();
-
-
-        info->setModificationVersion("0");
-        info->setHardwareVersion("1");
-        info->setFirmwareVersion("0.1.0");
+        device0->deviceInfo()->setModificationVersion("0");
+        device0->deviceInfo()->setHardwareVersion("1");
+        device0->deviceInfo()->setFirmwareVersion("0.1.0");
+        device0->deviceInfo()->setDeviceType(DeviceInfo::dtSspdDevice);
 
         quint8 tmpUDID[12];
         for (quint8 i = 0; i< 12; i++)
             tmpUDID[i] = 0x01*i;
-        info->setDeviceUID(tmpUDID);
+        device0->deviceInfo()->setDeviceUID(tmpUDID);
 
         FakeSspdDevice *device1 = new FakeSspdDevice();
         device1->installFakeInterface(tmpInterface);
         device1->setAddress(1);
         device1->setLightOn(false);
 
-        info = device1->deviceInfo();
-
-        info->setModificationVersion("1");
-        info->setHardwareVersion("2");
-        info->setFirmwareVersion("0.1.2");
+        device1->deviceInfo()->setModificationVersion("1");
+        device1->deviceInfo()->setHardwareVersion("2");
+        device1->deviceInfo()->setFirmwareVersion("0.1.2");
+        device1->deviceInfo()->setDeviceType(DeviceInfo::dtSspdDevice);
 
         for (quint8 i = 0; i< 12; i++)
             tmpUDID[i] = 0x01*i+1;
-        info->setDeviceUID(tmpUDID);
+        device1->deviceInfo()->setDeviceUID(tmpUDID);
     }
     else {
 #endif

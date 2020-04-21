@@ -5,7 +5,7 @@ CppApplication{
     name: "cu-tcpipserver"
     consoleApplication: true
 
-    cpp.cxxLanguageVersion: "c++14"
+    cpp.cxxLanguageVersion: "c++17"
 
     Depends { //Fake Devices in AdditionalLibs with NonFreeSoftware
         name: "FakeDevices"

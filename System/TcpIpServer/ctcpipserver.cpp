@@ -1,5 +1,4 @@
 #include "ctcpipserver.h"
-#include "Interfaces/cuiointerface.h"
 #include <QtNetwork>
 #include <QNetworkProxy>
 #include <QNetworkInterface>
