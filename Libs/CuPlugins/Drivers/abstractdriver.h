@@ -8,13 +8,13 @@
 
 class DriverProperty_p;
 
-class AbstractDriver_V2 : public cuIODeviceImpl
+class AbstractDriver : public cuIODeviceImpl
 {
     Q_OBJECT
     using cuIODeviceImpl::sendMsg;
 
 public:
-    explicit AbstractDriver_V2(QObject * parent = nullptr);
+    explicit AbstractDriver(QObject * parent = nullptr);
 
     bool waitingAnswer();
 

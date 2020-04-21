@@ -2,7 +2,7 @@
 #include "star_prc_commands.h"
 
 CommonDriver::CommonDriver(QObject *parent)
-    : AbstractDriver_V2(parent)
+    : AbstractDriver(parent)
     , mDeviceType(new DriverPropertyReadOnly<QString>(this, cmd::G_GetDeviceType))
     , mModificationVersion(new DriverPropertyReadOnly<QString> (this, cmd::G_GetModVersion))
     , mHardwareVersion(new DriverPropertyReadOnly<QString> (this, cmd::G_GetHwVersion))

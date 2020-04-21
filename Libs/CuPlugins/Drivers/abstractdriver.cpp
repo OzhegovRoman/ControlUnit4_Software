@@ -1,8 +1,8 @@
-#include "abstractdriver_v2.h"
+#include "abstractdriver.h"
 #include <QCoreApplication>
 #include "driverproperty.h"
 
-AbstractDriver_V2::AbstractDriver_V2(QObject *parent)
+AbstractDriver::AbstractDriver(QObject *parent)
     : cuIODeviceImpl(parent)
     , mTimer(new QTimer(this))
 {
@@ -10,7 +10,7 @@ AbstractDriver_V2::AbstractDriver_V2(QObject *parent)
     connect(mTimer, &QTimer::timeout, this, [=](){mTimeOut = true;});
 }
 
-bool AbstractDriver_V2::waitingAnswer()
+bool AbstractDriver::waitingAnswer()
 {
     while (!(mAnswerReceive || mTimeOut)){
         qApp->processEvents();
@@ -18,17 +18,17 @@ bool AbstractDriver_V2::waitingAnswer()
     return (!mTimeOut);
 }
 
-int AbstractDriver_V2::timeOut() const
+int AbstractDriver::timeOut() const
 {
     return mDriverTimeOut;
 }
 
-void AbstractDriver_V2::setTimeOut(int value)
+void AbstractDriver::setTimeOut(int value)
 {
     mDriverTimeOut = value;
 }
 
-void AbstractDriver_V2::appendProperty(DriverProperty_p *property)
+void AbstractDriver::appendProperty(DriverProperty_p *property)
 {
     QMutableVectorIterator<DriverProperty_p*> iter(mProperties);
     while (iter.hasNext()){
@@ -40,7 +40,7 @@ void AbstractDriver_V2::appendProperty(DriverProperty_p *property)
     mProperties.push_back(property);
 }
 
-void AbstractDriver_V2::sendMsg(quint8 command, QByteArray data)
+void AbstractDriver::sendMsg(quint8 command, QByteArray data)
 {
     mTimer->start(mDriverTimeOut);
     mTimeOut = false;
@@ -50,7 +50,7 @@ void AbstractDriver_V2::sendMsg(quint8 command, QByteArray data)
                             reinterpret_cast<quint8*>(data.data()));
 }
 
-bool AbstractDriver_V2::pMsgReceived(quint8 address, quint8 command, quint8 dataLength, quint8 *data)
+bool AbstractDriver::pMsgReceived(quint8 address, quint8 command, quint8 dataLength, quint8 *data)
 {
     if (address != devAddress()) return false;
     mTimer->stop();

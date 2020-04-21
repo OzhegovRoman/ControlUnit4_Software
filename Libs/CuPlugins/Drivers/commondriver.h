@@ -2,10 +2,10 @@
 #define COMMONDRIVER_H
 
 #include <QObject>
-#include "abstractdriver_v2.h"
+#include "abstractdriver.h"
 #include "driverproperty.h"
 
-class CommonDriver: public AbstractDriver_V2
+class CommonDriver: public AbstractDriver
 {
     Q_OBJECT
 public:

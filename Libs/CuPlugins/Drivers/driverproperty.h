@@ -1,7 +1,7 @@
 #ifndef DRIVERPROPERTY_H
 #define DRIVERPROPERTY_H
 
-#include "abstractdriver_v2.h"
+#include "abstractdriver.h"
 #include <QObject>
 #include <QVariant>
 #include "../cudid.h"
@@ -69,7 +69,7 @@ public:
     virtual ServiceSignal *settedSignal();
 
 protected:
-    DriverProperty_p(AbstractDriver_V2 * parent, quint8 cmdGetter, quint8 cmdSetter = 0xFF);
+    DriverProperty_p(AbstractDriver * parent, quint8 cmdGetter, quint8 cmdSetter = 0xFF);
 
     void readWrite(quint8 cmd, QByteArray data);
     QByteArray readWriteSync(quint8 cmd, QByteArray data, bool *ok = nullptr, int tryCount = 1);
@@ -79,7 +79,7 @@ protected:
     QByteArray lastSettedData() const;
 
 private:
-    AbstractDriver_V2 *mDriver;
+    AbstractDriver *mDriver;
     quint8 mCmdGetter;
     quint8 mCmdSetter;
     QByteArray mBuffer;
@@ -87,14 +87,14 @@ private:
     ServiceSignal *mGettedSignal;
     ServiceSignal *mSettedSignal;
 
-    friend AbstractDriver_V2;
+    friend AbstractDriver;
     friend TempDriverM0; //к сожалению нужен доступ к побитному вводу выводу для получения температурной таблицы
 };
 
 class DriverCommand: protected DriverProperty_p
 {
 public:
-    DriverCommand(AbstractDriver_V2 * parent, quint8 command)
+    DriverCommand(AbstractDriver * parent, quint8 command)
         : DriverProperty_p(parent, 0xFF, command)
     {}
 
@@ -112,7 +112,7 @@ template <typename T>
 class DriverProperty: protected DriverProperty_p
 {
 public:
-    DriverProperty(AbstractDriver_V2* parent, quint8 cmdGetter, quint8 cmdSetter)
+    DriverProperty(AbstractDriver* parent, quint8 cmdGetter, quint8 cmdSetter)
         : DriverProperty_p(parent, cmdGetter, cmdSetter)
     {}
     virtual ~DriverProperty() override
@@ -173,7 +173,7 @@ template <typename T>
 class DriverPropertyReadOnly: protected DriverProperty<T>
 {
 public:
-    DriverPropertyReadOnly(AbstractDriver_V2* parent, quint8 cmdGetter)
+    DriverPropertyReadOnly(AbstractDriver* parent, quint8 cmdGetter)
         : DriverProperty<T>(parent, cmdGetter, 0xFF)
     {}
 
@@ -207,7 +207,7 @@ template <typename T>
 class DriverPropertyWriteOnly: protected DriverProperty<T>
 {
 public:
-    DriverPropertyWriteOnly(AbstractDriver_V2* parent, quint8 cmdSetter)
+    DriverPropertyWriteOnly(AbstractDriver* parent, quint8 cmdSetter)
         : DriverProperty<T>(parent, 0xFF, cmdSetter)
     {}
 

@@ -2,7 +2,7 @@
 #include <QDebug>
 
 
-DriverProperty_p::DriverProperty_p(AbstractDriver_V2 *parent, quint8 cmdGetter, quint8 cmdSetter)
+DriverProperty_p::DriverProperty_p(AbstractDriver *parent, quint8 cmdGetter, quint8 cmdSetter)
     : mDriver(parent)
     , mCmdGetter(cmdGetter)
     , mCmdSetter(cmdSetter)
