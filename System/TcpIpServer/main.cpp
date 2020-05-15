@@ -8,6 +8,7 @@
 
 #ifdef FAKE_DEVICES
 #include "fakesspddevice.h"
+#include "faketempdevice.h"
 #include "fiointerface.h"
 #endif
 
@@ -58,10 +59,24 @@ int main(int argc, char *argv[])
 
         mInterface = tmpInterface;
 
+        FakeTempDevice *tempDevice = new FakeTempDevice();
+        tempDevice->installFakeInterface(tmpInterface);
+        tempDevice->setAddress(0);
+        tempDevice->deviceInfo()->setModificationVersion("0");
+        tempDevice->deviceInfo()->setHardwareVersion("1");
+        tempDevice->deviceInfo()->setFirmwareVersion("0.1.0");
+        tempDevice->deviceInfo()->setDeviceType(DeviceInfo::dtTemperatureDevice);
+
+        quint8 tmpUDID[12];
+        for (quint8 i = 0; i< 12; i++)
+            tmpUDID[i] = 0x01*i;
+        tempDevice->deviceInfo()->setDeviceUID(tmpUDID);
+
+
         FakeSspdDevice * device0 = new FakeSspdDevice();
         device0->installFakeInterface(tmpInterface);
 
-        device0->setAddress(0);
+        device0->setAddress(1);
         device0->setLightOn(true);
 
         device0->deviceInfo()->setModificationVersion("0");
@@ -69,14 +84,13 @@ int main(int argc, char *argv[])
         device0->deviceInfo()->setFirmwareVersion("0.1.0");
         device0->deviceInfo()->setDeviceType(DeviceInfo::dtSspdDevice);
 
-        quint8 tmpUDID[12];
         for (quint8 i = 0; i< 12; i++)
-            tmpUDID[i] = 0x01*i;
+            tmpUDID[i] = 0x01*i+1;
         device0->deviceInfo()->setDeviceUID(tmpUDID);
 
         FakeSspdDevice *device1 = new FakeSspdDevice();
         device1->installFakeInterface(tmpInterface);
-        device1->setAddress(1);
+        device1->setAddress(2);
         device1->setLightOn(false);
 
         device1->deviceInfo()->setModificationVersion("1");
@@ -85,7 +99,7 @@ int main(int argc, char *argv[])
         device1->deviceInfo()->setDeviceType(DeviceInfo::dtSspdDevice);
 
         for (quint8 i = 0; i< 12; i++)
-            tmpUDID[i] = 0x01*i+1;
+            tmpUDID[i] = 0x01*i+2;
         device1->deviceInfo()->setDeviceUID(tmpUDID);
     }
     else {
