@@ -15,7 +15,9 @@
 #include "servercommands.h"
 #include "../qCustomLib/qCustomLib.h"
 
-static FT801_SPI _FT801;
+#include "riverdieve.h"
+
+static Gpu_Hal_Context_t host;
 
 void ignoreUnixSignals(std::initializer_list<int> ignoreSignals) {
     for (int sig : ignoreSignals)

@@ -24,7 +24,7 @@
 
 /* Chip identifier macros */
 #define FT801_CHIPID			0x00010108UL
-
+#define BT815_CHIPID            0x00011508UL
 /* Macros for general purpose */
 #define FT_DISABLE				0
 #define FT_ENABLE				1

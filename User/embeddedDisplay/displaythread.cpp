@@ -486,7 +486,7 @@ void cDisplay::showPreviouseButton(bool pressed)
     FTImpl.BitmapSize(FT_BILINEAR, FT_BORDER, FT_BORDER, 64, 64);
     FTImpl.Cmd_LoadIdentity();
     FTImpl.Cmd_Scale(65536, 65536);
-    FTImpl.Cmd_SetMatrix();ui
+    FTImpl.Cmd_SetMatrix();
     FTImpl.Begin(FT_BITMAPS);
     FTImpl.Vertex2f(176,0);
     FTImpl.End();

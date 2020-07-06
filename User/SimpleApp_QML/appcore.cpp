@@ -193,7 +193,7 @@ void AppCore::setNewData(int dataListIndex, double value)
         auto status = mSspdDriver->status()->currentValue();
         status.stCounterOn =
                 status.stRfKeyToCmp =
-                status.stCounterOn = value < 0.01 ? 0 : 1;
+                status.stComparatorOn = value < 0.01 ? 0 : 1;
         mSspdDriver->status()->setValueSync(status, nullptr, 5);
     }
 

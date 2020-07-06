@@ -3,18 +3,7 @@
 #include <QDebug>
 #include <QSettings>
 
-#define FT_DISPLAYWIDTH		FT_DISPLAY_HSIZE_WQVGA
-#define FT_DISPLAYHEIGHT	FT_DISPLAY_VSIZE_WQVGA
-#define FT_DISPLAY_RESOLUTION	FT_DISPLAY_WQVGA_480x272
-#define FT_DISPLAY_ROTATE       1
-
-#include "../FTDI/hardware/FT801/FT801.h"
-#include "../FTDI/libraries/FT_GC/FT_Transport_SPI/FT_Transport_SPI_RaspPI.h"
-#include "../FTDI/libraries/FT_GC/FT_GC.h"
-#include "../FTDI/libraries/FT_GC/FT801/FT801Impl.h"
-
-typedef FT801Impl<FT_Transport_SPI_RaspPi> FT801IMPL_SPI;
-
+#include "riverdieve.h"
 
 int main(int argc, char *argv[])
 {
@@ -29,70 +18,53 @@ int main(int argc, char *argv[])
 
     parser.process(a);
 
+    DisplaySettings::getInstance().autoDetectDisplayGeneration();
 
-    FT801IMPL_SPI FTImpl;
+    Gpu_Hal_Context_t host;
     QSettings settings("Scontel", "embeddedDisplay");
 
-    // инициализация дисплея
-    FTImpl.Init(FT_DISPLAY_RESOLUTION);
-    delay(20);
+    App_Common_Init(&host);
+    App_Calibrate_Screen(&host);
+
 
     //Read Register ID to check if FT800 is ready.
     unsigned int tmp = 0;
-    int tryCount = 0;
-    while ((FT801_CHIPID != tmp) && (tryCount++ < 10)){
-        tmp = FTImpl.Read32(FT_ROM_CHIPID);
-        qDebug()<<tmp;
-    }
 
-    if (tmp != FT801_CHIPID){
-        qDebug()<<"Critical error!!! There is no any FT801 based display";
-        return 1;
-    }
-
-    FTImpl.SetDisplayEnablePin(FT_DISPENABLE_PIN);
-    FTImpl.SetAudioEnablePin(FT_AUDIOENABLE_PIN);
-    FTImpl.DisplayOn();
-    FTImpl.AudioOff();
-
-
-    FTImpl.DLStart();
-    FTImpl.ClearColorRGB(64,64,64);
-    FTImpl.Clear(1,1,1);
-    FTImpl.ColorRGB(0xff,0xff,0xff);
-    FTImpl.Cmd_Text(FT_DISPLAYWIDTH/2, FT_DISPLAYHEIGHT/2, 27, FT_OPT_CENTER, "Please Tap on the dot.");
-    FTImpl.Cmd_Calibrate(0);
-
-    FTImpl.DLEnd();
-    FTImpl.Finish();
-
-    delay(20);
-
-    tmp = FTImpl.Read32(REG_CTOUCH_TRANSFORM_A);
+    tmp = Gpu_Hal_Rd32(&host, REG_TOUCH_TRANSFORM_A);
     qDebug()<<"TransformA"<<tmp;
     settings.setValue("TransformA", tmp);
-    tmp = FTImpl.Read32(REG_CTOUCH_TRANSFORM_B);
+    tmp = Gpu_Hal_Rd32(&host, REG_TOUCH_TRANSFORM_B);
     qDebug()<<"TransformB"<<tmp;
     settings.setValue("TransformB", tmp);
-    tmp = FTImpl.Read32(REG_CTOUCH_TRANSFORM_C);
+    tmp = Gpu_Hal_Rd32(&host, REG_TOUCH_TRANSFORM_C);
     qDebug()<<"TransformC"<<tmp;
     settings.setValue("TransformC", tmp);
-    tmp = FTImpl.Read32(REG_CTOUCH_TRANSFORM_D);
+    tmp = Gpu_Hal_Rd32(&host, REG_TOUCH_TRANSFORM_D);
     qDebug()<<"TransformD"<<tmp;
     settings.setValue("TransformD", tmp);
-    tmp = FTImpl.Read32(REG_CTOUCH_TRANSFORM_E);
+    tmp = Gpu_Hal_Rd32(&host, REG_TOUCH_TRANSFORM_E);
     qDebug()<<"TransformE"<<tmp;
     settings.setValue("TransformE", tmp);
-    tmp = FTImpl.Read32(REG_CTOUCH_TRANSFORM_F);
+    tmp = Gpu_Hal_Rd32(&host, REG_TOUCH_TRANSFORM_F);
     qDebug()<<"TransformF"<<tmp;
     settings.setValue("TransformF", tmp);
 
-    FTImpl.DLStart();
-    FTImpl.Clear(1,1,1);
-    FTImpl.ColorRGB(0xff,0xff,0xff);
-    FTImpl.Cmd_Text(FT_DISPLAYWIDTH/2, FT_DISPLAYHEIGHT/2, 27, FT_OPT_CENTER, "Well Done!!");
-    FTImpl.DLEnd();
-    FTImpl.Finish();
+    Gpu_CoCmd_Dlstart(&host);
+
+    App_WrCoCmd_Buffer(&host, CLEAR(1,1,1));
+    App_WrCoCmd_Buffer(&host, COLOR_RGB(255,255,255));
+
+    Gpu_CoCmd_Text(&host,
+                   static_cast<int16_t>(DispWidth/2),
+                   static_cast<int16_t>(DispHeight/2),
+                   27,
+                   static_cast<uint16_t>(OPT_CENTER), "Well Done!!");
+
+    /* Calibration */
+    App_WrCoCmd_Buffer(&host, DISPLAY());
+    Gpu_CoCmd_Swap(&host);
+    App_Flush_Co_Buffer(&host);
+    Gpu_Hal_WaitCmdfifo_empty(&host);
 
     return 0;
 }

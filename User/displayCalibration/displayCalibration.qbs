@@ -13,11 +13,13 @@ CppApplication{
         "../../Libs/CuPlugins/",
         "../../Libs/StarProtocol/",
         "../../Libs/RaspPiMMap/",
+        "../../Libs/RiverdiEve/"
     ]
 
 
     Depends { name: "CuPlugins" }
     Depends { name: "RaspPiMMap" }
+    Depends { name: "RiverdiEve"}
     cpp.dynamicLibraries:[
         "wiringPi"
     ]

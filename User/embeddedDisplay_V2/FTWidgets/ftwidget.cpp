@@ -3,23 +3,13 @@
 
 FTWidget::FTWidget(QObject *parent)
     : QObject(parent)
-    , mFt801 (nullptr)
+    , mHost (nullptr)
     , mTerminateFlag (false)
     , mSleepTimer (50)
     , mTimer(new QTimer(this))
 {
     mTimer->setSingleShot(true);
     connect(mTimer, &QTimer::timeout, this, &FTWidget::loop);
-}
-
-FT801_SPI *FTWidget::ft801() const
-{
-    return mFt801;
-}
-
-void FTWidget::setFt801(FT801_SPI *fT801)
-{
-    mFt801 = fT801;
 }
 
 void FTWidget::exec()
@@ -43,6 +33,16 @@ void FTWidget::loop()
     // к этому моменту должно быть выполнено все операции
     if (!mTerminateFlag)
         mTimer->start(mSleepTimer);
+}
+
+Gpu_App_Context_t *FTWidget::host() const
+{
+    return mHost;
+}
+
+void FTWidget::setHost(Gpu_App_Context_t *host)
+{
+    mHost = host;
 }
 
 bool FTWidget::isStoped() const
