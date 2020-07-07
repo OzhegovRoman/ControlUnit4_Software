@@ -16,21 +16,21 @@ public:
 
     bool isStoped() const;
 
-    Gpu_App_Context_t *host() const;
-    void setHost(Gpu_App_Context_t *host);
-
+    Gpu_Hal_Context_t *host() const;
+    void setHost(Gpu_Hal_Context_t *host);
+    
 public slots:
     void exec();
     void terminate();
-
+    
 signals:
-
+    
 protected:
     virtual void setup() = 0;
     virtual void loop();
 
 private:
-    Gpu_App_Context_t *mHost;
+    Gpu_Hal_Context_t *mHost;
     bool mTerminateFlag;
     int mSleepTimer;
     QTimer *mTimer;

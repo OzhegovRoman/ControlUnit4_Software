@@ -5,12 +5,13 @@
 #include "ftwidget.h"
 #include "Drivers/tempdriverm0.h"
 #include <QTimer>
+#include "riverdieve.h"
 
 class TempWidget: public FTWidget
 {
     Q_OBJECT
 public:
-    explicit TempWidget(FT801_SPI * ft801);
+    explicit TempWidget(Gpu_Hal_Context_t * host);
     // FTWidget interface
     void setDriver(TempDriverM0 *driver);
 

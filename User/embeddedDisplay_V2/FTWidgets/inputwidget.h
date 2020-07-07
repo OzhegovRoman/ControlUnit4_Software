@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include "ftwidget.h"
+#include "riverdieve.h"
 
 class InputWidget
 {
@@ -12,7 +13,7 @@ public:
         BT_Ok = 2
     };
 
-    static double getDouble(FT801_SPI *ft801, QString title = QString());
+    static double getDouble(Gpu_Hal_Context_t *host, QString title = QString());
 
 };
 

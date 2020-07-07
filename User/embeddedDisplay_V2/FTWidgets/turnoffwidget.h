@@ -6,7 +6,7 @@
 class TurnOffWidget
 {
 public:
-    static void turnOff(FT801_SPI *ft801);
+    static void turnOff(Gpu_Hal_Context_t *host);
 };
 
 #endif // TURNOFFWIDGET_H

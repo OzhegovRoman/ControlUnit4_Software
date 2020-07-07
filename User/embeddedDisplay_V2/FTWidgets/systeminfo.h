@@ -2,12 +2,13 @@
 #define SYSTEMINFO_H
 
 #include "ftwidget.h"
+#include "riverdieve.h"
 
 class SystemInfo : public FTWidget
 {
     Q_OBJECT
 public:
-    explicit SystemInfo(FT801_SPI * ft801);
+    explicit SystemInfo(Gpu_Hal_Context_t * host);
 
     // FTWidget interface
 

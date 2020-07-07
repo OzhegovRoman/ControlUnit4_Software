@@ -35,12 +35,12 @@ void FTWidget::loop()
         mTimer->start(mSleepTimer);
 }
 
-Gpu_App_Context_t *FTWidget::host() const
+Gpu_Hal_Context_t *FTWidget::host() const
 {
     return mHost;
 }
 
-void FTWidget::setHost(Gpu_App_Context_t *host)
+void FTWidget::setHost(Gpu_Hal_Context_t *host)
 {
     mHost = host;
 }

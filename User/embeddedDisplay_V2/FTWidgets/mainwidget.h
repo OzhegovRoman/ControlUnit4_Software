@@ -3,12 +3,13 @@
 
 #include "ftwidget.h"
 #include "../DataHarvester/dataharvester.h"
+#include "riverdieve.h"
 
 class MainWidget: public FTWidget
 {
     Q_OBJECT
 public:
-    explicit MainWidget(FT801_SPI * ft801, DataHarvester *harvester);
+    explicit MainWidget(Gpu_Hal_Context_t * host, DataHarvester *harvester);
 
 signals:
     void systemInfoClicked();

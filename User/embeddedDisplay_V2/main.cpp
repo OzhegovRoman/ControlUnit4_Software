@@ -29,7 +29,7 @@ void catchUnixSignals(std::initializer_list<int> quitSignals) {
         // blocking and not aysnc-signal-safe func are valid
         printf("\nquit the application by signal(%d).\n", sig);
 
-        TurnOffWidget::turnOff(&_FT801);
+        TurnOffWidget::turnOff(&host);
         QCoreApplication::quit();
 
     };
@@ -111,20 +111,21 @@ int main(int argc, char *argv[])
 
     qDebug()<< "init interface";
 
-    DataHarvester *_DataHarvester = new DataHarvester();//(createInterface(parser, tcpIpOption, serialPortOption));
+    DataHarvester *_DataHarvester = new DataHarvester();
     _DataHarvester->setInterface(createInterface(parser, tcpIpOption, serialPortOption));
 
     // TODO: Установить все параметры программы
 
-    DisplayInitializer _DisplayInitializer(&_FT801);
+    DisplayInitializer _DisplayInitializer(&host);
 
-    MainWidget _MainWidget(&_FT801, _DataHarvester);
-    SystemInfo _SystemInfo(&_FT801);
-    TempWidget _TempWidget(&_FT801);
-    SspdWidget _SspdWidget(&_FT801);
-    WelcomePageWidget _WelcomePage(&_FT801);
+    MainWidget _MainWidget(&host, _DataHarvester);
+    SystemInfo _SystemInfo(&host);
+    TempWidget _TempWidget(&host);
+    SspdWidget _SspdWidget(&host);
+    WelcomePageWidget _WelcomePage(&host);
 
     QObject::connect(&_DisplayInitializer, &DisplayInitializer::initialized, &_WelcomePage, &WelcomePageWidget::exec);
+
 
     QObject::connect(&_WelcomePage, &WelcomePageWidget::done, [&_MainWidget, &_DataHarvester](){
         _DataHarvester->initialize();

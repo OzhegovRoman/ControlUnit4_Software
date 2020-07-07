@@ -1,7 +1,7 @@
 #include "tempwidget.h"
 #include <QDebug>
 
-TempWidget::TempWidget(FT801_SPI *ft801)
+TempWidget::TempWidget(Gpu_Hal_Context_t *host)
     : FTWidget (nullptr)
     , mUpdateFlag(false)
     , mDriver(nullptr)
@@ -9,7 +9,7 @@ TempWidget::TempWidget(FT801_SPI *ft801)
     , errorFlag(false)
     , dataTimer(new QTimer(this))
 {
-    setFt801(ft801);
+    setHost(host);
     dataTimer->setSingleShot(true);
     connect(dataTimer, &QTimer::timeout, this, &TempWidget::readData);
 }
@@ -18,71 +18,74 @@ void TempWidget::setup()
 {
     mUpdateFlag = false;
 
-    if (ft801() == nullptr || mDriver == nullptr){
+    if (host() == nullptr || mDriver == nullptr){
         terminate();
         return;
     }
 
-    ft801()->DLStart();
+    Gpu_CoCmd_Dlstart(host());
+    App_WrCoCmd_Buffer(host(), TAG_MASK(1));
+    App_WrCoCmd_Buffer(host(), TAG(BT_Back));
+    Gpu_CoCmd_Button(host(), 17, 8, 48, 48, 27, 0, "");
+    App_WrCoCmd_Buffer(host(), TAG_MASK(0));
 
-    ft801()->TagMask(1);
-    ft801()->Tag(BT_Back);
-    ft801()->Cmd_Button(17, 8, 48, 48, 27, 0, "");
-    ft801()->TagMask(0);
+    Gpu_CoCmd_Gradient(host(), 464, 73, 0x3E3E3E, 464, 283, 0x000000);
+    App_WrCoCmd_Buffer(host(), LINE_WIDTH(16));
 
-    ft801()->Cmd_Gradient(464, 73, 0x3E3E3E, 464, 283, 0x000000);
-    ft801()->LineWidth(16);
+    App_WrCoCmd_Buffer(host(), COLOR_RGB(130, 130, 130));
+    App_WrCoCmd_Buffer(host(), BEGIN(LINES));
+    App_WrCoCmd_Buffer(host(), VERTEX2II(0, 68, 0, 0));
+    App_WrCoCmd_Buffer(host(), VERTEX2II(480, 68, 0, 0));
+    App_WrCoCmd_Buffer(host(), END());
+    App_WrCoCmd_Buffer(host(), COLOR_RGB(0, 0, 0));
+    App_WrCoCmd_Buffer(host(), BEGIN(LINES));
+    App_WrCoCmd_Buffer(host(), VERTEX2II(0, 66, 0, 0));
+    App_WrCoCmd_Buffer(host(), VERTEX2II(480, 66, 0, 0));
+    App_WrCoCmd_Buffer(host(), END());
 
-    ft801()->ColorRGB(130, 130, 130);
-    ft801()->Begin(FT_LINES);
-    ft801()->Vertex2ii(0, 68, 0, 0);
-    ft801()->Vertex2ii(480, 68, 0, 0);
-    ft801()->End();
-    ft801()->ColorRGB(0,0,0);
-    ft801()->Begin(FT_LINES);
-    ft801()->Vertex2ii(0, 66, 0, 0);
-    ft801()->Vertex2ii(480, 66, 0, 0);
-    ft801()->End();
+    App_WrCoCmd_Buffer(host(), COLOR_RGB(255, 255, 255));
+    Gpu_CoCmd_Text(host(), 240, 24, 31, OPT_CENTER, "Temperature Unit");
+    Gpu_CoCmd_Text(host(), 240, 57, 26, OPT_CENTER, QString("Address: %1").arg(mDriver->devAddress()).toLocal8Bit());
 
-    ft801()->ColorRGB(255, 255, 255);
-    ft801()->Cmd_Text(240,24,31, 1536, "Temperature");
-    ft801()->Cmd_Text(240,57,26, 1536, QString("Address: %1").arg(mDriver->devAddress()).toLocal8Bit());
+    App_WrCoCmd_Buffer(host(), LINE_WIDTH(32));
+    App_WrCoCmd_Buffer(host(), BEGIN(LINES));
+    App_WrCoCmd_Buffer(host(), VERTEX2II(30, 32, 0, 0));
+    App_WrCoCmd_Buffer(host(), VERTEX2II(58, 32, 0, 0));
+    App_WrCoCmd_Buffer(host(), VERTEX2II(26, 32, 0, 0));
+    App_WrCoCmd_Buffer(host(), VERTEX2II(40, 18, 0, 0));
+    App_WrCoCmd_Buffer(host(), VERTEX2II(26, 32, 0, 0));
+    App_WrCoCmd_Buffer(host(), VERTEX2II(40, 46, 0, 0));
+    App_WrCoCmd_Buffer(host(), END());
 
-    ft801()->LineWidth(32);
-    ft801()->ColorRGB(255, 255, 255);
-    ft801()->Begin(FT_LINES);
-    ft801()->Vertex2ii(30, 32, 0, 0);
-    ft801()->Vertex2ii(58, 32, 0, 0);
-    ft801()->Vertex2ii(26, 32, 0, 0);
-    ft801()->Vertex2ii(40, 18, 0, 0);
-    ft801()->Vertex2ii(26, 32, 0, 0);
-    ft801()->Vertex2ii(40, 46, 0, 0);
-    ft801()->End();
+    App_WrCoCmd_Buffer(host(), LINE_WIDTH(40));
 
-    ft801()->LineWidth(40);
+    App_WrCoCmd_Buffer(host(), COLOR_RGB(102, 85, 102));
+    App_WrCoCmd_Buffer(host(), BEGIN(RECTS));
+    App_WrCoCmd_Buffer(host(), VERTEX2II(132, 117, 0, 0));
+    App_WrCoCmd_Buffer(host(), VERTEX2II(352, 207, 0, 0));
+    App_WrCoCmd_Buffer(host(), END());
 
-    ft801()->ColorRGB(102, 85, 102);
-    ft801()->Begin(FT_RECTS);
-    ft801()->Vertex2ii(132, 117, 0, 0);
-    ft801()->Vertex2ii(352, 207, 0, 0);
-    ft801()->End();
+    App_WrCoCmd_Buffer(host(), COLOR_RGB(0, 0, 0));
+    App_WrCoCmd_Buffer(host(), BEGIN(RECTS));
+    App_WrCoCmd_Buffer(host(), VERTEX2II(130, 115, 0, 0));
+    App_WrCoCmd_Buffer(host(), VERTEX2II(350, 205, 0, 0));
+    App_WrCoCmd_Buffer(host(), END());
 
-    ft801()->ColorRGB(0, 0, 0);
-    ft801()->Begin(FT_RECTS);
-    ft801()->Vertex2ii(130, 115, 0, 0);
-    ft801()->Vertex2ii(350, 205, 0, 0);
-    ft801()->End();
+    App_WrCoCmd_Buffer(host(), POINT_SIZE(100));
 
-    ft801()->PointSize(100);
+    App_Flush_Co_Buffer(host());
+    Gpu_Hal_WaitCmdfifo_empty(host());
 
-    dlOffset = ft801()->Read16(REG_CMD_DL);
-    ft801()->Cmd_Memcpy(100000L, FT_RAM_DL, dlOffset);
+    dlOffset = Gpu_Hal_Rd16(host(), REG_CMD_DL);
+    Gpu_CoCmd_Memcpy(host(), 100000L, RAM_DL, dlOffset);
 
-    ft801()->ColorRGB(255, 119, 0);
-    ft801()->Cmd_Spinner(240, 160, 0, 0);
+    App_WrCoCmd_Buffer(host(), COLOR_RGB(255, 119, 0));
+    Gpu_CoCmd_Spinner(host(), 240, 160, 0, 0);
 
-    ft801()->DLEnd();
-    ft801()->Finish();
+    App_WrCoCmd_Buffer(host(), DISPLAY());
+    Gpu_CoCmd_Swap(host());
+    App_Flush_Co_Buffer(host());
+    Gpu_Hal_WaitCmdfifo_empty(host());
 
     readData();
 }
@@ -90,7 +93,7 @@ void TempWidget::setup()
 void TempWidget::loop()
 {
     static uint32_t lastButtonPressedTag = 0;
-    uint8_t buttonTag = ft801()->Read(REG_TOUCH_TAG);
+    uint8_t buttonTag = Gpu_Hal_Rd8(host(), REG_TOUCH_TAG);
     if (buttonTag)
         lastButtonPressedTag = buttonTag;
     else {
@@ -111,46 +114,47 @@ void TempWidget::loop()
         if (mDriver == nullptr)
             return;
 
-        ft801()->DLStart();
-        ft801()->Cmd_Append(100000L, dlOffset);
+        Gpu_CoCmd_Dlstart(host());
+        Gpu_CoCmd_Append(host(), 100000L, dlOffset);
 
         bool isConnected = qAbs(static_cast<double>(mDriver->temperature()->currentValue())) > 1e-5;
         QString tempStr;
 
         if (isConnected){
-            ft801()->ColorRGB(255,255,255);
+            App_WrCoCmd_Buffer(host(), COLOR_RGB(255, 255, 255));
             tempStr = QString("T: %1 K").
                     arg(static_cast<double>(mDriver->temperature()->currentValue()), 4, 'f', 2);
         }
         else {
-            ft801()->ColorRGB(135, 135, 135);
+            App_WrCoCmd_Buffer(host(), COLOR_RGB(135, 135, 135));
             tempStr = "N/C";
         }
-        ft801()->Cmd_Text(240,160,31, 1536, tempStr.toLocal8Bit());
+        Gpu_CoCmd_Text(host(), 240, 160, 31, 1536, tempStr.toLocal8Bit());
 
         if (dataReady){
             // зеленый
-            ft801()->ColorRGB(29, 204, 55);
+            App_WrCoCmd_Buffer(host(), COLOR_RGB(29, 204, 55));
             dataReady = false;
             update();
         }
         else  if (errorFlag){
             // красный
-            ft801()->ColorRGB(247, 38, 56);
+            App_WrCoCmd_Buffer(host(), COLOR_RGB(247, 38, 56));
             errorFlag = false;
             update();
         }
         else
             //серый
-            ft801()->ColorRGB(135, 135, 135);
+            App_WrCoCmd_Buffer(host(), COLOR_RGB(135, 135, 135));
 
-        ft801()->Begin(FT_POINTS);
-        ft801()->Vertex2ii(342, 124, 0, 0);
-        ft801()->End();
+        App_WrCoCmd_Buffer(host(), BEGIN(POINTS));
+        App_WrCoCmd_Buffer(host(), VERTEX2II(342, 124, 0, 0));
+        App_WrCoCmd_Buffer(host(), END());
 
-        ft801()->DLEnd();
-        ft801()->Finish();
-
+        App_WrCoCmd_Buffer(host(), DISPLAY());
+        Gpu_CoCmd_Swap(host());
+        App_Flush_Co_Buffer(host());
+        Gpu_Hal_WaitCmdfifo_empty(host());
     }
     FTWidget::loop();
 }

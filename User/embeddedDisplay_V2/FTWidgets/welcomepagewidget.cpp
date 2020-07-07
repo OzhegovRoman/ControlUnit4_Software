@@ -5,44 +5,45 @@ const uint8_t welcome_screen[]={
     #include "../Design/Images/LOGO.binh"
 };
 
-WelcomePageWidget::WelcomePageWidget(FT801_SPI *ft801)
+WelcomePageWidget::WelcomePageWidget(Gpu_Hal_Context_t *host)
 {
-    setFt801(ft801);
+    setHost(host);
 }
 
 void WelcomePageWidget::setup()
 {
-    ft801()->WriteCmd(CMD_INFLATE);
-    ft801()->WriteCmd(0);
-    ft801()->WriteCmdfromflash(welcome_screen, sizeof(welcome_screen));
+    Gpu_Hal_WrCmd32(host(), CMD_INFLATE);
+    Gpu_Hal_WrCmd32(host(), 0);
+    Gpu_Hal_WrCmdBuf(host(), const_cast<uint8_t*>(welcome_screen), sizeof(welcome_screen));
 
     uint16_t pos = 0;
-    uint16_t max = 120;
+    uint16_t max = 10;//120;
     while (pos < max){
 
-        ft801()->DLStart();
 
-        ft801()->Cmd_Gradient(240, 79, 0xFEFFFF, 240, 240, 0xA5A5A5);
+        Gpu_CoCmd_Dlstart(host());
+        Gpu_CoCmd_Gradient(host(), 0, 0, 0xFEFFFF, 480, 272, 0xA5A5A5);
+        App_WrCoCmd_Buffer(host(), BITMAP_HANDLE(0));
+        App_WrCoCmd_Buffer(host(), BITMAP_SOURCE(0));
+        App_WrCoCmd_Buffer(host(), BITMAP_LAYOUT(ARGB1555, 960, 272));
+        App_WrCoCmd_Buffer(host(), BITMAP_SIZE(BILINEAR, BORDER, BORDER, 480, 272));
 
-        ft801()->BitmapHandle(0);
-        ft801()->BitmapSource(0);//?
-        ft801()->BitmapLayout(FT_ARGB1555, 960, 272);
-        ft801()->BitmapSize(FT_BILINEAR, FT_BORDER, FT_BORDER, 480, 272);
+        App_WrCoCmd_Buffer(host(), BEGIN(BITMAPS));
+        App_WrCoCmd_Buffer(host(), VERTEX2II(0, 0, 0, 0));
+        App_WrCoCmd_Buffer(host(), END());
 
-        ft801()->Begin(FT_BITMAPS);
-        ft801()->Vertex2ii(0, 0, 0, 0);
-        ft801()->End();
+        App_WrCoCmd_Buffer(host(), COLOR_RGB(218, 131, 0));
+        Gpu_CoCmd_FgColor(host(), 0xC8510B);
+        Gpu_CoCmd_BgColor(host(), 0x783508);
+        Gpu_CoCmd_Progress(host(), 30, 240, 420, 18, 0, pos, max);
 
-        ft801()->ColorRGB(218, 131, 0);
-        ft801()->Cmd_FGColor(0xC8510B);
-        ft801()->Cmd_BGColor(0x783508);
-        ft801()->Cmd_Progress(30, 240, 420, 18, 0, pos, max);
-
-        ft801()->DLEnd();
-        ft801()->Finish();
+        App_WrCoCmd_Buffer(host(), DISPLAY());
+        Gpu_CoCmd_Swap(host());
+        App_Flush_Co_Buffer(host());
+        Gpu_Hal_WaitCmdfifo_empty(host());
 
         pos++;
-        QThread::currentThread()->msleep(50);
+        Gpu_Hal_Sleep(50);
     }
     terminate();
     emit done();

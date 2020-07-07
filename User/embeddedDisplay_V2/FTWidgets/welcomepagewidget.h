@@ -3,12 +3,11 @@
 
 #include "ftwidget.h"
 
-
 class WelcomePageWidget: public FTWidget
 {
     Q_OBJECT
 public:
-    explicit WelcomePageWidget(FT801_SPI * ft801);
+    explicit WelcomePageWidget(Gpu_Hal_Context_t * host);
 
 signals:
     void done();

@@ -2,12 +2,13 @@
 #define FTDISPLAYINITIALIZER_H
 
 #include "ftwidget.h"
+#include "riverdieve.h"
 
 class DisplayInitializer: public FTWidget
 {
     Q_OBJECT
 public:
-    explicit DisplayInitializer(FT801_SPI * ft801);
+    explicit DisplayInitializer(Gpu_Hal_Context_t * host);
 
 signals:
     void initialized();
@@ -16,8 +17,6 @@ signals:
 protected:
     void setup() override;
     void loop() override;
-private:
-    bool isFT801present();
 };
 
 #endif // FTDISPLAYINITIALIZER_H

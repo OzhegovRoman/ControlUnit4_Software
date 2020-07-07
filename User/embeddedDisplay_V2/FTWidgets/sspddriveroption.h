@@ -4,6 +4,7 @@
 #include <QObject>
 #include "ftwidget.h"
 #include "Drivers/sspddriverm0.h"
+#include "riverdieve.h"
 
 class SspdDriverOption
 {
@@ -16,7 +17,7 @@ public:
         BT_AutoresetThreshold = 5,
         BT_AutoresetTimeOut = 6
     };
-    static void getOptions(FT801_SPI *ft801, SspdDriverM0* driver);
+    static void getOptions(Gpu_Hal_Context_t *host, SspdDriverM0* driver);
 };
 
 #endif // SSPDDRIVEROPTION_H

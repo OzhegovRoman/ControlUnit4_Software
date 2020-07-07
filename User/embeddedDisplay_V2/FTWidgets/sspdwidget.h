@@ -5,12 +5,13 @@
 #include "ftwidget.h"
 #include "Drivers/sspddriverm0.h"
 #include <QTimer>
+#include "riverdieve.h"
 
 class SspdWidget: public FTWidget
 {
     Q_OBJECT
 public:
-    explicit SspdWidget(FT801_SPI * ft801);
+    explicit SspdWidget(Gpu_Hal_Context_t * host);
     void setDriver(SspdDriverM0 *driver);
 
 signals:
