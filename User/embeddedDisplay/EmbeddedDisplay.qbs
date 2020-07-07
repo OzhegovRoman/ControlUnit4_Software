@@ -4,7 +4,7 @@ import qbs.Process
 
 CppApplication{
     condition: project.target === "raspberryPi"
-    name: "cu-embeddeddisplay_v2"
+    name: "cu-embeddeddisplay"
     type: ["application","deployData"]
 
     consoleApplication: true
