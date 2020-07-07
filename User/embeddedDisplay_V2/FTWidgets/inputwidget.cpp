@@ -1,5 +1,4 @@
 #include "inputwidget.h"
-#include <QDebug>
 
 double InputWidget::getDouble(Gpu_Hal_Context_t *host, QString title)
 {

@@ -10,8 +10,6 @@ Project {
         "qCustomPlot/qCustomPlot.qbs",
         "RaspPiMMap/RaspPiMMap.qbs",
         "qCustomLib/qCustomLib.qbs",
-        "FTDI/FTDI.qbs",
         "RiverdiEve/RiverdiEve.qbs"
-
     ]
 }
