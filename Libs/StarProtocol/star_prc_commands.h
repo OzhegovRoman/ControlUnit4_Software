@@ -133,6 +133,45 @@ enum enum_CU4TDM0V1 {
     TD_GetTempTableValues           = 0x28,
     TD_SetTempTableValues           = 0x29
 };
+
+/*
+ * Команды для CU4TDM1
+ */
+enum enum_CU4TDM1 {
+    // данные устройства
+    TDM1_GetData                      = 0x10, // не реализована
+    TDM1_GetTemperature               = 0x11, // реализовывается по другому, требует 1 байт c адресом канала (0-3) или 255 чтобы получить все данные сразу же
+    TDM1_SetTempSensorCurrent         = 0x14, // реализовывается по другому, требует 1 байт c адресом канала (0-3) или 255 чтобы получить все данные сразу же
+    TDM1_GetTempSensorVoltage         = 0x15, // реализовывается по другому, требует 1 байт c адресом канала (0-3) или 255 чтобы получить все данные сразу же
+
+    TDM1_GetEepromConst               = 0x1a, //
+    TDM1_SetEepromConst               = 0x1b, //
+
+//    TDM1_GetTempSensorCurrentDacCoeff = 0x1e, // не реализована
+//    TDM1_SetTempSensorCurrentDacCoeff = 0x1f, // не реализована
+
+//    TDM1_GetTempSensorVoltageCoeff    = 0x20, // не реализована
+//    TDM1_SetTempSensorVoltageCoeff    = 0x21, // не реализована
+
+    TDM1_GetTempTableValues           = 0x28, // не реализована
+    TDM1_SetTempTableValues           = 0x29, // не реализована
+
+    TDM1_GetRelaysStatus              = 0x2A, // включить-выключить
+    TDM1_SetRelaysStatus              = 0x2B,
+
+    TDM1_GetSwitcherMode              = 0x2C, // изменение режима переключателя
+    TDM1_SetSwitcherMode              = 0x2D,
+
+    TDM1_GetDefaultParams             = 0x2E,  // получение параметров по умолчанию
+    TDM1_SetDefaultParams             = 0x2F,
+
+};
+
+enum enum_CU4TDM1_SwitcherMode {
+    smConnect = 0,
+    smDisconnect = 1,
+    smAC = 2
+};
 }
 
 #endif /* STAR_PRC_COMMANDS_H_ */

@@ -10,6 +10,7 @@
 typedef enum {
     dtSspdDriverM0,
     dtTempDriverM0,
+    dtTempDriverM1,
     dtUnknown
 } CU4DriverType ;
 

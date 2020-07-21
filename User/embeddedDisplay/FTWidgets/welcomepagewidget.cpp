@@ -17,7 +17,7 @@ void WelcomePageWidget::setup()
     Gpu_Hal_WrCmdBuf(host(), const_cast<uint8_t*>(welcome_screen), sizeof(welcome_screen));
 
     uint16_t pos = 0;
-    uint16_t max = 10;//120;
+    uint16_t max = 200;
     while (pos < max){
 
 

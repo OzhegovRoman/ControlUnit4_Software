@@ -5,12 +5,15 @@
 #include <QTimer>
 #include "Drivers/sspddriverm0.h"
 #include "Drivers/tempdriverm0.h"
+#include "Drivers/tempdriverm1.h"
+
 #include "Interfaces/cutcpsocketiointerface.h"
 #include "servercommands.h"
 
 using cInterface = cuTcpSocketIOInterface;
 
 #include "tempwidget.h"
+#include "tempm1widget.h"
 #include "sspdwidget.h"
 #include "allchannels.h"
 
@@ -48,6 +51,7 @@ private slots:
 private:
     Ui::MainDialog *ui;
     QVector<TempDriverM0*> mTdDrivers;
+    QVector<TempDriverM1*> mTdM1Drivers;
     QVector<SspdDriverM0*> mSdDrivers;
     cuIOInterface *mInterface;
     bool mWaiting{};

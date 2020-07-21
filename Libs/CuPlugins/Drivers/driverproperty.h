@@ -5,6 +5,8 @@
 #include <QObject>
 #include <QVariant>
 #include "../cudid.h"
+#include "../crelaysstatus.h"
+#include "../StarProtocol/star_prc_commands.h"
 
 class ServiceSignal {
 public:
@@ -54,6 +56,7 @@ private:
 };
 
 class TempDriverM0;
+class TempDriverM1;
 
 class DriverProperty_p
 {
@@ -89,6 +92,7 @@ private:
 
     friend AbstractDriver;
     friend TempDriverM0; //к сожалению нужен доступ к побитному вводу выводу для получения температурной таблицы
+    friend TempDriverM1; //и к напряжению по индексу канала
 };
 
 class DriverCommand: protected DriverProperty_p
@@ -238,6 +242,23 @@ QByteArray DriverProperty<T>::toByteArray(const T &data)
     return QByteArray(reinterpret_cast<const char*>(&data), sizeof(T));
 }
 
+template<> inline
+QByteArray DriverProperty<cRelaysStatus>::toByteArray(const cRelaysStatus &data)
+{
+    QByteArray ba;
+    ba.append(data.status());
+    return ba;
+}
+
+template<> inline
+QByteArray DriverProperty<cmd::enum_CU4TDM1_SwitcherMode>::toByteArray(const cmd::enum_CU4TDM1_SwitcherMode &data)
+{
+    uint8_t tmp = static_cast<uint8_t>(data);
+    QByteArray ba;
+    ba.append(tmp);
+    return ba;
+}
+
 template<typename T> inline
 T DriverProperty<T>::fromByteArray(const QByteArray &ba)
 {
@@ -256,6 +277,20 @@ template<> inline
 QString DriverProperty<QString>::fromByteArray(const QByteArray &ba)
 {
     return QString(ba);
+}
+
+template<> inline
+cRelaysStatus DriverProperty<cRelaysStatus>::fromByteArray(const QByteArray &ba)
+{
+    cRelaysStatus rs;
+    rs.setStatus(ba.data()[0]);
+    return rs;
+}
+
+template<> inline
+cmd::enum_CU4TDM1_SwitcherMode DriverProperty<cmd::enum_CU4TDM1_SwitcherMode>::fromByteArray(const QByteArray &ba)
+{
+    return static_cast<cmd::enum_CU4TDM1_SwitcherMode>(ba.data()[0]);
 }
 
 #endif // DRIVERPROPERTY_H

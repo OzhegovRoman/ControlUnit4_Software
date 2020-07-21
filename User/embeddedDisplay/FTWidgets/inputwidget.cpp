@@ -72,7 +72,7 @@ double InputWidget::getDouble(Gpu_Hal_Context_t *host, QString title)
     while (true){
         // отрисовываем
         buttonTag = Gpu_Hal_Rd8(host, REG_TOUCH_TAG);
-        if (buttonTag){
+        if (buttonTag && buttonTag != 255){
             if (buttonTag != lastButtonPressedTag){
                 lastButtonPressedTag = buttonTag;
                 update = true;

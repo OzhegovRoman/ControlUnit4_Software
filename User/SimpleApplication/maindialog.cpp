@@ -39,8 +39,10 @@ void MainDialog::on_stackedWidget_currentChanged(int arg1)
             aWidget->closeWidget();
         else {
             auto* tWidget = qobject_cast<TempWidget*>(ui->stackedWidget->widget(lastWidgetIndex));
+            auto* tM1Widget = qobject_cast<TempM1Widget*>(ui->stackedWidget->widget(lastWidgetIndex));
             auto* sWidget = qobject_cast<SspdWidget*>(ui->stackedWidget->widget(lastWidgetIndex));
             if (tWidget) tWidget->closeWidget();
+            if (tM1Widget) tM1Widget->closeWidget();
             if (sWidget) sWidget->closeWidget();
         }
     }
@@ -49,8 +51,10 @@ void MainDialog::on_stackedWidget_currentChanged(int arg1)
         aWidget->openWidget();
     else {
         auto* tWidget = qobject_cast<TempWidget*>(ui->stackedWidget->widget(arg1));
+        auto* tM1Widget = qobject_cast<TempM1Widget*>(ui->stackedWidget->widget(arg1));
         auto* sWidget = qobject_cast<SspdWidget*>(ui->stackedWidget->widget(arg1));
         if (tWidget) tWidget->openWidget();
+        if (tM1Widget) tM1Widget->openWidget();
         if (sWidget) sWidget->openWidget();
     }
 }
@@ -68,8 +72,10 @@ void MainDialog::timerTimeOut()
     }
     else {
         auto* tWidget = qobject_cast<TempWidget*>(ui->stackedWidget->widget(i));
+        auto* tM1Widget = qobject_cast<TempM1Widget*>(ui->stackedWidget->widget(i));
         auto* sWidget = qobject_cast<SspdWidget*>(ui->stackedWidget->widget(i));
         if (tWidget) tWidget->updateWidget();
+        if (tM1Widget) tM1Widget->updateWidget();
         if (sWidget) sWidget->updateWidget();
     }
     mTimer->start(mTimerTimeOut);
@@ -198,7 +204,7 @@ bool MainDialog::createUI(const QString& deviceList)
                 widget->setDriver(mSdDrivers[i]);
                 ui->stackedWidget->addWidget(widget);
             }
-            else if (type.contains("CU4TD")){
+            else if (type.contains("CU4TDM0")){
                 //данное устройство - TempDriver
                 mTdDrivers.append(new TempDriverM0(this));
                 int i = mTdDrivers.size()-1;
@@ -208,6 +214,18 @@ bool MainDialog::createUI(const QString& deviceList)
 
                 auto* widget = new TempWidget(this);
                 widget->setDriver(mTdDrivers[i]);
+                ui->stackedWidget->addWidget(widget);
+            }
+            else if (type.contains("CU4TDM1")){
+                //данное устройство - TempDriver
+                mTdM1Drivers.append(new TempDriverM1(this));
+                int i = mTdM1Drivers.size()-1;
+                mTdM1Drivers[i]->setDevAddress(add);
+                ui->listWidget->addItem(QString("Temperature (M1)\nAddress: %1").arg(add));
+                mTdM1Drivers[i]->setIOInterface(mInterface);
+
+                auto* widget = new TempM1Widget(this);
+                widget->setDriver(mTdM1Drivers[i]);
                 ui->stackedWidget->addWidget(widget);
             }
         }

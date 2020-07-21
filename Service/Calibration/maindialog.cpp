@@ -291,8 +291,10 @@ void MainDialog::setDeviceType(const QString &deviceType)
     mDriverType = CU4DriverType::dtUnknown;
     if (deviceType.contains("CU4SDM0"))
         mDriverType = CU4DriverType::dtSspdDriverM0;
-    if (deviceType.contains("CU4TD"))
+    if (deviceType.contains("CU4TDM0"))
         mDriverType = CU4DriverType::dtTempDriverM0;
+    if (deviceType.contains("CU4TDM1"))
+        mDriverType = CU4DriverType::dtTempDriverM1;
 }
 
 void MainDialog::initializeUI()

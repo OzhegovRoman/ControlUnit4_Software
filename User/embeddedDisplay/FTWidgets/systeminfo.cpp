@@ -87,6 +87,7 @@ void SystemInfo::loop()
         lastButtonPressedTag = buttonTag;
     else {
         if (lastButtonPressedTag){
+
             lastButtonPressedTag = 0;
             terminate();
             emit backClicked();

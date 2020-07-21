@@ -14,7 +14,6 @@ DataHarvester::DataHarvester(cuIOInterfaceImpl *interface)
     , mMode (hmSleep)
 {
     qDebug()<<"create DataHarvester";
-    initializeDriverList();
 }
 
 void DataHarvester::initialize()

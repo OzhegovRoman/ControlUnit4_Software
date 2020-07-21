@@ -3,11 +3,13 @@
 #include <QApplication>
 #include  <QNetworkProxy>
 #include <QThread>
+#include "servercommands.h"
 
-cuTcpSocketIOInterface::cuTcpSocketIOInterface(QObject *parent):
-    cuIOInterfaceImpl(parent),
-    mSocket(new QTcpSocket(this)),
-    mAddress(QHostAddress::Null)
+cuTcpSocketIOInterface::cuTcpSocketIOInterface(QObject *parent)
+    : cuIOInterfaceImpl(parent)
+    , mSocket(new QTcpSocket(this))
+    , mAddress(QHostAddress::Null)
+    , mPort(SERVER_TCPIP_PORT)
 {
     buffer.clear();
     mSocket->setProxy(QNetworkProxy::NoProxy);

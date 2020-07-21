@@ -96,12 +96,8 @@ void SspdWidget::setup()
     Gpu_CoCmd_Text(host(), 16,106,31, 1024, "I:");
     Gpu_CoCmd_Text(host(), 12, 166, 31, OPT_CENTERY, "U:");
     Gpu_CoCmd_Text(host(), 12, 226, 31, 1024, "cps:");
-    Gpu_CoCmd_Text(host(), 290, 106, 31, OPT_CENTERY | OPT_RIGHTX,
-                      QString("uA")
-                      .toLocal8Bit());
-    Gpu_CoCmd_Text(host(), 290, 166, 31, OPT_CENTERY | OPT_RIGHTX,
-                      QString("mV")
-                      .toLocal8Bit());
+    Gpu_CoCmd_Text(host(), 290, 106, 31, OPT_CENTERY | OPT_RIGHTX, "uA");
+    Gpu_CoCmd_Text(host(), 290, 166, 31, OPT_CENTERY | OPT_RIGHTX, "mV");
 
 
     App_WrCoCmd_Buffer(host(), POINT_SIZE(100));
@@ -130,7 +126,7 @@ void SspdWidget::loop()
     static int timeToValueChange = 0;
     static int timerCounts = 0;
     uint8_t buttonTag = Gpu_Hal_Rd8(host(), REG_TOUCH_TAG);
-    if (buttonTag){
+    if (buttonTag && buttonTag!=255){
 
         if (lastButtonPressedTag == 0){
             qDebug()<<"start ticking";
@@ -256,10 +252,12 @@ void SspdWidget::loop()
                           QString("%1")
                           .arg(static_cast<double>(mDriver->voltage()->currentValue()) * 1e3, 6,'f', 1)
                           .toLocal8Bit());
+        QString tmp = QString("%1")
+                .arg(static_cast<double>(mDriver->counts()->currentValue())/mDriver->params()->currentValue().Time_Const, 6, 'g', 4);
+        tmp.replace("e+0","e");
+
         Gpu_CoCmd_Text(host(), 290, 226, 31, OPT_CENTERY | OPT_RIGHTX,
-                          QString("%1")
-                          .arg(static_cast<double>(mDriver->counts()->currentValue())/mDriver->params()->currentValue().Time_Const, 6, 'g', 3)
-                          .toLocal8Bit());
+                          tmp.toLocal8Bit());
 
         // кнопки
         Gpu_CoCmd_FgColor(host(), 0x2b2b2b);

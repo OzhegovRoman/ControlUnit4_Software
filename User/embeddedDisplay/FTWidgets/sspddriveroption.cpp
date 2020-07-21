@@ -111,7 +111,7 @@ void SspdDriverOption::getOptions(Gpu_Hal_Context_t *host, SspdDriverM0 *driver)
 
         //обработка кнопок
         buttonTag = Gpu_Hal_Rd8(host, REG_TOUCH_TAG);
-        if (buttonTag){
+        if (buttonTag && buttonTag!=255){
             if (buttonTag != lastButtonPressedTag){
                 lastButtonPressedTag = buttonTag;
                 update = true;

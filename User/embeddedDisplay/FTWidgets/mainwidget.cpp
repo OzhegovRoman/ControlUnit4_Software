@@ -106,7 +106,7 @@ void MainWidget::loop()
 {
     static uint32_t lastButtonPressedTag = 0;
     uint8_t buttonTag = Gpu_Hal_Rd8(host(), REG_TOUCH_TAG);
-    if (buttonTag){
+    if (buttonTag && (buttonTag != 255)){
         if (buttonTag != lastButtonPressedTag){
             update();
             lastButtonPressedTag = buttonTag;
@@ -208,10 +208,11 @@ void MainWidget::loop()
                                       QString("%1 uA")
                                       .arg(static_cast<double>(sspddriver->current()->currentValue()) * 1e6, 6,'f', 1)
                                       .toLocal8Bit());
+                    QString tmp = QString("%1 cps")
+                            .arg(static_cast<double>(sspddriver->counts()->currentValue() / sspddriver->params()->currentValue().Time_Const), 6, 'g', 4);
+                    tmp.replace("e+0","e");
                     Gpu_CoCmd_Text(host(), wideList ? 434 : 398, top + 16, 28, OPT_CENTERY | OPT_RIGHTX,
-                                      QString("%1 cps")
-                                      .arg(static_cast<double>(sspddriver->counts()->currentValue() / sspddriver->params()->currentValue().Time_Const), 6, 'g', 4)
-                                      .toLocal8Bit());
+                                      tmp.toLocal8Bit());
                 }
 
                 App_WrCoCmd_Buffer(host(), LINE_WIDTH(16));

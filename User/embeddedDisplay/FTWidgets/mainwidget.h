@@ -22,8 +22,8 @@ protected:
 
 private:
     enum {
-        BT_Info = 1,
-        BT_SCROLLER = 2,
+        BT_Info = 2,
+        BT_SCROLLER = 3,
         BT_DriverButton = 0x80
     };
 

@@ -574,7 +574,7 @@ int CalibrateDialog::exec()
         break;
     case (CU4DriverType::dtTempDriverM0):
         modeList<<"PressSensorVoltageP"<<"PressSensorVoltageN"<<"TempSensorVoltage"<<"TempSensorCurrent";
-        if (oldDriverType == "CU4TD") currentIndex = settings.value("TempDriverMode",0).toInt();
+        if (oldDriverType == "CU4TDM0") currentIndex = settings.value("TempDriverMode",0).toInt();
         break;
     default:
         break;

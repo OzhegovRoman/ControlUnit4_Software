@@ -94,7 +94,7 @@ void TempWidget::loop()
 {
     static uint32_t lastButtonPressedTag = 0;
     uint8_t buttonTag = Gpu_Hal_Rd8(host(), REG_TOUCH_TAG);
-    if (buttonTag)
+    if (buttonTag && buttonTag != 255)
         lastButtonPressedTag = buttonTag;
     else {
         if (lastButtonPressedTag){
