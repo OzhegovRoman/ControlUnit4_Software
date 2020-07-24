@@ -193,7 +193,7 @@ bool TempDriverM0::sendTempTable()
 
 bool TempDriverM0::receiveTempTable()
 {
-    // TODO: требуетс провыерка данной функции
+    // TODO: требуется провыерка данной функции
     QByteArray buffer;
     char offset = 0;
     while (offset < TEMP_TABLE_SIZE) {

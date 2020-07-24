@@ -46,7 +46,7 @@ void TempM1Widget::onTimerTicker()
 
     for (int i = 0; i < 4; ++i){
         if (mDriver->defaultParam(i).enable){
-            strTemperature += QString("T%1: %2K\n").arg(i) .arg(mDriver->currentTemperature(i), 0, 'g', 2);
+            strTemperature += QString("T%1: %2K\n").arg(i) .arg(mDriver->currentTemperature(i), 4, 'f', 2);
             strVoltage += QString("U%1: %2V\n").arg(i) .arg(mDriver->currentVoltage(i), 0, 'g', 5);
         }
     }
@@ -74,10 +74,4 @@ void TempM1Widget::on_cb25V_clicked(bool checked)
     cRelaysStatus status;
     status.setStatus(cRelaysStatus::ri25V, checked ? cRelaysStatus::ri25V : 0);
     mDriver->relaysStatus()->setValueSync(status, nullptr, 5);
-
-}
-
-void TempM1Widget::on_pushButton_clicked()
-{
-    mDriver->setCurrent(ui->sbChannel->value(), ui->sbCurrent->value()*1e-6);
 }

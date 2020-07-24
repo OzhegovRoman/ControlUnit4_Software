@@ -47,9 +47,9 @@ void cRelaysStatus::clearMask()
 void cRelaysStatus::setValue(uint8_t index, bool value)
 {
     assert(index < 2);
-    mStatus |= ( 1 << (index + 4));
+    mStatus |= ( 1 << (index + 3));
     if (value)
-        mStatus |= 1<<index;
+        mStatus |= 1<<(index-1);
     else
-        mStatus &= ~(1<<index);
+        mStatus &= ~(1<<(index-1));
 }

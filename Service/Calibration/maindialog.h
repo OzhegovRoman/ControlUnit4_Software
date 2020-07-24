@@ -5,9 +5,15 @@
 #include "Interfaces/cuiointerfaceimpl.h"
 #include "Drivers/sspddriverm0.h"
 #include "Drivers/tempdriverm0.h"
+#include "Drivers/tempdriverm1.h"
 #include "savedialog.h"
 #include "opendialog.h"
 #include "calibratedialog.h"
+
+#include "driverwidget.h"
+#include "wsspddriver.h"
+#include "wtempcalibr.h"
+#include "wtempm1calibr.h"
 
 namespace Ui {
 class MainDialog;
@@ -41,6 +47,7 @@ private slots:
 
 private:
     Ui::MainDialog *ui;
+    DriverWidget *mDriverWidget;
     CU4DriverType mDriverType;
     CommonDriver *mDriver;
     cuIOInterfaceImpl *mInterface;

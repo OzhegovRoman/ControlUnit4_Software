@@ -5,6 +5,7 @@
 #include "mainwidget.h"
 #include "systeminfo.h"
 #include "tempwidget.h"
+#include "tempm1widget.h"
 #include "sspdwidget.h"
 #include "inputwidget.h"
 #include "sspddriveroption.h"

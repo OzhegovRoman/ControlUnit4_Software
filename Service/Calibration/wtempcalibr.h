@@ -2,13 +2,14 @@
 #define WTEMPCALIBR_H
 
 #include <QWidget>
+#include "driverwidget.h"
 #include "Drivers/tempdriverm0.h"
 
 namespace Ui {
 class wTempCalibr;
 }
 
-class wTempCalibr : public QWidget
+class wTempCalibr : public DriverWidget
 {
     Q_OBJECT
 
@@ -30,6 +31,16 @@ private slots:
 private:
     Ui::wTempCalibr *ui;
     CU4TDM0V1_Temp_Table_Item_t mTempTable[TEMP_TABLE_SIZE]{};
+    TempDriverM0 *mTempDriver;
+
+    // DriverWidget interface
+public:
+    virtual void setDriver(CommonDriver *driver) override;
+    virtual void enableGUI(bool enable = true) override;
+    virtual void getEeprom() override;
+    virtual void setEeprom() override;
+    virtual QJsonObject eepromToJson() override;
+    virtual void eepromFromJson(QJsonObject data) override;
 };
 
 #endif // WTEMPCALIBR_H

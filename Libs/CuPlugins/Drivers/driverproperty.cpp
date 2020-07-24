@@ -20,7 +20,6 @@ QByteArray DriverProperty_p::data() const
 
 void DriverProperty_p::readWrite(quint8 cmd, QByteArray data)
 {
-    qDebug()<<"cmd"<<cmd<<"data"<<data.toHex();
     mDriver->sendMsg(cmd, data);
     mLastSettedValue = data;
 }

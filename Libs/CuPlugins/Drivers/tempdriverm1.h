@@ -49,6 +49,13 @@ public:
     TDM1_EepromCoeff eepromCoeff(uint8_t index) const;
     void setEepromCoeff(uint8_t index, TDM1_EepromCoeff coeff);
 
+    bool receiveTempTables();
+    bool sendTempTables();
+
+    CU4TDM0V1_Temp_Table_Item_t tempTableItem(uint8_t channel, uint8_t index);
+    CU4TDM0V1_Temp_Table_Item_t* tempTable(uint8_t channel);
+    void setTempTableItem(uint8_t channel, uint8_t index, CU4TDM0V1_Temp_Table_Item_t item);
+    void setTempTable(uint8_t channel, CU4TDM0V1_Temp_Table_Item_t* table);
 
 private:
     DriverProperty<cRelaysStatus> *mRelaysStatus;
@@ -67,7 +74,8 @@ private:
     DriverProperty_p *mEepromCoeffs;
     TDM1_EepromCoeff m_EepromCoeffs[4];
 
-
+    DriverProperty_p *mTempTableProperty;
+    CU4TDM0V1_Temp_Table_Item_t mTempTables[4][TEMP_TABLE_SIZE];
 };
 
 #endif // TEMPDRIVERM1_H

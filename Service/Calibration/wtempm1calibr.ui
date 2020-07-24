@@ -7,12 +7,56 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>474</height>
+    <height>639</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tChannel0">
+      <attribute name="title">
+       <string>Channel0</string>
+      </attribute>
+     </widget>
+     <widget class="QWidget" name="tChannel1">
+      <attribute name="title">
+       <string>Channel1</string>
+      </attribute>
+     </widget>
+     <widget class="QWidget" name="tChannel2">
+      <attribute name="title">
+       <string>Channel2</string>
+      </attribute>
+     </widget>
+     <widget class="QWidget" name="tChannel3">
+      <attribute name="title">
+       <string>Channel3</string>
+      </attribute>
+     </widget>
+    </widget>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>

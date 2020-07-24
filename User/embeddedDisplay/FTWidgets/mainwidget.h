@@ -28,6 +28,7 @@ private:
     };
 
     const uint8_t maxDeviceListSize = 5;
+    const int32_t animationPeriod = 500;
 
     struct DataInfoHelper{
         bool channelInited;
@@ -41,6 +42,8 @@ private:
     quint8 mTopIndex;
     QVector<DataInfoHelper> dataInfo;
     QTimer *dataHarvesterTimer;
+
+    int32_t animationProcess = 0;
 
     void update();
 

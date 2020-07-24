@@ -3,6 +3,7 @@
 #include "Interfaces/curs485iointerface.h"
 #include "Drivers/sspddriverm0.h"
 #include "Drivers/tempdriverm0.h"
+#include "Drivers/tempdriverm1.h"
 #include "../qCustomLib/qCustomLib.h"
 #include "servercommands.h"
 #include <QSettings>
@@ -99,10 +100,13 @@ void DataHarvester::initializeDriverList()
                 //данное устройство - SspdDriver
                 tmpDriver = new SspdDriverM0(this);
             }
-            else
-                if (type.contains("CU4TD"))
-                    //данное устройство - TempDriver
-                    tmpDriver = new TempDriverM0(this);
+            else if (type.contains("CU4TDM0"))
+                //данное устройство - TempDriver
+                tmpDriver = new TempDriverM0(this);
+            else if (type.contains("CU4TDM1")){
+                //данное устройство - TempDriver
+                tmpDriver = new TempDriverM1(this);
+            }
 
             if (tmpDriver == nullptr)
                 continue;
@@ -110,7 +114,14 @@ void DataHarvester::initializeDriverList()
             tmpDriver->setDevAddress(static_cast<quint8>(address));
             tmpDriver->setIOInterface(mInterface);
             tmpDriver->deviceType()->getValueSync(nullptr, 5);
+
             mDrivers.append(tmpDriver);
+
+            if (tmpDriver->deviceType()->currentValue().contains("CU4TDM1")){
+                //данное устройство - TempDriverM1
+                qobject_cast<TempDriverM1*>(tmpDriver)->readDefaultParams();
+            }
+
         }
     }
 }

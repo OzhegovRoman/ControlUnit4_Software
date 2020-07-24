@@ -46,8 +46,14 @@ CppApplication{
 
     // зависимости для сборки под RaspberryPi
     Properties{
+        condition: qbs.buildVariant.contains("debug")
         cpp.defines:
-            outer.concat("VERSION=\""+project.softwareVersion+"\"");
+            outer.concat(["VERSION=\""+project.softwareVersion+"\"",
+                          "DEBUG"]);
+    }
+    Properties{
+        cpp.defines:
+            outer.concat(["VERSION=\""+project.softwareVersion+"\""]);
     }
 
     Group {

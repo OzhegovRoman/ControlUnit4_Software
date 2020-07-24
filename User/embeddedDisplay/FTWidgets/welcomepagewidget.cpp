@@ -17,10 +17,12 @@ void WelcomePageWidget::setup()
     Gpu_Hal_WrCmdBuf(host(), const_cast<uint8_t*>(welcome_screen), sizeof(welcome_screen));
 
     uint16_t pos = 0;
+#ifdef DEBUG
+    uint16_t max = 10;
+#else
     uint16_t max = 200;
+#endif
     while (pos < max){
-
-
         Gpu_CoCmd_Dlstart(host());
         Gpu_CoCmd_Gradient(host(), 0, 0, 0xFEFFFF, 480, 272, 0xA5A5A5);
         App_WrCoCmd_Buffer(host(), BITMAP_HANDLE(0));

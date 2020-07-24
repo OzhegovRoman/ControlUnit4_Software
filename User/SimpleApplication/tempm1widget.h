@@ -28,11 +28,7 @@ public slots:
 
 private slots:
     void on_cb5V_clicked(bool checked);
-
     void on_cb25V_clicked(bool checked);
-
-    void on_pushButton_clicked();
-
 private:
     Ui::TempM1Widget *ui;
     TempDriverM1 *mDriver{nullptr};

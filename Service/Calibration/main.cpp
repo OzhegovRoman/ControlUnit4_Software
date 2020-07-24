@@ -12,8 +12,8 @@ int main(int argc, char *argv[])
         w2.setInterface(w.interface());
         w2.setDeviceType(w.deviceType());
         w2.setDeviceAddress(w.deviceAddress());
-        w2.initializeUI();
         w2.show();
+        w2.initializeUI();
         return a.exec();
     }
     else

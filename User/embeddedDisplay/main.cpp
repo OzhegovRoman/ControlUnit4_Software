@@ -121,6 +121,7 @@ int main(int argc, char *argv[])
     MainWidget _MainWidget(&host, _DataHarvester);
     SystemInfo _SystemInfo(&host);
     TempWidget _TempWidget(&host);
+    TempM1Widget _TempM1Widget(&host);
     SspdWidget _SspdWidget(&host);
     WelcomePageWidget _WelcomePage(&host);
 
@@ -133,22 +134,34 @@ int main(int argc, char *argv[])
     });
 
     QObject::connect(&_MainWidget, &MainWidget::systemInfoClicked, &_SystemInfo, &SystemInfo::exec);
-    QObject::connect(&_MainWidget, &MainWidget::channelChoosen, [&_DataHarvester, &_TempWidget, &_SspdWidget](const int index){
+    QObject::connect(&_MainWidget, &MainWidget::channelChoosen, [&_DataHarvester, &_TempWidget, &_TempM1Widget, &_SspdWidget](const int index){
         qDebug()<<"index"<<index;
-        auto tempDriver = qobject_cast<TempDriverM0*>(_DataHarvester->drivers()[index]);
-        if (tempDriver){
-            _TempWidget.setDriver(tempDriver);
-            _TempWidget.exec();
+        {
+            auto tempDriver = qobject_cast<TempDriverM0*>(_DataHarvester->drivers()[index]);
+            if (tempDriver){
+                _TempWidget.setDriver(tempDriver);
+                _TempWidget.exec();
+            }
         }
-        auto sspdDriver = qobject_cast<SspdDriverM0*>(_DataHarvester->drivers()[index]);
-        if (sspdDriver){
-            _SspdWidget.setDriver(sspdDriver);
-            _SspdWidget.exec();
+        {
+            auto tempDriver = qobject_cast<TempDriverM1*>(_DataHarvester->drivers()[index]);
+            if (tempDriver){
+                _TempM1Widget.setDriver(tempDriver);
+                _TempM1Widget.exec();
+            }
+        }
+        {
+            auto sspdDriver = qobject_cast<SspdDriverM0*>(_DataHarvester->drivers()[index]);
+            if (sspdDriver){
+                _SspdWidget.setDriver(sspdDriver);
+                _SspdWidget.exec();
+            }
         }
     });
 
     QObject::connect(&_SystemInfo, &SystemInfo::backClicked, &_MainWidget, &MainWidget::exec);
     QObject::connect(&_TempWidget, &TempWidget::backClicked, &_MainWidget, &MainWidget::exec);
+    QObject::connect(&_TempM1Widget, &TempM1Widget::backClicked, &_MainWidget, &MainWidget::exec);
     QObject::connect(&_SspdWidget, &SspdWidget::backClicked, &_MainWidget, &MainWidget::exec);
 
     _DisplayInitializer.exec();
