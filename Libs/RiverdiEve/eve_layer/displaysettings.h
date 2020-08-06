@@ -29,7 +29,7 @@ public:
 
     DisplayGeneration getDisplayGeneration() const;
     void setDisplayGeneration(const DisplayGeneration &disGen);
-    void autoDetectDisplayGeneration();
+    bool autoDetectDisplayGeneration();
 
     uint32_t operator[](const QString property);
 

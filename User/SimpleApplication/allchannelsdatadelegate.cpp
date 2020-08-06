@@ -1,6 +1,7 @@
 #include "allchannelsdatadelegate.h"
 #include <QDebug>
 #include "editwidget.h"
+#include "Drivers/sspddriverm0.h"
 
 AllChannelsDataDelegate::AllChannelsDataDelegate(QObject *parent):
     QItemDelegate (parent)
@@ -13,11 +14,13 @@ QWidget *AllChannelsDataDelegate::createEditor(QWidget *parent, const QStyleOpti
     Q_UNUSED(option)
     qDebug()<<"create Editor";
     auto *widget = new EditWidget(parent);
-    widget->setCurrent(model->devices[index.row()].current*1e6);
-    qDebug()<<model->devices[index.row()].current;
-    widget->setChecked(model->devices[index.row()].isShorted);
-    widget->setInterface(interface);
-    widget->setIndex(model->devices[index.row()].devAddress);
+    auto* driver = qobject_cast<SspdDriverM0*>(model->drivers[index.row()]);
+    if (driver){
+        widget->setCurrent(driver->current()->currentValue()*1e6);
+        widget->setChecked(driver->status()->currentValue().stShorted);
+        widget->setInterface(interface);
+        widget->setIndex(driver->devAddress());
+    }
     return widget;
 }
 
@@ -31,7 +34,6 @@ void AllChannelsDataDelegate::setEditorData(QWidget *editor, const QModelIndex &
 void AllChannelsDataDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
     // напрямую отправлять данные не будем
-    qDebug()<<"setModelData";
     Q_UNUSED(editor)
     Q_UNUSED(model)
     Q_UNUSED(index)
@@ -39,7 +41,6 @@ void AllChannelsDataDelegate::setModelData(QWidget *editor, QAbstractItemModel *
 
 void AllChannelsDataDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    qDebug()<<"updateEditorGeometry";
     QItemDelegate::updateEditorGeometry(editor, option, index);
 }
 

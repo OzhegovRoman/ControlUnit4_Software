@@ -190,43 +190,40 @@ bool MainDialog::createUI(const QString& deviceList)
         QStringList lList = str.split(':');
         if (lList.size() == 3){ //должно быть описание устройства
             //первое значение DevX - X порядковый номер
-            quint8 add = static_cast<quint8>(lList[1].split('=')[1].toInt());
+            quint8 address = static_cast<quint8>(lList[1].split('=')[1].toInt());
             QString type = lList[2].split('=')[1];
+            CommonDriver * tmpDriver = nullptr;
             if (type.contains("CU4SD")){
                 //данное устройство - SspdDriver
-                mSdDrivers.append(new SspdDriverM0(this));
-                int i = mSdDrivers.size()-1;
-                mSdDrivers[i]->setDevAddress(add);
-                ui->listWidget->addItem(QString("Sspd Driver\nAddress: %1").arg(add));
-                mSdDrivers[i]->setIOInterface(mInterface);
+                tmpDriver = new SspdDriverM0(this);
 
+                ui->listWidget->addItem(QString("Sspd Driver\nAddress: %1").arg(address));
                 auto* widget = new SspdWidget(this);
-                widget->setDriver(mSdDrivers[i]);
+                widget->setDriver(qobject_cast<SspdDriverM0*>(tmpDriver));
                 ui->stackedWidget->addWidget(widget);
             }
             else if (type.contains("CU4TDM0")){
                 //данное устройство - TempDriver
-                mTdDrivers.append(new TempDriverM0(this));
-                int i = mTdDrivers.size()-1;
-                mTdDrivers[i]->setDevAddress(add);
-                ui->listWidget->addItem(QString("Temperature\nAddress: %1").arg(add));
-                mTdDrivers[i]->setIOInterface(mInterface);
-
+                tmpDriver = new TempDriverM0(this);
+                ui->listWidget->addItem(QString("Temperature\nAddress: %1").arg(address));
                 auto* widget = new TempWidget(this);
-                widget->setDriver(mTdDrivers[i]);
+                widget->setDriver(qobject_cast<TempDriverM0*>(tmpDriver));
                 ui->stackedWidget->addWidget(widget);
             }
             else if (type.contains("CU4TDM1")){
                 //данное устройство - TempDriver
-                mTdM1Drivers.append(new TempDriverM1(this));
-                int i = mTdM1Drivers.size()-1;
-                mTdM1Drivers[i]->setDevAddress(add);
-                ui->listWidget->addItem(QString("Temperature (M1)\nAddress: %1").arg(add));
-                mTdM1Drivers[i]->setIOInterface(mInterface);
+                tmpDriver = new TempDriverM1(this);
+                ui->listWidget->addItem(QString("Temperature (M1)\nAddress: %1").arg(address));
 
                 auto* widget = new TempM1Widget(this);
-                widget->setDriver(mTdM1Drivers[i]);
+                widget->setDriver(qobject_cast<TempDriverM1*>(tmpDriver));
                 ui->stackedWidget->addWidget(widget);
+            }
+
+            if (tmpDriver != nullptr){
+                tmpDriver->setDevAddress(address);
+                tmpDriver->setIOInterface(mInterface);
+                mDrivers.append(tmpDriver);
             }
         }
     }
@@ -234,7 +231,7 @@ bool MainDialog::createUI(const QString& deviceList)
     ui->listWidget->addItem("All Channels");
     aWidget = new AllChannels(this);
     ui->stackedWidget->addWidget(aWidget);
-    aWidget->initialize(deviceList);
+    aWidget->initialize(mDrivers);
     aWidget->setInterface(mInterface);
 
     connect(aWidget, SIGNAL(setTimeOut(int)), SLOT(changeTimeOut(int)));

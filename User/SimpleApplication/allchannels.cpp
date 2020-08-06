@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <Drivers/sspddriverm0.h>
 #include <Drivers/tempdriverm0.h>
+#include <Drivers/tempdriverm1.h>
 #include <QSettings>
 #include <QDir>
 #include <QDateTime>
@@ -33,65 +34,67 @@ AllChannels::~AllChannels()
 
 void AllChannels::openWidget()
 {
-    qDebug()<<"oopen";
     emit setTimeOut(static_cast<int>(ui->dsbTimeOut->value()*1000.0));
 }
 
 void AllChannels::closeWidget()
 {
-    qDebug()<<"close";
     emit setTimeOut(500);
 }
 
 void AllChannels::updateWidget()
 {
     // опрос всех устройств
-    for (int idx = 0; idx < model->devices.count(); ++idx){
-        if (model->devices[idx].isSspd){
-            SspdDriverM0 driver;
-            driver.setIOInterface(mInterface);
-            driver.setDevAddress(model->devices[idx].devAddress);
-            bool ok;
-            CU4SDM0V1_Data_t data = driver.data()->getValueSync(&ok, 5);
-            if (ok){
-                model->devices[idx].current = static_cast<double>(data.Current);
-                model->devices[idx].voltage = static_cast<double>(data.Voltage);
-                model->devices[idx].isShorted = data.Status.stShorted;
-                if (data.Status.stAutoResetOn && ui->cbLogEnable->isChecked()){
-                    auto param = driver.params()->getValueSync(&ok, 5);
-                    if (ok && (param.AutoResetCounts != model->devices[idx].triggerCount)){
-                        QFile m_File(QString("%1\\TriggerLog.txt").arg(ui->leLogPath->text()));
-                        m_File.open(QIODevice::ReadWrite | QIODevice::Append);
-                        QTextStream out(&m_File);
-                        QString tmpStr = QString("[%1]: SSPD Unit Triggered. Adress: %2. Trigger counts: %3\r\n")
-                                .arg(QDateTime::currentDateTime().toString("MM-dd-yyyy HH-mm-ss"))
-                                .arg(model->devices[idx].devAddress)
-                                .arg(param.AutoResetCounts);
-                        qDebug()<<tmpStr;
-                        out<<tmpStr;
-                        m_File.close();
-                        model->devices[idx].triggerCount = param.AutoResetCounts;
+    for (int idx = 0; idx < model->drivers.count(); ++idx){
+        {
+            auto driver = qobject_cast<SspdDriverM0*>(model->drivers[idx]);
+            if (driver){
+                bool ok;
+                CU4SDM0V1_Data_t data = driver->data()->getValueSync(&ok, 5);
+                if (ok){
+                    if (data.Status.stAutoResetOn && ui->cbLogEnable->isChecked()){
+                        auto lastTriggerCount = driver->params()->currentValue().AutoResetCounts;
+                        auto param = driver->params()->getValueSync(&ok, 5);
+                        if (ok && (param.AutoResetCounts != lastTriggerCount)){
+                            QFile m_File(QString("%1\\TriggerLog.txt").arg(ui->leLogPath->text()));
+                            m_File.open(QIODevice::ReadWrite | QIODevice::Append);
+                            QTextStream out(&m_File);
+                            QString tmpStr = QString("[%1]: SSPD Unit Triggered. Adress: %2. Trigger counts: %3\r\n")
+                                    .arg(QDateTime::currentDateTime().toString("MM-dd-yyyy HH-mm-ss"))
+                                    .arg(driver->devAddress())
+                                    .arg(param.AutoResetCounts);
+                            qDebug()<<tmpStr;
+                            out<<tmpStr;
+                            m_File.close();
+                        }
                     }
                 }
+
             }
+        }
+        {
+            auto driver = qobject_cast<TempDriverM0*>(model->drivers[idx]);
+            if (driver){
+                CU4TDM0V1_Data_t data = driver->data()->getValueSync(nullptr, 5);
+                if (!data.CommutatorOn) driver->commutator()->setValueSync(true, nullptr, 5);
+            }
+        }
 
+        {
+            auto driver = qobject_cast<TempDriverM1*>(model->drivers[idx]);
+            if (driver){
+                QString tmpString = QString();
+                driver->updateTemperature();
+            }
         }
-        else{
-            TempDriverM0 driver;
-            driver.setIOInterface(mInterface);
-            driver.setDevAddress(model->devices[idx].devAddress);
-            CU4TDM0V1_Data_t data = driver.data()->getValueSync(nullptr, 5);
-            model->devices[idx].temperature = static_cast<double>(data.Temperature);
-            if (!data.CommutatorOn) driver.commutator()->setValueSync(true, nullptr, 5);
-        }
+
     }
-
-    emit model->dataChanged(model->index(0), model->index(model->devices.count()));
+    emit model->dataChanged(model->index(0), model->index(model->rowCount()));
 }
 
-void AllChannels::initialize(const QString& deviceInfo)
+void AllChannels::initialize(const QVector<CommonDriver*>& mDrivers)
 {
-    model->initialize(deviceInfo);
+    model->initialize(mDrivers);
     ui->tableView->setModel(model);
     delegate->setModel(model);
     ui->tableView->setItemDelegate(delegate);

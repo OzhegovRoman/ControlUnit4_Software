@@ -23,7 +23,7 @@ QVariant SspdDataModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || !mData)
         return QVariant();
 
-    const SspdDataItem item = mData->items().at(index.row());
+    const DataItem item = mData->items().at(index.row());
     switch (role) {
     case NameRole:
         return QVariant(item.name);
@@ -46,12 +46,9 @@ QVariant SspdDataModel::data(const QModelIndex &index, int role) const
 
 bool SspdDataModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    qDebug()<<"SspdDataModel::setData";
     if (data(index, role) != value) {
-        // FIXME: Implement me!
         if (role == ValueRole)
             emit newDataSetted(index.row(), value.toDouble());
-        //emit dataChanged(index, index, QVector<int>() << role);
         return true;
     }
     return false;
@@ -78,19 +75,19 @@ QHash<int, QByteArray> SspdDataModel::roleNames() const
     return names;
 }
 
-SspdData *SspdDataModel::data() const
+UnitData *SspdDataModel::data() const
 {
     return mData;
 }
 
-void SspdDataModel::setData(SspdData *data)
+void SspdDataModel::setData(UnitData *data)
 {
     if (mData)
         mData->disconnect(this);
 
     mData = data;
     if (mData){
-        connect(mData, &SspdData::dataChanged, this, [=](int index) {
+        connect(mData, &UnitData::dataChanged, this, [=](int index) {
             emit dataChanged(this->index(index), this->index(index), QVector<int>() << ValueRole);
         });
         connect(this, SIGNAL(newDataSetted(int, double)), mData, SIGNAL(newDataSetted(int, double)));

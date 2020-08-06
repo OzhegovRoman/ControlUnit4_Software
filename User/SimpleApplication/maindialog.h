@@ -50,9 +50,7 @@ private slots:
 
 private:
     Ui::MainDialog *ui;
-    QVector<TempDriverM0*> mTdDrivers;
-    QVector<TempDriverM1*> mTdM1Drivers;
-    QVector<SspdDriverM0*> mSdDrivers;
+    QVector<CommonDriver*> mDrivers;
     cuIOInterface *mInterface;
     bool mWaiting{};
     int lastWidgetIndex{-1};

@@ -3,12 +3,12 @@
 
 #include <QAbstractListModel>
 
-class SspdData;
+class UnitData;
 
 class SspdDataModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(SspdData *data READ data WRITE setData)
+    Q_PROPERTY(UnitData *data READ data WRITE setData)
 
 public:
     explicit SspdDataModel(QObject *parent = nullptr);
@@ -36,14 +36,14 @@ public:
 
     QHash<int, QByteArray> roleNames() const override;
 
-    SspdData *data() const;
-    void setData(SspdData *data);
+    UnitData *data() const;
+    void setData(UnitData *data);
 
 signals:
     void newDataSetted(int index, double data);
 
 private:
-    SspdData *mData;
+    UnitData *mData;
 };
 
 #endif // SSPDDATAMODEL_H

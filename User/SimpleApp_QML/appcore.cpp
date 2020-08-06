@@ -77,7 +77,8 @@ void AppCore::coreConnectToIpAddress(const QString& ipAddress)
             for (QString tmpStr : strL){
                 QString driverType = "undefined";
                 if (tmpStr.indexOf("CU4SD")> -1) driverType = "SSPD Driver";
-                if (tmpStr.indexOf("CU4TD")> -1) driverType = "Temperature";
+                if (tmpStr.indexOf("CU4TDM0")> -1) driverType = "Temperature";
+                if (tmpStr.indexOf("CU4TDM1")> -1) driverType = "Temperature M1";
                 int driverAddress = -1;
                 QRegExp reg("address=[0-9]{1,2}:");
 
@@ -228,12 +229,12 @@ void AppCore::setCurrentAddress(int currentAddress)
     mCurrentAddress = currentAddress;
 }
 
-SspdData *AppCore::getSspdData() const
+UnitData *AppCore::getSspdData() const
 {
     return mSspdData;
 }
 
-void AppCore::setSspdData(SspdData *sspdData)
+void AppCore::setSspdData(UnitData *sspdData)
 {
     if (mSspdData)
         mSspdData->disconnect(this);

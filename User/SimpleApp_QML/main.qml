@@ -13,11 +13,8 @@ ApplicationWindow {
 
     AppCore {
         id: appcore
-        // @disable-check M16
         devList: deviceList
-        // @disable-check M16
         mTempData: temperatureData
-        // @disable-check M16
         mSspdData: sspdData
 
         onConnectionReject: {

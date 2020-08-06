@@ -9,7 +9,7 @@
 
 class DeviceList;
 class TemperatureData;
-class SspdData;
+class UnitData;
 class cuTcpSocketIOInterface;
 
 class AppCore : public QObject
@@ -19,7 +19,7 @@ class AppCore : public QObject
     Q_PROPERTY(QString lastIpAddress READ lastIpAddress NOTIFY lastIpAddressChanged)
     Q_PROPERTY(DeviceList *devList READ devList WRITE setDevList)
     Q_PROPERTY(TemperatureData *mTempData READ getTempData WRITE setTempData)
-    Q_PROPERTY(SspdData *mSspdData READ getSspdData WRITE setSspdData)
+    Q_PROPERTY(UnitData *mSspdData READ getSspdData WRITE setSspdData)
     Q_PROPERTY(int currentAddress WRITE setCurrentAddress)
     Q_PROPERTY(QStringList controlUnits READ controlUnits WRITE setControlUnits NOTIFY controlUnitsListChanged)
 
@@ -39,8 +39,8 @@ public:
     TemperatureData *getTempData() const;
     void setTempData(TemperatureData *tempData);
 
-    SspdData *getSspdData() const;
-    void setSspdData(SspdData *sspdData);
+    UnitData *getSspdData() const;
+    void setSspdData(UnitData *sspdData);
 
     int getCurrentAddress() const;
     void setCurrentAddress(int currentAddress);
@@ -69,7 +69,7 @@ private:
     QString mLastIpAddress;
     DeviceList *mDevList;
     TemperatureData *mTempData;
-    SspdData * mSspdData;
+    UnitData * mSspdData;
     int mCurrentAddress;
     cuTcpSocketIOInterface *mInterface;
     TempDriverM0 *mTempDriver;

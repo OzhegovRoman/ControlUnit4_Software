@@ -16,8 +16,11 @@ class SaveDialog : public QDialog
 public:
     explicit SaveDialog(QWidget *parent = nullptr);
     ~SaveDialog();
-
     void setJsonData(const QJsonObject &jsonData);
+
+
+    int exec() override;
+
 
 private slots:
     void on_tbFilePath_clicked();
@@ -27,6 +30,8 @@ private slots:
     void on_buttonBox_accepted();
 
     void on_tbWinScp_clicked();
+
+    void on_tbDownload_clicked();
 
 private:
     Ui::SaveDialog *ui;

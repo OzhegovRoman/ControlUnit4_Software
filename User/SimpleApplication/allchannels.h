@@ -5,6 +5,7 @@
 #include "allchannelsdatamodel.h"
 #include "allchannelsdatadelegate.h"
 #include "Interfaces/cuiointerface.h"
+#include "Drivers/commondriver.h"
 
 namespace Ui {
 class AllChannels;
@@ -22,7 +23,7 @@ public:
     void closeWidget();
     void updateWidget();
 
-    void initialize(const QString& deviceInfo);
+    void initialize(const QVector<CommonDriver *> &mDrivers);
 
     void setInterface(cuIOInterface *interface);
 
@@ -33,7 +34,6 @@ signals:
 
 private slots:
    void on_pbSetUpdateTime_clicked();
-
    void on_pushButton_clicked();
 
 private:

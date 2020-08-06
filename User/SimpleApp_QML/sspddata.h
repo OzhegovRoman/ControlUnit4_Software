@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QVector>
 
-struct SspdDataItem
+struct DataItem
 {
     QString name;
     QString title;
@@ -15,12 +15,12 @@ struct SspdDataItem
     double step;
 };
 
-class SspdData : public QObject
+class UnitData : public QObject
 {
     Q_OBJECT
 public:
-    explicit SspdData(QObject *parent = nullptr);
-    QVector<SspdDataItem> items() const;
+    explicit UnitData(QObject *parent = nullptr);
+    QVector<DataItem> items() const;
 
     int getIndexByName(QString name);
 
@@ -32,8 +32,11 @@ public slots:
     void setData(int index, double value);
     void setData(int index, bool value);
 
+protected:
+    virtual void initialize();
+
 private:
-    QVector<SspdDataItem> mItems;
+    QVector<DataItem> mItems;
 
 };
 

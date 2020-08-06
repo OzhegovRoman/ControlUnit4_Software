@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Calibration</string>
   </property>
   <widget class="Line" name="vline">
    <property name="geometry">

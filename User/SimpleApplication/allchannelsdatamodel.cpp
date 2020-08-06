@@ -2,6 +2,9 @@
 #include <QBrush>
 #include <QDebug>
 #include <cmath>
+#include "Drivers/sspddriverm0.h"
+#include "Drivers/tempdriverm0.h"
+#include "Drivers/tempdriverm1.h"
 
 AllChannelsDataModel::AllChannelsDataModel(QObject *parent):
     QAbstractListModel (parent)
@@ -12,7 +15,7 @@ AllChannelsDataModel::AllChannelsDataModel(QObject *parent):
 int AllChannelsDataModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent)
-    return devices.count();
+    return drivers.count();
 }
 
 int AllChannelsDataModel::columnCount(const QModelIndex &parent) const
@@ -21,55 +24,62 @@ int AllChannelsDataModel::columnCount(const QModelIndex &parent) const
     return 1;
 }
 
-void AllChannelsDataModel::initialize(const QString& info)
+void AllChannelsDataModel::initialize(const QVector<CommonDriver *>& mDrivers)
 {
-    for (const QString& str : info.split("\r\n")){
-        QStringList strL = str.split(": ");
-        if (strL.count()>2)
-        {
-            deviceInfo_t tmpDeviceInfo{};
-            tmpDeviceInfo.current = 0;
-            tmpDeviceInfo.voltage = 0;
-            tmpDeviceInfo.temperature = 0;
-            tmpDeviceInfo.isShorted = true;
-            for (const QString& x : strL){
-                QStringList strL2 = x.split("=");
-                if (strL2.count() == 2){
-                    if (strL2[0] == "address")
-                        tmpDeviceInfo.devAddress = static_cast<quint8>(strL2[1].toUShort());
-                    if (strL2[0] == "type")
-                        tmpDeviceInfo.isSspd = strL2[1].contains("CU4SD");
-                }
-            }
-            devices.append(tmpDeviceInfo);
-        }
+    for (auto driver: mDrivers){
+        drivers.append(driver);
     }
 }
 
 QVariant AllChannelsDataModel::data(const QModelIndex &index, int role) const
 {
     int idx = index.row();
-    if (devices[idx].isSspd){
-        if (role == Qt::DisplayRole)
-            return QString("%1 uA").arg(devices[idx].current*1e6, 6, 'f', 1);
-        if (role == Qt::BackgroundRole){
-            if (!devices[idx].isShorted){
-                if (qAbs(devices[idx].voltage)<0.01)
-                    return QBrush(Qt::green);
-                return QBrush(Qt::red);
+    {
+        auto driver = qobject_cast<SspdDriverM0*>(drivers[idx]);
+        if (driver){
+            if (role == Qt::DisplayRole)
+                return QString("%1 uA").arg(driver->current()->currentValue()*1e6, 6, 'f', 1);
+            if (role == Qt::BackgroundRole){
+                if (!driver->status()->currentValue().stShorted){
+                    if (qAbs(driver->voltage()->currentValue())<0.01)
+                        return QBrush(Qt::green);
+                    return QBrush(Qt::red);
+                }
             }
         }
     }
-    else{
-        if ((std::isnan(devices[idx].temperature)) || (qAbs(devices[idx].temperature) < 1e-5)){
-            if (role == Qt::DisplayRole)
-                return QString("Not connected");
-            if (role == Qt::BackgroundRole)
-                return QBrush(Qt::red);
+
+    {
+        auto driver = qobject_cast<TempDriverM0*>(drivers[idx]);
+        if (driver){
+            if ((std::isnan(driver->temperature()->currentValue())) || (qAbs(driver->temperature()->currentValue()) < 1e-5)){
+                if (role == Qt::DisplayRole)
+                    return QString("Not connected");
+                if (role == Qt::BackgroundRole)
+                    return QBrush(Qt::red);
+            }
+            else
+                if (role == Qt::DisplayRole){
+                    return QString("%1 K").arg(driver->temperature()->currentValue(), 4, 'f', 2);
+                }
         }
-        else
-            if (role == Qt::DisplayRole)
-                return QString("%1 K").arg(devices[idx].temperature, 4, 'f', 2);
+    }
+
+    {
+        auto driver = qobject_cast<TempDriverM1*>(drivers[idx]);
+        if (driver){
+            if (role == Qt::DisplayRole){
+                QString tmpString;
+                for (int i = 0; i < 4; ++i){
+                    if (driver->defaultParam(i).enable)
+                        tmpString.append(QString("T%1: %2 K; ")
+                                         .arg(i)
+                                         .arg(driver->currentTemperature(i), 4,'f', 2));
+                }
+                tmpString.chop(2);
+                return tmpString;
+            }
+        }
     }
     return QVariant();
 }
@@ -79,9 +89,12 @@ QVariant AllChannelsDataModel::headerData(int section, Qt::Orientation orientati
     if (role != Qt::DisplayRole)
         return QVariant();
     if (orientation == Qt::Vertical){
-        if (devices[section].isSspd)
+        if (qobject_cast<SspdDriverM0*>(drivers[section]))
             return QString("SSPD#%1").arg(section);
-        return ("Temperature");
+        if (qobject_cast<TempDriverM0*>(drivers[section]))
+            return ("Temperature");
+        if (qobject_cast<TempDriverM1*>(drivers[section]))
+            return ("Temperature");
     }
     return QAbstractListModel::headerData(section, orientation, role);
 }
@@ -90,15 +103,13 @@ bool AllChannelsDataModel::setData(const QModelIndex &index, const QVariant &val
 {
     Q_UNUSED(index)
     Q_UNUSED(value)
-    if (role == Qt::EditRole){
-        qDebug()<<"setData";
-    }
+    Q_UNUSED(role)
     return true;
 }
 
 Qt::ItemFlags AllChannelsDataModel::flags(const QModelIndex &index) const
 {
-    if (devices[index.row()].isSspd)
+    if (qobject_cast<SspdDriverM0*>(drivers[index.row()]))
         return Qt::ItemIsSelectable |  Qt::ItemIsEditable | Qt::ItemIsEnabled ;
     return Qt::NoItemFlags;
 }

@@ -39,7 +39,6 @@ void TempM1Widget::setDriver(TempDriverM1 *driver)
 
 void TempM1Widget::onTimerTicker()
 {
-    qDebug()<<"tick";
     QString strTemperature, strVoltage;
     mDriver->updateTemperature();
     mDriver->updateVoltage();

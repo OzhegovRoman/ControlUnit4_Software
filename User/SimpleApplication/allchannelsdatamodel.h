@@ -3,12 +3,13 @@
 
 #include <QObject>
 #include <QAbstractListModel>
+#include "Drivers/commondriver.h"
 
 struct deviceInfo_t {
     quint8  devAddress;
-    bool isSspd;
+    CommonDriver* driver;
     bool isShorted;
-    double temperature;
+    QString temperature;
     double current;
     double voltage;
     unsigned int triggerCount;
@@ -23,9 +24,9 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 
-    void initialize(const QString& info);
+    void initialize(const QVector<CommonDriver *>& mDrivers);
 
-    QList<deviceInfo_t> devices;
+    QVector<CommonDriver*> drivers;
 
     // QAbstractItemModel interface
 public:

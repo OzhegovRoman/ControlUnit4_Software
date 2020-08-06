@@ -159,6 +159,8 @@ void MainDialog::initializeUI()
 
     mDriver->setIOInterface(mInterface);
     mDriver->setDevAddress(static_cast<quint8>(mDeviceAddress));
+    setWindowTitle(QString("%1 EEPROM data")
+                   .arg(mDriver->deviceType()->getValueSync(nullptr, 5)));
 
     on_pbGetEeprom_clicked();
 }

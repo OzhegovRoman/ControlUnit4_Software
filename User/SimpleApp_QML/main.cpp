@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     qmlRegisterUncreatableType<TemperatureData>("AppCore", 1, 0, "TemperatureData",
                                            QStringLiteral("TemperatureData should not be created in QML"));
     qmlRegisterType<SspdDataModel>("AppCore", 1, 0, "SspdDataModel");
-    qmlRegisterUncreatableType<SspdData>("AppCore", 1, 0, "SspdData",
+    qmlRegisterUncreatableType<UnitData>("AppCore", 1, 0, "SspdData",
                                            QStringLiteral("SspdData should not be created in QML"));
 
     qDebug()<<"reconnectEnableFlag"<<!parser.isSet(reconnectDisableOption);
@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 
     DeviceList devList;
     TemperatureData tempData;
-    SspdData sspdData;
+    UnitData sspdData;
     engine.rootContext()->setContextProperty(QStringLiteral("deviceList"), &devList);
     engine.rootContext()->setContextProperty(QStringLiteral("temperatureData"), &tempData);
     engine.rootContext()->setContextProperty(QStringLiteral("sspdData"), &sspdData);

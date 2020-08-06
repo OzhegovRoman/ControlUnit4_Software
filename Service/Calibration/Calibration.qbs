@@ -3,6 +3,9 @@ import qbs.TextFile
 import qbs.File
 
 CppApplication{
+    files: [
+        "resources.qrc",
+    ]
     condition: (project.target === "win_x86") ||
                (project.target === "win_x86_64")
     name: "cu-devcalibration"

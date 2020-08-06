@@ -7,6 +7,9 @@
 #include <QJsonDocument>
 #include <QProcess>
 #include <QDebug>
+#include <QDesktopServices>
+#include <QStandardPaths>
+#include <QDir>
 
 SaveDialog::SaveDialog(QWidget *parent) :
     QDialog(parent),
@@ -29,6 +32,14 @@ SaveDialog::~SaveDialog()
 void SaveDialog::setJsonData(const QJsonObject &jsonData)
 {
     mJsonData = jsonData;
+}
+
+int SaveDialog::exec()
+{
+    ui->teLog->setVisible(false);
+    layout()->setSizeConstraint(QLayout::SetFixedSize);
+    resize(0,0);
+    return QDialog::exec();
 }
 
 void SaveDialog::on_tbFilePath_clicked()
@@ -57,6 +68,12 @@ void SaveDialog::on_tbWinScp_clicked()
 
 void SaveDialog::on_buttonBox_accepted()
 {
+    setEnabled(false);
+    ui->teLog->clear();
+    ui->teLog->setVisible(true);
+    resize(0,0);
+    qApp->processEvents();
+
     if (ui->gbSaveFile->isChecked())
         if (!saveToFile()) return;
 
@@ -70,7 +87,8 @@ void SaveDialog::on_buttonBox_accepted()
     settings.setValue("SaveToFtp",ui->gbSaveFtp->isChecked());
     settings.setValue("WinScp", ui->leWinScp->text());
 
-    accept();
+    setEnabled(true);
+    if (ui->cbCloseAfterSaving->isChecked()) accept();
 }
 
 bool SaveDialog::saveToFile()
@@ -105,6 +123,9 @@ bool SaveDialog::saveToFile()
 
     fileName += tmp+QDateTime::currentDateTime().toString("_yyyy_MM_dd_hh_mm")+".json";
 
+    ui->teLog->appendHtml("<font color=\"Blue\">Save data to file!!!</font>");
+    ui->teLog->appendHtml(QString("Save data to the file: %1").arg(fileName));
+
     QFile saveFile(fileName);
     if (!saveFile.open(QIODevice::WriteOnly)) {
         QMessageBox::critical(this,"Error","Couldn't open save file.");
@@ -112,7 +133,10 @@ bool SaveDialog::saveToFile()
     }
 
     saveFile.write(QJsonDocument(mJsonData).toJson());
+    saveFile.flush();
+    saveFile.close();
 
+    ui->teLog->appendHtml(QString("Done!!!"));
     return true;
 }
 
@@ -140,8 +164,11 @@ bool SaveDialog::sendToFtp()
         return false;
     }
 
-    QString tmpFileName = qApp->applicationDirPath()+"\\"+tmp+QDateTime::currentDateTime().toString("_yyyy_MM_dd_hh_mm")+".json";
+    QString tmpFileName = QStandardPaths::standardLocations(QStandardPaths::TempLocation)[0]+"\\"+tmp+QDateTime::currentDateTime().toString("_yyyy_MM_dd_hh_mm")+".json";
+    tmpFileName = tmpFileName.replace("/","\\");
 
+    ui->teLog->appendHtml("<font color=\"Blue\">Save data to ftp!!!</font>");
+    ui->teLog->appendHtml(QString("Preparing tmp_file: %1").arg(tmpFileName));
     QFile saveFile(tmpFileName);
     if (!saveFile.open(QIODevice::WriteOnly)) {
         QMessageBox::critical(this,"Error","Couldn't open save file.");
@@ -151,6 +178,7 @@ bool SaveDialog::sendToFtp()
     saveFile.write(QJsonDocument(mJsonData).toJson());
     saveFile.flush();
     saveFile.close();
+    ui->teLog->appendHtml(QString("Done!!!"));
 
     // а теперь отправляем этот файл по месту назначения
 
@@ -161,31 +189,80 @@ bool SaveDialog::sendToFtp()
     }
 
     if (result) {
-        QString tmpWinScpScript = qApp->applicationDirPath()+"\\script.tmp";
+        QString tmpWinScpScript = QStandardPaths::standardLocations(QStandardPaths::TempLocation)[0]+"/script.tmp";
+
+        ui->teLog->appendHtml(QString("Preparing script file: %1").arg(tmpWinScpScript));
         QFile script(tmpWinScpScript);
         script.open(QIODevice::WriteOnly | QIODevice::Text);
         QTextStream out(&script);
-        out<<QString("open sftp://ozhegov@rplab.ru -privatekey=%1 -hostkey=\"ssh-ed25519 256 c3:91:45:ad:6d:d4:ee:b1:3a:c1:b9:e3:16:d0:93:d1\"\r\n")
+
+        out<<QString("open sftp://ozhegov@rplab.ru/ "
+                     "-hostkey=\"ssh-ed25519 256 hBKCMocZux/5LUxnUYELguRg3goxhTNCVnpxGF7GRVU=\" "
+                     "-privatekey=\"%1\" "
+                     "-rawsettings Cipher=\"aes,blowfish,3des,chacha20,WARN,arcfour,des\" KEX=\"ecdh,dh-gex-sha1,dh-group14-sha1,dh-group1-sha1,rsa,WARN\"\r\n")
              .arg(ui->lePrivateKey->text());
+
+        out<<QString("option batch continue\r\n");
+
+        out<<QString("mkdir /home/ozhegov/public_html/ControlUnit4/Calibration/%1/\r\n")
+             .arg(mJsonData["DeviceType"].toString());
+
+        out<<QString("option batch abort\r\n");
+
         out<<QString("put %1 /home/ozhegov/public_html/ControlUnit4/Calibration/%2/\r\n")
-             .arg(tmpFileName.replace("/","\\"))
+             .arg(tmpFileName)
              .arg(mJsonData["DeviceType"].toString());
         out<<QString("exit");
         script.flush();
         script.close();
+        ui->teLog->appendHtml(QString("Done!!!"));
+
         QProcess process;
         process.setEnvironment(process.systemEnvironment());
-        process.start(ui->leWinScp->text(), QStringList() << "/ini=nul"<<"/script="+qApp->applicationDirPath()+"\\script.tmp");
-        process.waitForFinished(10000);
+        QString tmpstr= QString("\"%1\" /ini=nul /script=\"%2\"")
+                .arg(ui->leWinScp->text())
+                .arg(tmpWinScpScript);
+        ui->teLog->appendHtml(QString("Start WinScp process"));
+        ui->teLog->appendHtml(tmpstr);
+        process.start(tmpstr);
+
+        if (!process.waitForStarted()){
+            ui->teLog->appendHtml("<font color=\"Red\">Can't start WinScp process!!!</font>");
+            return false;
+        }
+
+        do {
+            QString tmpStr = process.readAllStandardOutput();
+            if (!tmpStr.isEmpty())
+                ui->teLog->appendHtml(tmpStr);
+            tmpStr = process.readAllStandardError();
+            if (!tmpStr.isEmpty())
+                ui->teLog->appendHtml(QString("<font color=\"Red\">%1</font>").arg(tmpStr));
+            qApp->processEvents();
+        } while (!process.waitForFinished(10));
+
+        QString tmpStr = process.readAllStandardOutput();
+        if (!tmpStr.isEmpty())
+            ui->teLog->appendHtml(tmpStr);
+        tmpStr = process.readAllStandardError();
+        if (!tmpStr.isEmpty())
+            ui->teLog->appendHtml(QString("<font color=\"Red\">%1</font>").arg(tmpStr));
+        qApp->processEvents();
 
         qDebug()<<process.exitCode();
-
         script.remove();
     }
 
     // удаляем временный файл
+    ui->teLog->appendHtml(QString("Delete tmp_file"));
     saveFile.remove();
+    ui->teLog->appendHtml(QString("Done!!!"));
     return result;
 
 
+}
+
+void SaveDialog::on_tbDownload_clicked()
+{
+    QDesktopServices::openUrl(QUrl("https://winscp.net/eng/download.php"));
 }

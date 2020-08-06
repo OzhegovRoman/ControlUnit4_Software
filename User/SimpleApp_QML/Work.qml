@@ -123,7 +123,7 @@ Item {
 
                 Text {
                     id: typeText
-                    text: type
+                    text: type == "Temperature M1" ? "Temperature" : type;
                     anchors {
                         top: devListItemButton.top
                         horizontalCenter: devListItemButton.horizontalCenter
@@ -149,6 +149,11 @@ Item {
                         if (type == "Temperature"){
                             currentDriverAddress = address
                             workPageLoader.setSource("./WorkForms/Temperature.qml");
+                            titleText = qsTr("Temperature") + " (" + address + ")";
+                        }
+                        if (type == "Temperature M1"){
+                            currentDriverAddress = address
+                            workPageLoader.setSource("./WorkForms/TemperatureM1.qml");
                             titleText = qsTr("Temperature") + " (" + address + ")";
                         }
                         else if (type == "SSPD Driver"){

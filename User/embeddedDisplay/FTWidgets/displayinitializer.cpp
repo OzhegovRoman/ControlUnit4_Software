@@ -16,7 +16,9 @@ void DisplayInitializer::setup()
         exit(1);
     }
 
-    DisplaySettings::getInstance().autoDetectDisplayGeneration();
+    if (!DisplaySettings::getInstance().autoDetectDisplayGeneration())
+        exit(1);
+
     DisplaySettings::getInstance().setDisplaySize(DisplaySettings::ds43);
 
     App_Common_Init(host());    

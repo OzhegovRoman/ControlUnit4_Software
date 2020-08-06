@@ -1068,7 +1068,7 @@ void DisplaySettings::setDisplayGeneration(const DisplaySettings::DisplayGenerat
     }
 }
 
-void DisplaySettings::autoDetectDisplayGeneration()
+bool DisplaySettings::autoDetectDisplayGeneration()
 {
     Gpu_Hal_Context_t tmp_host;
 
@@ -1101,13 +1101,14 @@ void DisplaySettings::autoDetectDisplayGeneration()
         qDebug()<<tmp;
         if (tmp == 0x11508){
             setDisplayGeneration(dgEve3);
-            return;
+            return true;
         }
         else if (tmp == 0x10108) {
             setDisplayGeneration(dgEve1);
-            return;
+            return true;
         }
     }
+    return false;
 }
 
 uint32_t DisplaySettings::operator[](const QString property)

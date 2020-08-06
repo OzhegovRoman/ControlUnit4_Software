@@ -48,7 +48,6 @@ void SspdWidget::closeWidget()
 
 void SspdWidget::updateData(CU4SDM0V1_Data_t data)
 {
-    qDebug()<<"data Updated";
     ui->lbData->setText(QString("I: %1 uA<br>U: %2 mV")
                         .arg(static_cast<double>(data.Current) * 1e6, 6,'f', 1)
                         .arg(static_cast<double>(data.Voltage) * 1e3, 6, 'f', 2));
