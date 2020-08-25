@@ -44,7 +44,7 @@ enum enum_CU4SDM0V1 {
     SD_GetCounts             ,      // отсчеты счетчика
     SD_GetStatus             ,      // статус
     SD_SetStatus             ,
-                                    // побитовые операции со статусом
+    // побитовые операции со статусом
     SD_SetShortEnable        ,      // Закоротка
     SD_SetAmpEnable          ,      // Усилитель
     SD_SetRfKeyToComparatorEnable , // Rf ключ
@@ -80,19 +80,20 @@ enum enum_CU4SDM0V1 {
     SD_GetPIDStatus          ,      // PID регулятор стабилизации тока смещения
     SD_SetPIDStatus          ,
 
-//    // PWM на ShortCircuitPin
-//    SD_GetPWMShortCircuitStatus     ,
-//    SD_SetPWMShortCircuitStatus     ,
-//    SD_GetPWMShortCircuitFrequency  ,
-//    SD_SetPWMShortCircuitFrequency  ,
-//    SD_GetPWMShortCircuitDuty       ,
-//    SD_SetPWMShortCircuitDuty       ,
+    //    // PWM на ShortCircuitPin
+    //    SD_GetPWMShortCircuitStatus     ,
+    //    SD_SetPWMShortCircuitStatus     ,
+    //    SD_GetPWMShortCircuitFrequency  ,
+    //    SD_SetPWMShortCircuitFrequency  ,
+    //    SD_GetPWMShortCircuitDuty       ,
+    //    SD_SetPWMShortCircuitDuty       ,
 
     // расширение команд для CU4SDM1
-    SD_GetCurrentMonitor            ,
-    SD_GetCurrentMonitorAdcCoeff    ,
-    SD_SetCurrentMonitorAdcCoeff
-
+    //    SD_GetCurrentMonitor            ,
+    //    SD_GetCurrentMonitorAdcCoeff    ,
+    //    SD_SetCurrentMonitorAdcCoeff
+    SD_SetHFMode        ,      // HighFrequency mode
+    SD_GetHFMode        ,      // HighFrequency mode
 };
 /*
  * Команды для CU4TDM0V1
