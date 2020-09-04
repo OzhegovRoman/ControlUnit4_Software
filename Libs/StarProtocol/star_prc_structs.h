@@ -24,19 +24,19 @@ typedef union {
     unsigned char Data;   // статус
 } CU4SDM0_Status_t;
 
-//typedef union {
-//    struct {
-//        unsigned char stInite: 1;
-//        unsigned char stShorted: 1;
-//        unsigned char stAmplifierOn: 1;
-//        unsigned char stRfKeyToCmp: 1;
-//        unsigned char stComparatorOn: 1;
-//        unsigned char stCounterOn: 1;
-//        unsigned char stAutoResetOn: 1;
-//        unsigned char stError: 1;
-//    };
-//    unsigned char Data;   // статус
-//} CU4SDM1_Status_t;
+typedef union {
+    struct {
+        unsigned char stInite: 1;
+        unsigned char stShorted: 1;
+        unsigned char stAmplifierOn: 1;
+        unsigned char stHFModeOn: 1;
+        unsigned char stComparatorOn: 1;
+        unsigned char stCounterOn: 1;
+        unsigned char stAutoResetOn: 1;
+        unsigned char stError: 1;
+    };
+    unsigned char Data;   // статус
+} CU4SDM1_Status_t;
 
 // CU4SDM0V1 данные
 typedef struct {
@@ -46,12 +46,12 @@ typedef struct {
     CU4SDM0_Status_t Status;
 } CU4SDM0V1_Data_t;
 
+// CU4SDM1V1 данные
 typedef struct {
     float Current;          // ток смещения детектора в [Амперах]
-    float CurrentMonitor;   // ток, измеренный с монитора в [Амперах]
     float Voltage;          // напряжение смещения детектора в [Вольтах]
     float Counts;           // количество отсчетов
-    CU4SDM0_Status_t Status;
+    CU4SDM1_Status_t Status;
 } CU4SDM1_Data_t;
 
 // Подробное описание битов статуса устройства
@@ -65,6 +65,7 @@ typedef struct {
 #define CU4SDM0V1_STATUS_ERROR         (0x80) // случилась ошибка
 
 #define CU4SDM0V1_STATUS_COUNTER_WORKED (CU4SDM0V1_STATUS_AMP_ON | CU4SDM0V1_STATUS_RF_KEY_CMP | CU4SDM0V1_STATUS_CMP_ON | CU4SDM0V1_STATUS_COUNTER_ON)
+#define CU4SDM1V1_STATUS_COUNTER_WORKED (CU4SDM0V1_STATUS_AMP_ON | CU4SDM0V1_STATUS_CMP_ON | CU4SDM0V1_STATUS_COUNTER_ON)
 
 // CU4SDM0V1 параметры
 typedef struct {
@@ -74,6 +75,8 @@ typedef struct {
     float AutoResetTimeOut;     // время закорачивания системы автосброса в [секундах]
     unsigned int AutoResetCounts;
 } CU4SDM0V1_Param_t;
+
+using CU4SDM1_Param_t = CU4SDM0V1_Param_t;
 
 typedef struct {
     float slope;
@@ -94,7 +97,7 @@ typedef struct {
     pair_t<float> Current_ADC;    // из показаний АЦП ток пересчитывается как Current_ADC_slope*ADC_Value+Current_ADC_intercept
     pair_t<float> Voltage_ADC;    // из показаний АЦП напряжение пересчитывается как Voltage_ADC_slope*ADC_Value+Voltage_ADC_intercept
     pair_t<float> Current_DAC;    // требуемое к установке значение ЦАП считается как Value*DAC_slope+DAC_intercept;
-    pair_t<float> CurrentMonitor_ADC;
+    float         PulseWidth;     // время срабатывания детектора в секундах  
     pair_t<float> Cmp_Ref_DAC;
 } CU4SDM1_EEPROM_Const_t;
 

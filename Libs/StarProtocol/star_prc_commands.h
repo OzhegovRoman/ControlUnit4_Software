@@ -92,8 +92,10 @@ enum enum_CU4SDM0V1 {
     //    SD_GetCurrentMonitor            ,
     //    SD_GetCurrentMonitorAdcCoeff    ,
     //    SD_SetCurrentMonitorAdcCoeff
-    SD_SetHFMode        ,      // HighFrequency mode
-    SD_GetHFMode        ,      // HighFrequency mode
+    SD_SetHFModeEnable        ,      // HighFrequency mode
+
+    SD_SetHFPulseWidth  ,       //HighFrequency PulseWidth. Нужен для правильного расчета ошибки тока
+    SD_GetHFPulseWidth  ,       //HighFrequency PulseWidth. Нужен для правильного расчета
 };
 /*
  * Команды для CU4TDM0V1
