@@ -3,16 +3,16 @@
 
 #include <QObject>
 #include <QDialog>
-#include "Drivers/sspddriverm0.h"
-#include "Drivers/tempdriverm0.h"
 #include "cagilent34401avisainterface.h"
+#include "Calibrator/commoncalibrator.h"
 
 typedef enum {
     dtSspdDriverM0,
+    dtSspdDriverM1,
     dtTempDriverM0,
     dtTempDriverM1,
     dtUnknown
-} CU4DriverType ;
+} CU4DriverType;
 
 namespace Ui {
 class CalibrateDialog;
@@ -37,29 +37,18 @@ public:
 private slots:
     void on_pbStart_clicked();
     void messagePerform(QString str);
-    void agilentCheckZero();
+    void changeProgress(int progress);
+    void appendPoints(int graphIndex, double x, double y, bool update);
+    void plotPerform();
     void stopCalibration();
 
 private:
     Ui::CalibrateDialog *ui;
     CU4DriverType mDriverType;
     CommonDriver *mDriver{nullptr};
-    CU4SDM0V1_EEPROM_Const_t lastCU4SDEepromConst;
-    CU4TDM0V1_EEPROM_Const_t lastCU4TDEepromConst;
     cAgilent34401aVisaInterface *agilent;
-
-    QVector<double> x[2], y[2];
-    bool stopFlag;
+    CommonCalibrator *mCalibrator;
     void enableComponents(bool state);
-    void updateGraphData();
-    void plotPerform();
-    void agilentPerform();
-    void eepromConstInitialize();
-    void setCurrent(float value);
-    void calibrationFirstStep();
-    void deleteBadPoints();
-    void sleep(int msec);
-
 };
 
 #endif // CALIBRATEDIALOG_H

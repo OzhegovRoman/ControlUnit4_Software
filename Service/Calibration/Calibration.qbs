@@ -77,5 +77,15 @@ CppApplication{
             "*.ui",
         ]
     }
+
+    Group {
+        name: "Calibrator"
+        prefix: "Calibrator/**/"
+        files: [
+            "*.cpp",
+            "*.h",
+        ]
+    }
+
     cpp.defines: ["VERSION=\""+project.softwareVersion+"\""];
 }

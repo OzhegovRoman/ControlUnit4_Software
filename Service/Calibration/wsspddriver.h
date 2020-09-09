@@ -3,7 +3,8 @@
 
 #include <QWidget>
 #include "driverwidget.h"
-#include "Drivers/sspddriverm0.h"
+#include "Drivers/commondriver.h"
+#include "calibratedialog.h"
 
 namespace Ui {
 class wSspdDriver;
@@ -17,14 +18,9 @@ public:
     explicit wSspdDriver(QWidget *parent = nullptr);
     ~wSspdDriver() override;
 
-    CU4SDM0V1_EEPROM_Const_t getEepromConst();
-
-public slots:
-    void onEepromConstReceived(CU4SDM0V1_EEPROM_Const_t eepromConst);
-
 private:
     Ui::wSspdDriver *ui;
-    SspdDriverM0* mSspdDriver;
+    CU4DriverType mDeviceType;
 
     // DriverWidget interface
 public:

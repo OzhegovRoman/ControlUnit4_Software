@@ -38,7 +38,6 @@ quint64 cAgilent34401aVisaInterface::writeAgilent(QString str)
         return false;
     }
 
-    qDebug()<<"Try to write Agilent";
 
     using lviWrite = ViStatus (*)(ViSession, ViBuf, ViUInt32, ViPUInt32);
     auto write = reinterpret_cast<lviWrite> (lib.resolve("viWrite"));
@@ -48,7 +47,6 @@ quint64 cAgilent34401aVisaInterface::writeAgilent(QString str)
                               static_cast<ViUInt32>(str.length()),
                               &retCount);
     if (status > VI_SUCCESS){
-        qDebug()<<"error at write some data to agilent";
         return 0;
     }
     return retCount;
@@ -67,7 +65,6 @@ qreal cAgilent34401aVisaInterface::readAgilent()
     typedef ViStatus (*lviRead) (ViSession, ViBuf, ViUInt32, ViPUInt32);
     auto read = reinterpret_cast<lviRead> (lib.resolve("viRead"));
 
-    qDebug()<<"Try to read Agilent";
     ViStatus status = read(visaSession, rdBuff, MAX_SCPI_LEN, &retCount);
     if (status> VI_SUCCESS){
         qDebug()<<"error at read some data to agilent";

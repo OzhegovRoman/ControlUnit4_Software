@@ -108,8 +108,10 @@ void MainDialog::enableGUI(bool enable)
 void MainDialog::setDeviceType(const QString &deviceType)
 {
     mDriverType = CU4DriverType::dtUnknown;
-    if (deviceType.contains("CU4SDM0") || deviceType.contains("CU4SDM1")) // пока разницы нет между SDM0 и SDM1
+    if (deviceType.contains("CU4SDM0"))
         mDriverType = CU4DriverType::dtSspdDriverM0;
+    if (deviceType.contains("CU4SDM1"))
+        mDriverType = CU4DriverType::dtSspdDriverM1;
     if (deviceType.contains("CU4TDM0"))
         mDriverType = CU4DriverType::dtTempDriverM0;
     if (deviceType.contains("CU4TDM1"))
@@ -122,6 +124,12 @@ void MainDialog::initializeUI()
     case CU4DriverType::dtSspdDriverM0:
     {
         mDriver = new SspdDriverM0(this);
+        mDriverWidget = new wSspdDriver(this);
+        break;
+    }
+    case CU4DriverType::dtSspdDriverM1:
+    {
+        mDriver = new SspdDriverM1(this);
         mDriverWidget = new wSspdDriver(this);
         break;
     }

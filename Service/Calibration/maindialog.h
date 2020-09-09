@@ -4,6 +4,7 @@
 #include <QDialog>
 #include "Interfaces/cuiointerfaceimpl.h"
 #include "Drivers/sspddriverm0.h"
+#include "Drivers/sspddriverm1.h"
 #include "Drivers/tempdriverm0.h"
 #include "Drivers/tempdriverm1.h"
 #include "savedialog.h"

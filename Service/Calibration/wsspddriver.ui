@@ -146,6 +146,16 @@
       <item row="7" column="1">
        <widget class="QLineEdit" name="leCmpRefDacIntercept"/>
       </item>
+      <item row="8" column="0">
+       <widget class="QLabel" name="lPulseWidth">
+        <property name="text">
+         <string>Pulse Width</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="1">
+       <widget class="QLineEdit" name="lePulseWidth"/>
+      </item>
      </layout>
      <zorder>leCurrentAdcSlope</zorder>
      <zorder>label_3</zorder>
@@ -163,6 +173,8 @@
      <zorder>leCmpRefDacSlope</zorder>
      <zorder>label_9</zorder>
      <zorder>leCmpRefDacIntercept</zorder>
+     <zorder>lPulseWidth</zorder>
+     <zorder>lePulseWidth</zorder>
     </widget>
    </item>
   </layout>

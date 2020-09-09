@@ -96,7 +96,7 @@ bool cuRs485IOInterface::pInitialize()
         }
 
     // когда данные будут готовы для чтения будем читать их через соединение сигнал-слот
-    connect(mSerialPort, SIGNAL(readyRead()), this, SLOT(dataReady()));
+    connect(mSerialPort, SIGNAL(readyRead()), this, SLOT(dataReady()), Qt::QueuedConnection);
     return true;
 }
 

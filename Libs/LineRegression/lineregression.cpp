@@ -48,7 +48,7 @@ int findBadestPoint(QVector<double> x, QVector<double> y)
     int index = 0;
     qreal temp;
     for (int i = 0; i<N; ++i){
-        temp = qAbs(y[i]-coeff.slope*x[i]-coeff.intercept);
+        temp = qAbs(y[i] - coeff.slope * x[i] - coeff.intercept);
         if (temp>error){
             error = temp;
             index = i;
@@ -57,3 +57,34 @@ int findBadestPoint(QVector<double> x, QVector<double> y)
     return index;
 }
 
+
+lineRegressionCoeff lineRegression(QVector<QPointF> vector)
+{
+    QVector<double> x, y;
+    for (int i = 0; i < vector.size(); ++i){
+        x.append(vector[i].x());
+        y.append(vector[i].y());
+    }
+    return lineRegression(x, y);
+}
+
+int findBadestPoint(QVector<QPointF> vector)
+{
+    QVector<double> x, y;
+    for (int i = 0; i < vector.size(); ++i){
+        x.append(vector[i].x());
+        y.append(vector[i].y());
+    }
+    return findBadestPoint(x, y);
+}
+
+lineRegressionCoeff lineRegressionViaPoint(QVector<QPointF> vector, QPointF point)
+{
+    QVector<double> x, y;
+    for (int i = 0; i < vector.size(); ++i){
+        x.append(vector[i].x());
+        y.append(vector[i].y());
+    }
+    return lineRegressionViaPoint(x, y, point);
+
+}

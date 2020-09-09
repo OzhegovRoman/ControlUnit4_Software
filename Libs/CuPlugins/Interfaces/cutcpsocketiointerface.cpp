@@ -74,8 +74,7 @@ QString cuTcpSocketIOInterface::tcpIpQuery(QString query, int TimeOut, bool *ok)
     };
 
     buffer.append(mSocket->readAll());
-
-    connect(mSocket, SIGNAL(readyRead()), this, SLOT(dataReady()));
+    connect(mSocket, SIGNAL(readyRead()), this, SLOT(dataReady()), Qt::QueuedConnection);
     return QString(buffer);
 }
 
