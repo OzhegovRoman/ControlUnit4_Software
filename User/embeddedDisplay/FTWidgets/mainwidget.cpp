@@ -1,6 +1,7 @@
 #include "mainwidget.h"
 #include <QDebug>
 #include "Drivers/sspddriverm0.h"
+#include "Drivers/sspddriverm1.h"
 #include "Drivers/tempdriverm0.h"
 #include "Drivers/tempdriverm1.h"
 #include <QThread>
@@ -222,6 +223,45 @@ void MainWidget::loop()
 
             }
         }
+        //тоже самое для SSpdDriverM1
+        {
+            auto sspddriver = qobject_cast<SspdDriverM1*>(mHarvester->drivers()[i+mTopIndex]);
+            if (sspddriver){
+                // отрисовываем информацию по SSPD
+                if (!dataInfo[i+mTopIndex].channelInited || sspddriver->status()->currentValue().stShorted)
+                    // серый
+                    App_WrCoCmd_Buffer(host(), COLOR_RGB(135, 135, 135));
+                else
+                    if (qAbs(static_cast<double>(sspddriver->voltage()->currentValue()))<0.02){
+                        // норм - белый
+                        App_WrCoCmd_Buffer(host(), COLOR_RGB(255, 255, 255));
+                    }
+                    else
+                        // упал - оранжевый
+                        App_WrCoCmd_Buffer(host(), COLOR_RGB(255, 98, 46));
+
+                Gpu_CoCmd_Text(host(), 16, top + 16, 28, OPT_CENTERY, QString("#%1 SSPD").arg(sspddriver->devAddress()).toLocal8Bit());
+
+                if (dataInfo[i+mTopIndex].channelInited) {
+                    Gpu_CoCmd_Text(host(), wideList ? 270 : 260, top + 16, 28, OPT_CENTERY | OPT_RIGHTX,
+                                   QString("%1 uA")
+                                   .arg(static_cast<double>(sspddriver->current()->currentValue()) * 1e6, 6,'f', 1)
+                                   .toLocal8Bit());
+                    QString tmp = QString("%1 cps")
+                            .arg(static_cast<double>(sspddriver->counts()->currentValue() / sspddriver->params()->currentValue().Time_Const), 6, 'g', 4);
+                    tmp.replace("e+0","e");
+                    Gpu_CoCmd_Text(host(), wideList ? 434 : 398, top + 16, 28, OPT_CENTERY | OPT_RIGHTX,
+                                   tmp.toLocal8Bit());
+                }
+
+                App_WrCoCmd_Buffer(host(), LINE_WIDTH(16));
+                App_WrCoCmd_Buffer(host(), BEGIN(LINES));
+                App_WrCoCmd_Buffer(host(), VERTEX2II(wideList ? 280: 270, static_cast<uint16_t>(top + 6), 0, 0));
+                App_WrCoCmd_Buffer(host(), VERTEX2II(wideList ? 280: 270, static_cast<uint16_t>(top + 26), 0, 0));
+                App_WrCoCmd_Buffer(host(), END());
+
+            }
+        }
         //  а теперь попробуем скастовать в температуру
         {
             auto tempdriver =qobject_cast<TempDriverM0*>(mHarvester->drivers()[i+mTopIndex]);
@@ -356,6 +396,16 @@ void MainWidget::dataHarvest()
 
         {
             auto sspddriver = qobject_cast<SspdDriverM0*>(mHarvester->drivers()[currentIndex]);
+            if (sspddriver){
+                // в случае успеха
+                sspddriver->data()->getValueSync(&ok);
+                if (ok)
+                    sspddriver->params()->getValueSync(&ok);
+            }
+        }
+
+        {
+            auto sspddriver = qobject_cast<SspdDriverM1*>(mHarvester->drivers()[currentIndex]);
             if (sspddriver){
                 // в случае успеха
                 sspddriver->data()->getValueSync(&ok);

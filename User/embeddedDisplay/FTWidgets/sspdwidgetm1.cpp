@@ -1,30 +1,30 @@
-#include "sspdwidget.h"
+#include "sspdwidgetm1.h"
 #include <QDebug>
 #include <QElapsedTimer>
 #include "inputwidget.h"
 #include "sspddriveroption.h"
 #include <QThread>
 
-SspdWidget::SspdWidget(Gpu_Hal_Context_t *host)
+SspdWidgetM1::SspdWidgetM1(Gpu_Hal_Context_t *host)
     : FTWidget (nullptr)
-    , mUpdateFlag(false)
     , mDriver(nullptr)
+    , dataTimer(new QTimer(this))
+    , mUpdateFlag(false)
     , dataReady(false)
     , errorFlag(false)
-    , dataTimer(new QTimer(this))
 {
     setHost(host);
     dataTimer->setSingleShot(true);
-    connect(dataTimer, &QTimer::timeout, this, &SspdWidget::readData);
-    connect(this, &SspdWidget::restart, this, &SspdWidget::exec);
+    connect(dataTimer, &QTimer::timeout, this, &SspdWidgetM1::readData);
+    connect(this, &SspdWidgetM1::restart, this, &SspdWidgetM1::exec);
 }
 
-void SspdWidget::setDriver(SspdDriverM0 *driver)
+void SspdWidgetM1::setDriver(SspdDriverM1 *driver)
 {
     mDriver = driver;
 }
 
-void SspdWidget::setup()
+void SspdWidgetM1::setup()
 {
     mUpdateFlag = false;
 
@@ -119,7 +119,7 @@ void SspdWidget::setup()
     readData();
 }
 
-void SspdWidget::loop()
+void SspdWidgetM1::loop()
 {
     static uint32_t lastButtonPressedTag = 0;
     static QElapsedTimer buttonTimer;
@@ -157,7 +157,6 @@ void SspdWidget::loop()
                 update();
             }
             break;
-
         }
 
         }
@@ -194,13 +193,22 @@ void SspdWidget::loop()
                 lastButtonPressedTag = 0;
                 auto tmp = mDriver->status()->currentValue();
                 qDebug()<<tmp.Data;
-                bool tmpBool = !(tmp.stCounterOn | tmp.stRfKeyToCmp | tmp.stComparatorOn);
+                bool tmpBool = !(tmp.stCounterOn | tmp.stComparatorOn);
 
                 tmp.stCounterOn =    tmpBool;
-                tmp.stRfKeyToCmp =   tmpBool;
                 tmp.stComparatorOn = tmpBool;
 
                 mDriver->status()->setValueSync(tmp);
+                update();
+                break;
+            }
+            case BT_HFMode: {
+                lastButtonPressedTag = 0;
+                auto tmp = mDriver->status()->currentValue();
+                tmp.stHFModeOn = !tmp.stHFModeOn;
+
+                mDriver->highFrequencyModeEnable()->setValueSync(tmp.stHFModeOn);
+                mDriver->status()->setCurrentValue(tmp);
                 update();
                 break;
             }
@@ -265,27 +273,31 @@ void SspdWidget::loop()
 
         App_WrCoCmd_Buffer(host(), TAG_MASK(1));
         App_WrCoCmd_Buffer(host(), TAG(BT_Plus));
-        Gpu_CoCmd_Button(host(), 403, 201, 65, 60, 31, buttonTag == BT_Plus ? OPT_FLAT : 0, "+");
+        Gpu_CoCmd_Button(host(), 403, 215, 65, 45, 31, buttonTag == BT_Plus ? OPT_FLAT : 0, "+");
         App_WrCoCmd_Buffer(host(), TAG(BT_Minus));
-        Gpu_CoCmd_Button(host(), 332, 201, 65, 60, 31, buttonTag == BT_Minus ? OPT_FLAT : 0, "-");
+        Gpu_CoCmd_Button(host(), 332, 215, 65, 45, 31, buttonTag == BT_Minus ? OPT_FLAT : 0, "-");
 
         Gpu_CoCmd_FgColor(host(), 0xC8510B);
         bool tmpBool = mDriver->status()->currentValue().stShorted;
         Gpu_CoCmd_BgColor(host(), tmpBool ? 0x525252 : 0x783508);
         App_WrCoCmd_Buffer(host(), TAG(BT_Short));
-        Gpu_CoCmd_Toggle(host(), 348, 88, 100, 28, 0, tmpBool ? 0: 65535, "Short""\xFF""Open");
+        Gpu_CoCmd_Toggle(host(), 344, 88, 111, 27, 0, tmpBool ? 0: 65535, "Short""\xFF""Open");
 
         tmpBool = mDriver->status()->currentValue().stAmplifierOn;
         Gpu_CoCmd_BgColor(host(), tmpBool ? 0x783508 : 0x525252);
         App_WrCoCmd_Buffer(host(), TAG(BT_Amp));
-        Gpu_CoCmd_Toggle(host(), 348, 128, 100, 28, 0, tmpBool ? 65535 : 0, "Amp""\xFF""Amp");
+        Gpu_CoCmd_Toggle(host(), 344, 121, 111, 27, 0, tmpBool ? 65535 : 0, "Amp""\xFF""Amp");
 
         tmpBool = mDriver->status()->currentValue().stCounterOn &
-                mDriver->status()->currentValue().stRfKeyToCmp &
                 mDriver->status()->currentValue().stComparatorOn;
         Gpu_CoCmd_BgColor(host(), tmpBool ? 0x783508 : 0x525252);
         App_WrCoCmd_Buffer(host(), TAG(BT_Counter));
-        Gpu_CoCmd_Toggle(host(), 348, 168, 100, 28, 0, tmpBool ? 65535 : 0, "Counter""\xFF""Counter");
+        Gpu_CoCmd_Toggle(host(), 344, 154, 111, 27, 0, tmpBool ? 65535 : 0, "Counter""\xFF""Counter");
+
+        tmpBool = mDriver->status()->currentValue().stHFModeOn;
+        Gpu_CoCmd_BgColor(host(), tmpBool ? 0x783508 : 0x525252);
+        App_WrCoCmd_Buffer(host(), TAG(BT_HFMode));
+        Gpu_CoCmd_Toggle(host(), 344, 187, 111, 27, 0, tmpBool ? 65535 : 0, "HF Mode""\xFF""HF Mode");
         App_WrCoCmd_Buffer(host(), TAG_MASK(0));
 
         if (dataReady){
@@ -318,7 +330,7 @@ void SspdWidget::loop()
     FTWidget::loop();
 }
 
-void SspdWidget::readData()
+void SspdWidgetM1::readData()
 {
     if (isStoped() || mDriver == nullptr)
         return;
@@ -334,7 +346,7 @@ void SspdWidget::readData()
     dataTimer->start(1000);
 }
 
-void SspdWidget::update()
+void SspdWidgetM1::update()
 {
     mUpdateFlag = true;
 }

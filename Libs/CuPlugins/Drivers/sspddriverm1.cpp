@@ -358,7 +358,7 @@ DriverPropertyWriteOnly<bool> *SspdDriverM1::shortEnable() const
     return mShortEnable;
 }
 
-DriverProperty<CU4SDM1_Status_t> *SspdDriverM1::deviceStatus() const
+DriverProperty<CU4SDM1_Status_t> *SspdDriverM1::status() const
 {
     return mDeviceStatus;
 }
@@ -378,7 +378,7 @@ DriverProperty<float> *SspdDriverM1::current() const
     return mCurrent;
 }
 
-DriverPropertyReadOnly<CU4SDM1_Data_t> *SspdDriverM1::deviceData() const
+DriverPropertyReadOnly<CU4SDM1_Data_t> *SspdDriverM1::data() const
 {
     return mDeviceData;
 }

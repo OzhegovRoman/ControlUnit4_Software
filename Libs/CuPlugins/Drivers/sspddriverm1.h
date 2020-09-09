@@ -15,12 +15,12 @@ public:
     explicit SspdDriverM1(QObject *parent = nullptr);
     ~SspdDriverM1();
 
-    DriverPropertyReadOnly<CU4SDM1_Data_t>  * deviceData() const;
+    DriverPropertyReadOnly<CU4SDM1_Data_t>  * data() const;
 
     DriverProperty<float>                   * current() const;
     DriverPropertyReadOnly<float>           * voltage() const;
     DriverPropertyReadOnly<float>           * counts() const;
-    DriverProperty<CU4SDM1_Status_t>        * deviceStatus() const;
+    DriverProperty<CU4SDM1_Status_t>        * status() const;
 
     DriverPropertyWriteOnly<bool>           * shortEnable() const;
     DriverPropertyWriteOnly<bool>           * amplifierEnable() const;

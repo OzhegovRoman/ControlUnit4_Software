@@ -123,6 +123,7 @@ int main(int argc, char *argv[])
     TempWidget _TempWidget(&host);
     TempM1Widget _TempM1Widget(&host);
     SspdWidget _SspdWidget(&host);
+    SspdWidgetM1 _SspdWidgetM1(&host);
     WelcomePageWidget _WelcomePage(&host);
 
     QObject::connect(&_DisplayInitializer, &DisplayInitializer::initialized, &_WelcomePage, &WelcomePageWidget::exec);
@@ -134,7 +135,7 @@ int main(int argc, char *argv[])
     });
 
     QObject::connect(&_MainWidget, &MainWidget::systemInfoClicked, &_SystemInfo, &SystemInfo::exec);
-    QObject::connect(&_MainWidget, &MainWidget::channelChoosen, [&_DataHarvester, &_TempWidget, &_TempM1Widget, &_SspdWidget](const int index){
+    QObject::connect(&_MainWidget, &MainWidget::channelChoosen, [&_DataHarvester, &_TempWidget, &_TempM1Widget, &_SspdWidget, &_SspdWidgetM1](const int index){
         qDebug()<<"index"<<index;
         {
             auto tempDriver = qobject_cast<TempDriverM0*>(_DataHarvester->drivers()[index]);
@@ -157,12 +158,20 @@ int main(int argc, char *argv[])
                 _SspdWidget.exec();
             }
         }
+        {
+            auto sspdDriver = qobject_cast<SspdDriverM1*>(_DataHarvester->drivers()[index]);
+            if (sspdDriver){
+                _SspdWidgetM1.setDriver(sspdDriver);
+                _SspdWidgetM1.exec();
+            }
+        }
     });
 
     QObject::connect(&_SystemInfo, &SystemInfo::backClicked, &_MainWidget, &MainWidget::exec);
     QObject::connect(&_TempWidget, &TempWidget::backClicked, &_MainWidget, &MainWidget::exec);
     QObject::connect(&_TempM1Widget, &TempM1Widget::backClicked, &_MainWidget, &MainWidget::exec);
     QObject::connect(&_SspdWidget, &SspdWidget::backClicked, &_MainWidget, &MainWidget::exec);
+    QObject::connect(&_SspdWidgetM1, &SspdWidgetM1::backClicked, &_MainWidget, &MainWidget::exec);
 
     _DisplayInitializer.exec();
 

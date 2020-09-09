@@ -31,7 +31,7 @@ protected:
 private:
     bool mAnswerReceive {false};
     bool mTimeOut {false};
-    int mDriverTimeOut {500};
+    int mDriverTimeOut {200};
     QTimer *mTimer;
     QVector<DriverProperty_p*> mProperties;
 

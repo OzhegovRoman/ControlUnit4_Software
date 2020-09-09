@@ -7,6 +7,7 @@
 #include "tempwidget.h"
 #include "tempm1widget.h"
 #include "sspdwidget.h"
+#include "sspdwidgetm1.h"
 #include "inputwidget.h"
 #include "sspddriveroption.h"
 #include "welcomepagewidget.h"

@@ -11,18 +11,18 @@ class CommonDriver: public AbstractDriver
 public:
     explicit CommonDriver(QObject * parent = nullptr);
 
-    DriverPropertyReadOnly<QString> *deviceType() const;
-    DriverPropertyReadOnly<QString> *modificationVersion() const;
-    DriverPropertyReadOnly<QString> *hardwareVersion() const;
-    DriverPropertyReadOnly<QString> *firmwareVersion() const;
-    DriverPropertyReadOnly<QString> *deviceDescription() const;
-    DriverPropertyReadOnly<cUDID> *UDID() const;
+    DriverPropertyReadOnly<QString> * deviceType() const;
+    DriverPropertyReadOnly<QString> * modificationVersion() const;
+    DriverPropertyReadOnly<QString> * hardwareVersion() const;
+    DriverPropertyReadOnly<QString> * firmwareVersion() const;
+    DriverPropertyReadOnly<QString> * deviceDescription() const;
+    DriverPropertyReadOnly<cUDID>   * UDID() const;
 
-    DriverCommand *init() const;
-    DriverCommand *shutDown() const;
-    DriverCommand *silence() const;
-    DriverCommand *reboot() const;
-    DriverCommand *writeEeprom() const;
+    DriverCommand                   * init() const;
+    DriverCommand                   * shutDown() const;
+    DriverCommand                   * silence() const;
+    DriverCommand                   * reboot() const;
+    DriverCommand                   * writeEeprom() const;
 
     bool getDeviceInfo();
 

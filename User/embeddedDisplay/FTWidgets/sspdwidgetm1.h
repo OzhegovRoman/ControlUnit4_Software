@@ -1,18 +1,18 @@
-#ifndef SSPDWIDGET_H
-#define SSPDWIDGET_H
+#ifndef SSPDWIDGETM1_H
+#define SSPDWIDGETM1_H
 
 #include <QObject>
 #include "ftwidget.h"
-#include "Drivers/sspddriverm0.h"
+#include "Drivers/sspddriverm1.h"
 #include <QTimer>
 #include "riverdieve.h"
 
-class SspdWidget: public FTWidget
+class SspdWidgetM1: public FTWidget
 {
     Q_OBJECT
 public:
-    explicit SspdWidget(Gpu_Hal_Context_t * host);
-    void setDriver(SspdDriverM0 *driver);
+    explicit SspdWidgetM1(Gpu_Hal_Context_t * host);
+    void setDriver(SspdDriverM1 *driver);
 
 signals:
     void backClicked();
@@ -32,14 +32,15 @@ private:
         BT_Short = 5,
         BT_Amp = 6,
         BT_Counter = 7,
-        BT_SetCurrent = 8
+        BT_HFMode = 8,
+        BT_SetCurrent = 9
     };
+    SspdDriverM1 *mDriver;
+    QTimer *dataTimer;
     quint16 dlOffset;
     bool mUpdateFlag;
-    SspdDriverM0 *mDriver;
     bool dataReady;
     bool errorFlag;
-    QTimer *dataTimer;
 
 private slots:
     void readData();

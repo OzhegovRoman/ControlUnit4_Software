@@ -1,7 +1,11 @@
 #include "sspddriveroption.h"
 #include "inputwidget.h"
+#include "Drivers/sspddriverm0.h"
+#include "Drivers/sspddriverm1.h"
+#include <QDebug>
+#include <QThread>
 
-void SspdDriverOption::getOptions(Gpu_Hal_Context_t *host, SspdDriverM0 *driver)
+void SspdDriverOption::getOptions(Gpu_Hal_Context_t *host,  CommonDriver *driver)
 {
     if (host == nullptr || driver == nullptr)
         return;
@@ -81,7 +85,7 @@ void SspdDriverOption::getOptions(Gpu_Hal_Context_t *host, SspdDriverM0 *driver)
     Gpu_CoCmd_Text(host, 18, 136, 29, OPT_CENTERY, "Counter timeout:");
     Gpu_CoCmd_Text(host, 18, 172, 29, OPT_CENTERY, "Autoreset:");
     Gpu_CoCmd_Text(host, 18, 208, 29, OPT_CENTERY, "Autoreset threshold:");
-    Gpu_CoCmd_Text(host, 18, 244, 29, OPT_CENTERY, "Counter level:");
+    Gpu_CoCmd_Text(host, 18, 244, 29, OPT_CENTERY, "Autoreset timeout:");
 
     App_Flush_Co_Buffer(host);
     Gpu_Hal_WaitCmdfifo_empty(host);
@@ -97,11 +101,20 @@ void SspdDriverOption::getOptions(Gpu_Hal_Context_t *host, SspdDriverM0 *driver)
     App_Flush_Co_Buffer(host);
     Gpu_Hal_WaitCmdfifo_empty(host);
 
+    auto *tmpDriverM0 = qobject_cast<SspdDriverM0*>(driver);
+    auto *tmpDriverM1 = qobject_cast<SspdDriverM1*>(driver);
     bool ok = false;
 
-    driver->params()->getValueSync(&ok, 5);
-    if (ok)
-        driver->status()->getValueSync(&ok, 5);
+    if (tmpDriverM0){
+        tmpDriverM0->params()->getValueSync(&ok, 5);
+        if (ok)
+            tmpDriverM0->status()->getValueSync(&ok, 5);
+    }
+    if (tmpDriverM1){
+        tmpDriverM1->params()->getValueSync(&ok, 5);
+        if (ok)
+            tmpDriverM1->status()->getValueSync(&ok, 5);
+    }
 
     bool update = ok;
     uint32_t lastButtonPressedTag = 0;
@@ -125,8 +138,16 @@ void SspdDriverOption::getOptions(Gpu_Hal_Context_t *host, SspdDriverM0 *driver)
             case BT_ComparatorLevel: {
                 double temp = InputWidget::getDouble(host, "Counter level, mV");
                 if (!isnan(temp)){
-                    driver->cmpReferenceLevel()->setValueSync(static_cast<float>(temp * 1e-3), nullptr, 5);
-                    driver->params()->getValueSync(nullptr, 5);
+                    if (tmpDriverM0){
+                        tmpDriverM0->cmpReferenceLevel()->setValueSync(static_cast<float>(temp * 1e-3), nullptr, 10);
+                        QThread::msleep(100);
+                        tmpDriverM0->cmpReferenceLevel()->getValueSync(nullptr, 5);
+                    }
+                    if (tmpDriverM1){
+                        tmpDriverM1->cmpReferenceLevel()->setValueSync(static_cast<float>(temp * 1e-3), nullptr, 10);
+                        QThread::msleep(100);
+                        tmpDriverM1->cmpReferenceLevel()->getValueSync(nullptr, 5);
+                    }
                 }
                 lastButtonPressedTag = 0;
                 update = true;
@@ -135,8 +156,16 @@ void SspdDriverOption::getOptions(Gpu_Hal_Context_t *host, SspdDriverM0 *driver)
             case BT_CounterTimeOut: {
                 double temp = InputWidget::getDouble(host, "Timeout, sec");
                 if (!isnan(temp)){
-                    driver->timeConst()->setValueSync(static_cast<float>(temp), nullptr, 5);
-                    driver->params()->getValueSync(nullptr, 5);
+                    if (tmpDriverM0){
+                        tmpDriverM0->timeConst()->setValueSync(static_cast<float>(temp), nullptr, 10);
+                        QThread::msleep(100);
+                        tmpDriverM0->timeConst()->getValueSync(nullptr, 5);
+                    }
+                    if (tmpDriverM1){
+                        tmpDriverM1->timeConst()->setValueSync(static_cast<float>(temp), nullptr, 10);
+                        QThread::msleep(100);
+                        tmpDriverM1->timeConst()->getValueSync(nullptr, 5);
+                    }
                 }
                 lastButtonPressedTag = 0;
                 update = true;
@@ -145,8 +174,16 @@ void SspdDriverOption::getOptions(Gpu_Hal_Context_t *host, SspdDriverM0 *driver)
             case BT_AutoresetThreshold: {
                 double temp = InputWidget::getDouble(host, "AR trigger level, mV");
                 if (!isnan(temp)){
-                    driver->autoResetThreshold()->setValueSync(static_cast<float>(temp * 1e-3), nullptr, 5);
-                    driver->params()->getValueSync(nullptr, 5);
+                    if (tmpDriverM0){
+                        tmpDriverM0->autoResetThreshold()->setValueSync(static_cast<float>(temp * 1e-3), nullptr, 10);
+                        QThread::msleep(100);
+                        tmpDriverM0->autoResetThreshold()->getValueSync(nullptr, 5);
+                    }
+                    if (tmpDriverM1){
+                        tmpDriverM1->autoResetThreshold()->setValueSync(static_cast<float>(temp * 1e-3), nullptr, 10);
+                        QThread::msleep(100);
+                        tmpDriverM1->autoResetThreshold()->getValueSync(nullptr, 5);
+                    }
                 }
                 lastButtonPressedTag = 0;
                 update = true;
@@ -155,16 +192,32 @@ void SspdDriverOption::getOptions(Gpu_Hal_Context_t *host, SspdDriverM0 *driver)
             case BT_AutoresetTimeOut: {
                 double temp = InputWidget::getDouble(host, "AR timeout, sec");
                 if (!isnan(temp)){
-                    driver->autoResetTimeOut()->setValueSync(static_cast<float>(temp), nullptr, 5);
-                    driver->params()->getValueSync(nullptr, 5);
+                    if (tmpDriverM0){
+                        tmpDriverM0->autoResetTimeOut()->setValueSync(static_cast<float>(temp), nullptr, 10);
+                        QThread::msleep(100);
+                        tmpDriverM0->autoResetTimeOut()->getValueSync(nullptr, 5);
+                    }
+                    if (tmpDriverM1){
+                        tmpDriverM1->autoResetTimeOut()->setValueSync(static_cast<float>(temp), nullptr, 10);
+                        QThread::msleep(100);
+                        tmpDriverM1->autoResetTimeOut()->getValueSync(nullptr, 5);
+                    }
                 }
                 lastButtonPressedTag = 0;
                 update = true;
                 break;
             }
             case BT_AutoresetEnable: {
-                driver->autoResetEnable()->setValueSync(!driver->status()->currentValue().stAutoResetOn, nullptr, 5);
-                driver->status()->getValueSync(nullptr, 5);
+                if (tmpDriverM0){
+                    tmpDriverM0->autoResetEnable()->setValueSync(!tmpDriverM0->status()->currentValue().stAutoResetOn, nullptr, 10);
+                    QThread::msleep(100);
+                    tmpDriverM0->status()->getValueSync(nullptr, 5);
+                }
+                if (tmpDriverM1){
+                    tmpDriverM1->autoResetEnable()->setValueSync(!tmpDriverM1->status()->currentValue().stAutoResetOn, nullptr, 10);
+                    QThread::msleep(100);
+                    tmpDriverM1->status()->getValueSync(nullptr, 5);
+                }
                 lastButtonPressedTag = 0;
                 update = true;
                 break;
@@ -174,25 +227,32 @@ void SspdDriverOption::getOptions(Gpu_Hal_Context_t *host, SspdDriverM0 *driver)
         }
         //отрисовка
         if (update){
+            qDebug()<<"update";
             update = false;
             Gpu_CoCmd_Dlstart(host);
             Gpu_CoCmd_Append(host, 120000L, dlOffset);
 
             App_WrCoCmd_Buffer(host, COLOR_RGB(255, 255, 255));
+            CU4SDM0V1_Param_t params;
+            if (tmpDriverM0) params = tmpDriverM0->params()->currentValue();
+            if (tmpDriverM1) params = tmpDriverM1->params()->currentValue();
+
             Gpu_CoCmd_Text(host, 450, 100, 29, OPT_CENTERY | OPT_RIGHTX,
-                            QString("%1 mV").arg(static_cast<double>(driver->params()->currentValue().Cmp_Ref_Level) * 1000.0).toLocal8Bit());
+                           QString("%1 mV").arg(static_cast<double>(params.Cmp_Ref_Level) * 1000.0).toLocal8Bit());
             Gpu_CoCmd_Text(host, 450, 136, 29, OPT_CENTERY | OPT_RIGHTX,
-                            QString("%1 sec").arg(static_cast<double>(driver->params()->currentValue().Time_Const)).toLocal8Bit());
+                           QString("%1 sec").arg(static_cast<double>(params.Time_Const)).toLocal8Bit());
             Gpu_CoCmd_Text(host, 450, 208, 29, OPT_CENTERY | OPT_RIGHTX,
-                            QString("%1 mV").arg(static_cast<double>(driver->params()->currentValue().AutoResetThreshold) * 1000.0).toLocal8Bit());
+                           QString("%1 mV").arg(static_cast<double>(params.AutoResetThreshold) * 1000.0).toLocal8Bit());
             Gpu_CoCmd_Text(host, 450, 244, 29, OPT_CENTERY | OPT_RIGHTX,
-                            QString("%1 sec").arg(static_cast<double>(driver->params()->currentValue().AutoResetTimeOut)).toLocal8Bit());
+                           QString("%1 sec").arg(static_cast<double>(params.AutoResetTimeOut)).toLocal8Bit());
 
             Gpu_CoCmd_FgColor(host, 0xC8510B);
             Gpu_CoCmd_BgColor(host, 0x783508);
 
             App_WrCoCmd_Buffer(host, TAG_MASK(1));
-            bool tmpBool = driver->status()->currentValue().stAutoResetOn;
+            bool tmpBool = false;
+            if (tmpDriverM0) tmpBool = tmpDriverM0->status()->currentValue().stAutoResetOn;
+            if (tmpDriverM1) tmpBool = tmpDriverM1->status()->currentValue().stAutoResetOn;
             Gpu_CoCmd_BgColor(host, tmpBool ? 0x783508 : 0x525252);
             App_WrCoCmd_Buffer(host, TAG(BT_AutoresetEnable));
             Gpu_CoCmd_Toggle(host, 396, 166, 48, 27, 0, tmpBool ? 65535 : 0, "off""\xFF""on");

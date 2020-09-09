@@ -2,6 +2,7 @@
 #include "Interfaces/cutcpsocketiointerface.h"
 #include "Interfaces/curs485iointerface.h"
 #include "Drivers/sspddriverm0.h"
+#include "Drivers/sspddriverm1.h"
 #include "Drivers/tempdriverm0.h"
 #include "Drivers/tempdriverm1.h"
 #include "../qCustomLib/qCustomLib.h"
@@ -96,9 +97,13 @@ void DataHarvester::initializeDriverList()
 
             CommonDriver* tmpDriver = nullptr;
 
-            if (type.contains("CU4SD")){
+            if (type.contains("CU4SDM0")){
                 //данное устройство - SspdDriver
                 tmpDriver = new SspdDriverM0(this);
+            }
+            else if (type.contains("CU4SDM1")){
+                //данное устройство - SspdDriver
+                tmpDriver = new SspdDriverM1(this);
             }
             else if (type.contains("CU4TDM0"))
                 //данное устройство - TempDriver
