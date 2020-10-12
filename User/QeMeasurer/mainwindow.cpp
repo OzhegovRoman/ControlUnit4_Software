@@ -3,14 +3,18 @@
 #include <QDebug>
 #include <QSettings>
 #include "../qCustomLib/qCustomLib.h"
+#include "Drivers/sspddriverm0.h"
+#include "Drivers/sspddriverm1.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::MainWindow),
+    deviceType(dtUnknown),
     mDriver(nullptr),
     mInterface(new IOInterface_t(this)),
     mTimer(new QTimer(this))
 {
+    qDebug()<<"MainWindow::MainWindow";
     ui->setupUi(this);
 
     QSettings settings("Scontel","QeMeasurer");
@@ -36,9 +40,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mInterface->setPortName("ttyAMA0");
 #endif
 
-    qDebug()<<"test_01";
     updateControlUnitList();
-    qDebug()<<"test_02";
 
     for (int i = 0; i < ui->cbTcpIpAddress->count(); i++){
         if (ui->cbTcpIpAddress->itemText(i) == mLastTcpIpAddress){
@@ -65,11 +67,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    qDebug()<<"MainWindow::~MainWindow";
     delete ui;
 }
 
 void MainWindow::contextMenuRequest(QPoint pos)
 {
+    qDebug()<<"MainWindow::contextMenuRequest";
 
     if (ui->wMeasurerPlot->graphCount() == 0) return;
 
@@ -84,6 +88,7 @@ void MainWindow::contextMenuRequest(QPoint pos)
 
 void MainWindow::on_pbInitialize_clicked()
 {
+    qDebug()<<"MainWindow::on_pbInitialize_clicked";
     // сначала нужно получить информацию от модуля и выбрать подходящий тип
     CommonDriver driver;
     driver.setIOInterface(mInterface);
@@ -113,8 +118,21 @@ void MainWindow::on_pbInitialize_clicked()
     // а вот тут уже создаем новый
     if (mDriver!= nullptr)
         mDriver->deleteLater();
+    mDriver = nullptr;
 
-    mDriver = new SspdDriverM0(this);
+    if (driver.deviceType()->currentValue().contains("CU4SDM0")){
+        deviceType = dtSspdM0;
+        mDriver = new SspdDriverM0(this);
+        ui->cbHFMode->setVisible(false);
+    }
+    if (driver.deviceType()->currentValue().contains("CU4SDM1")){
+        deviceType = dtSspdM1;
+        mDriver = new SspdDriverM1(this);
+        ui->cbHFMode->setVisible(true);
+    }
+
+    assert(mDriver != nullptr);
+
     mDriver->setIOInterface(mInterface);
     mDriver->setDevAddress(driver.devAddress());
 
@@ -158,11 +176,6 @@ void MainWindow::on_pbInitialize_clicked()
 
 void MainWindow::on_stackedWidget_currentChanged(int arg1)
 {
-    bool ok;
-
-    CU4SDM0V1_Param_t params;
-    CU4SDM0_Status_t status;
-    mMode = arg1;
     mTimer->stop();
 
     disconnect(mTimer, nullptr, nullptr, nullptr);
@@ -174,18 +187,36 @@ void MainWindow::on_stackedWidget_currentChanged(int arg1)
         updateData();
         break;
     case 2:
-        params = mDriver->params()->getValueSync(&ok);
-        mTimerCount_Interval = static_cast<int>(static_cast<double>(params.Time_Const)*1000.0);
-        mTimer->setInterval(qMax(100, mTimerCount_Interval));
-        qDebug()<<"Time_Const:"<<params.Time_Const;
+    {
+        bool ok = false;
+        auto tmpSspdM0 = qobject_cast<SspdDriverM0*>(mDriver);
+        auto tmpSspdM1 = qobject_cast<SspdDriverM1*>(mDriver);
+        if (tmpSspdM0){
+            auto params = tmpSspdM0->params()->getValueSync(&ok, 2);
+            mTimerCount_Interval = static_cast<int>(static_cast<double>(params.Time_Const)*1000.0);
+            auto status = tmpSspdM0->status()->getValueSync(&ok, 2);
+            status.stCounterOn = true;
+            status.stRfKeyToCmp = true;
+            status.stComparatorOn = true;
+            status.stCounterOn = true;
+            tmpSspdM0->status()->setValueSync(status);
+        }
+        if (tmpSspdM1){
+            auto params = tmpSspdM1->params()->getValueSync(&ok, 2);
+            mTimerCount_Interval = static_cast<int>(static_cast<double>(params.Time_Const)*1000.0);
+            auto status = tmpSspdM1->status()->getValueSync(&ok, 2);
+            status.stCounterOn = true;
+            status.stComparatorOn = true;
+            status.stCounterOn = true;
+            tmpSspdM1->status()->setValueSync(status);
+        }
 
-        status = mDriver->status()->getValueSync(&ok);
-        status.Data = status.Data | CU4SDM0V1_STATUS_COUNTER_WORKED;
-        mDriver->status()->setValueSync(status);
+        mTimer->setInterval(qMax(100, mTimerCount_Interval));
 
         connect(mTimer, SIGNAL(timeout()), SLOT(updateCountsGraph()));
         updateCountsGraph();
         break;
+    }
     case 3: // Measure
         ui->cbType->setCurrentIndex(0);
         break;
@@ -197,25 +228,47 @@ void MainWindow::on_stackedWidget_currentChanged(int arg1)
 void MainWindow::updateData()
 {
     bool ok = false;
-    auto data = mDriver->data()->getValueSync(&ok);
-    if (ok){
-        ui->lbData->setText(QString("I: %1 uA<br>U: %2 mV")
-                            .arg(static_cast<double>(data.Current)*1e6, 6,'f', 1)
-                            .arg(static_cast<double>(data.Voltage)*1e3, 6, 'f', 2));
-        ui->cbAmplifier->setChecked(data.Status.stAmplifierOn);
-        ui->cbShort->setChecked(data.Status.stShorted);
-        ui->cbComparator->setChecked(data.Status.stComparatorOn);
-        qDebug()<<"new data. Status:" << data.Status.Data;
-        qDebug()<<"new data. Comparator:" << data.Status.stComparatorOn;
+    if (deviceType == dtSspdM0){
+        auto data = qobject_cast<SspdDriverM0*>(mDriver)->data()->getValueSync(&ok, 5);
+        if (ok){
+            ui->lbData->setText(QString("I: %1 uA<br>U: %2 mV")
+                                .arg(static_cast<double>(data.Current)*1e6, 6,'f', 1)
+                                .arg(static_cast<double>(data.Voltage)*1e3, 6, 'f', 2));
+            ui->cbAmplifier->setChecked(data.Status.stAmplifierOn);
+            ui->cbShort->setChecked(data.Status.stShorted);
+            ui->cbComparator->setChecked(data.Status.stComparatorOn);
+        }
     }
-    else qDebug()<<"error at getting data";
+    else if (deviceType == dtSspdM1){
+        auto data = qobject_cast<SspdDriverM1*>(mDriver)->data()->getValueSync(&ok, 5);
+        if (ok){
+            ui->lbData->setText(QString("I: %1 uA<br>Imon: %2 uA<br>U: %3 mV")
+                                .arg(static_cast<double>(data.Current)*1e6, 6,'f', 1)
+                                .arg(static_cast<double>(data.CurrentMonitor)*1e6, 6,'f', 1)
+                                .arg(static_cast<double>(data.Voltage)*1e3, 6, 'f', 2));
+            ui->cbAmplifier->setChecked(data.Status.stAmplifierOn);
+            ui->cbShort->setChecked(data.Status.stShorted);
+            ui->cbComparator->setChecked(data.Status.stComparatorOn);
+            ui->cbHFMode->setChecked(data.Status.stHFModeOn);
+        }
+    }
+    if (!ok)
+        qDebug()<<"error at getting data";
     mTimer->start();
 }
 
 void MainWindow::updateCountsGraph()
 {
-    bool ok;
-    auto counts = static_cast<double>(mDriver->counts()->getValueSync(&ok, 5));
+    qDebug()<<"MainWindow::updateCountsGraph";
+    bool ok = false;
+    double counts;
+    auto tmpSspdM0 = qobject_cast<SspdDriverM0*>(mDriver);
+    auto tmpSspdM1 = qobject_cast<SspdDriverM1*>(mDriver);
+    if (tmpSspdM0)
+        counts = tmpSspdM0->counts()->getValueSync(&ok, 5);
+    if (tmpSspdM1)
+        counts = tmpSspdM1->counts()->getValueSync(&ok, 5);
+
     if (!ok) {
         qDebug()<<"can't read counts data";
         mTimer->start();
@@ -240,19 +293,31 @@ void MainWindow::updateCountsGraph()
 
 void MainWindow::setCurrentValue()
 {
+    qDebug()<<"MainWindow::setCurrentValue";
     if (mCurrentValue > ui->sbStop->value()) {
         on_pbStop_clicked();
         return;
     }
 
+    float value = mCurrentValue;
+    auto tmpSspdM0 = qobject_cast<SspdDriverM0*>(mDriver);
+    auto tmpSspdM1 = qobject_cast<SspdDriverM1*>(mDriver);
+
     switch (ui->cbType->currentIndex()) {
     case 0:
         //Bias
-        mDriver->current()->setValueSync(static_cast<float>(mCurrentValue*1E-6), nullptr, 5);
+        value = mCurrentValue*1E-6;
+        if (tmpSspdM0)
+            tmpSspdM0->current()->setValueSync(value, nullptr, 5);
+        if (tmpSspdM1)
+            tmpSspdM1->current()->setValueSync(value, nullptr, 5);
         break;
     case 1:
         //Cmp  ref level
-        mDriver->cmpReferenceLevel()->setValueSync(static_cast<float>(mCurrentValue), nullptr, 5);
+        if (tmpSspdM0)
+            tmpSspdM0->cmpReferenceLevel()->setValueSync(value, nullptr, 5);
+        if (tmpSspdM1)
+            tmpSspdM1->cmpReferenceLevel()->setValueSync(value, nullptr, 5);
         break;
     default:
         return;
@@ -262,19 +327,32 @@ void MainWindow::setCurrentValue()
 
 void MainWindow::addPoint2MeasureGraphs()
 {
-    double key = 0;
-    double value = 0;
-    auto data = mDriver->data()->getValueSync(nullptr, 5);
-    value =  static_cast<double>(data.Counts/mDriver->params()->currentValue().Time_Const);
-    if (static_cast<double>(data.Voltage) > ui->sbTrigger->value()){ //триггер сработал
-        on_pbStop_clicked();
-        return;
+    qDebug()<<"MainWindow::addPoint2MeasureGraphs";
+    double key = mCurrentValue;
+    float value = 0;
+    auto tmpSspdM0 = qobject_cast<SspdDriverM0*>(mDriver);
+    auto tmpSspdM1 = qobject_cast<SspdDriverM1*>(mDriver);
+
+    if (tmpSspdM0){
+        auto data = tmpSspdM0->data()->getValueSync(nullptr, 5);
+        value =  static_cast<double>(data.Counts/tmpSspdM0->params()->currentValue().Time_Const);
+        if (static_cast<double>(data.Voltage) > ui->sbTrigger->value()){ //триггер сработал
+            on_pbStop_clicked();
+            return;
+        }
+        if (ui->cbType->currentIndex() == 0 )
+            key = static_cast<double>(data.Current)*1E6;
     }
-    key = static_cast<double>(data.Current)*1E6;
-
-    if (ui->cbType->currentIndex() !=0 )
-        key = mCurrentValue;
-
+    if (tmpSspdM1){
+        auto data = tmpSspdM1->data()->getValueSync(nullptr, 5);
+        value =  static_cast<double>(data.Counts/tmpSspdM1->params()->currentValue().Time_Const);
+        if (static_cast<double>(data.Voltage) > ui->sbTrigger->value()){ //триггер сработал
+            on_pbStop_clicked();
+            return;
+        }
+        if (ui->cbType->currentIndex() == 0 )
+            key = static_cast<double>(data.Current)*1E6;
+    }
 
     ui->wMeasurerPlot->graph(ui->wMeasurerPlot->graphCount() - 1)->addData(key, value);
     ui->wMeasurerPlot->rescaleAxes(true);
@@ -341,71 +419,136 @@ void MainWindow::enableControlsAtMeasure(bool value)
 
 void MainWindow::on_pbSetI_clicked()
 {
-    mDriver->current()->setValueSync(static_cast<float>(ui->sbI->value()*1E-6), nullptr, 5);
+    auto tmpSspdM0 = qobject_cast<SspdDriverM0*>(mDriver);
+    auto tmpSspdM1 = qobject_cast<SspdDriverM1*>(mDriver);
+    float value = ui->sbI->value()*1e-6;
+    if (tmpSspdM0)
+        tmpSspdM0->current()->setValueSync(value, nullptr, 5);
+    if (tmpSspdM1)
+        tmpSspdM1->current()->setValueSync(value, nullptr, 5);
 }
 
 void MainWindow::on_pbSetCmp_clicked()
 {
-    mDriver->cmpReferenceLevel()->setValueSync(static_cast<float>(ui->sbCmp->value()), nullptr, 5);
+    auto tmpSspdM0 = qobject_cast<SspdDriverM0*>(mDriver);
+    auto tmpSspdM1 = qobject_cast<SspdDriverM1*>(mDriver);
+    float value = ui->sbCmp->value();
+    if (tmpSspdM0)
+        tmpSspdM0->cmpReferenceLevel()->setValueSync(value, nullptr, 5);
+    if (tmpSspdM1)
+        tmpSspdM1->cmpReferenceLevel()->setValueSync(value, nullptr, 5);
 }
 
 void MainWindow::on_cbShort_clicked(bool checked)
 {
     bool ok = false;
-    mDriver->shortEnable()->setValueSync(checked, &ok);
+    auto tmpSspdM0 = qobject_cast<SspdDriverM0*>(mDriver);
+    auto tmpSspdM1 = qobject_cast<SspdDriverM1*>(mDriver);
+    if (tmpSspdM0)
+        tmpSspdM0->shortEnable()->setValueSync(checked, &ok);
+    if (tmpSspdM1)
+        tmpSspdM1->shortEnable()->setValueSync(checked, &ok);
     if (!ok) qDebug()<<"can't set short";
 }
 
 void MainWindow::on_cbAmplifier_clicked(bool checked)
 {
     bool ok = false;
-    mDriver->amplifierEnable()->setValueSync(checked, &ok);
+    auto tmpSspdM0 = qobject_cast<SspdDriverM0*>(mDriver);
+    auto tmpSspdM1 = qobject_cast<SspdDriverM1*>(mDriver);
+    if (tmpSspdM0)
+        tmpSspdM0->amplifierEnable()->setValueSync(checked, &ok);
+    if (tmpSspdM1)
+        tmpSspdM1->amplifierEnable()->setValueSync(checked, &ok);
     if (!ok) qDebug()<<"can't set amplifier";
 }
 
 void MainWindow::on_cbComparator_clicked(bool checked)
 {
-    bool ok;
-    CU4SDM0_Status_t status = mDriver->status()->getValueSync(&ok);
-    if  (!ok){
-        qDebug()<<"can't get Driver Status";
-        return;
+    bool ok = false;
+    auto tmpSspdM0 = qobject_cast<SspdDriverM0*>(mDriver);
+    auto tmpSspdM1 = qobject_cast<SspdDriverM1*>(mDriver);
+    if (tmpSspdM0){
+        auto status = tmpSspdM0->status()->getValueSync(&ok);
+        if  (!ok){
+            qDebug()<<"can't get Driver Status";
+            return;
+        }
+        if (checked) {
+            status.stComparatorOn = true;
+            status.stRfKeyToCmp = true;
+            status.stCounterOn = true;
+        }
+        else{
+            status.stComparatorOn = false;
+            status.stRfKeyToCmp = false;
+            status.stCounterOn = false;
+        }
+        tmpSspdM0->status()->setValueSync(status, &ok, 5);
     }
-    if (checked) {
-        status.stComparatorOn = true;
-        status.stRfKeyToCmp = true;
-        status.stCounterOn = true;
+    if (tmpSspdM1){
+        auto status = tmpSspdM1->status()->getValueSync(&ok);
+        if  (!ok){
+            qDebug()<<"can't get Driver Status";
+            return;
+        }
+        if (checked) {
+            status.stComparatorOn = true;
+            status.stCounterOn = true;
+        }
+        else{
+            status.stComparatorOn = false;
+            status.stCounterOn = false;
+        }
+        tmpSspdM1->status()->setValueSync(status, &ok, 5);
     }
-    else{
-        status.stComparatorOn = false;
-        status.stRfKeyToCmp = false;
-        status.stCounterOn = false;
-    }
-    qDebug()<<"setted status:"<<status.Data;
-    mDriver->status()->setValueSync(status, &ok, 5);
     if (!ok) qDebug()<<"can't set device status";
 }
 
 void MainWindow::on_pbReadParams_clicked()
 {
+    qDebug()<<"MainWindow::on_pbReadParams_clicked";
     bool ok = false;
-    auto params = mDriver->params()->getValueSync(&ok, 5);
-    if (!ok){
-        qDebug()<<"can't read params";
-        return;
+    float value = 0;
+    auto tmpSspdM0 = qobject_cast<SspdDriverM0*>(mDriver);
+    auto tmpSspdM1 = qobject_cast<SspdDriverM1*>(mDriver);
+    if (tmpSspdM0){
+        auto params = tmpSspdM0->params()->getValueSync(&ok, 5);
+        if (!ok){
+            qDebug()<<"can't read params";
+            return;
+        }
+        value = params.Time_Const;
     }
-    ui->sbTimeConst->setValue(static_cast<double>(params.Time_Const));
+    if (tmpSspdM1){
+        auto params = tmpSspdM1->params()->getValueSync(&ok, 5);
+        if (!ok){
+            qDebug()<<"can't read params";
+            return;
+        }
+        value = params.Time_Const;
+    }
+
+    ui->sbTimeConst->setValue(value);
 }
 
 void MainWindow::on_pbSetParams_clicked()
 {
+    qDebug()<<"MainWindow::on_pbSetParams_clicked";
     mTimerCount_Interval = static_cast<int>(ui->sbTimeConst->value()*1000.0);
-    mDriver->timeConst()->setValueSync(static_cast<float>(mTimerCount_Interval)/1000.0f, nullptr, 5);
+    auto tmpSspdM0 = qobject_cast<SspdDriverM0*>(mDriver);
+    auto tmpSspdM1 = qobject_cast<SspdDriverM1*>(mDriver);
+    if (tmpSspdM0)
+        tmpSspdM0->timeConst()->setValueSync(static_cast<float>(mTimerCount_Interval)/1000.0f, nullptr, 5);
+    if (tmpSspdM1)
+        tmpSspdM1->timeConst()->setValueSync(static_cast<float>(mTimerCount_Interval)/1000.0f, nullptr, 5);
+
     mTimer->setInterval(qMax(100, mTimerCount_Interval));
 }
 
 void MainWindow::on_pbStart_clicked()
 {
+    qDebug()<<"MainWindow::on_pbStart_clicked";
     // Запуск процесса измерения
     ui->wMeasurerPlot->addGraph();
     QCPGraph *graph = ui->wMeasurerPlot->graph(ui->wMeasurerPlot->graphCount() - 1);
@@ -422,18 +565,34 @@ void MainWindow::on_pbStart_clicked()
     mCurrentValue = ui->sbStart->value();
 
     // включаем закоротку
-
-    mDriver->shortEnable()->setValueSync(true, nullptr, 5);
+    auto tmpSspdM0 = qobject_cast<SspdDriverM0*>(mDriver);
+    auto tmpSspdM1 = qobject_cast<SspdDriverM1*>(mDriver);
+    if (tmpSspdM0){
+        tmpSspdM0->shortEnable()->setValueSync(true, nullptr, 5);
+    }
+    if (tmpSspdM1){
+        tmpSspdM1->shortEnable()->setValueSync(true, nullptr, 5);
+    }
 
     // устанавливаем начальное значение
     switch (ui->cbType->currentIndex()) {
     case 0:
         //Bias
-        mDriver->current()->setValueSync(static_cast<float>(mCurrentValue*1E-6), nullptr, 5);
+        if (tmpSspdM0){
+            tmpSspdM0->current()->setValueSync(static_cast<float>(mCurrentValue*1E-6), nullptr, 5);
+        }
+        if (tmpSspdM1){
+            tmpSspdM1->current()->setValueSync(static_cast<float>(mCurrentValue*1E-6), nullptr, 5);
+        }
         break;
     case 1:
         //Cmp  ref level
-        mDriver->cmpReferenceLevel()->setValueSync(static_cast<float>(mCurrentValue), nullptr, 5);
+        if (tmpSspdM0){
+            tmpSspdM0->cmpReferenceLevel()->setValueSync(static_cast<float>(mCurrentValue), nullptr, 5);
+        }
+        if (tmpSspdM1){
+            tmpSspdM1->cmpReferenceLevel()->setValueSync(static_cast<float>(mCurrentValue), nullptr, 5);
+        }
         break;
     default:
         return;
@@ -446,15 +605,31 @@ void MainWindow::on_pbStart_clicked()
         qApp->processEvents();
 
     // раскорачиваем и далее уже как обычно.
-    mDriver->shortEnable()->setValueSync(false, nullptr, 5);
+    if (tmpSspdM0){
+        tmpSspdM0->shortEnable()->setValueSync(false, nullptr, 5);
+        auto params = tmpSspdM0->params()->getValueSync();
+        mTimer->setInterval(static_cast<int>(static_cast<double>(params.Time_Const)*2000.0));
 
-    // настроим постоянную времени
-    auto params = mDriver->params()->getValueSync();
-    mTimer->setInterval(static_cast<int>(static_cast<double>(params.Time_Const)*2000.0));
+        auto status = tmpSspdM0->status()->getValueSync();
+        status.stAmplifierOn = true;
+        status.stComparatorOn = true;
+        status.stRfKeyToCmp = true;
+        status.stCounterOn = true;
 
-    auto status = mDriver->status()->getValueSync();
-    status.Data |= CU4SDM0V1_STATUS_COUNTER_WORKED;
-    mDriver->status()->setValueSync(status);
+        tmpSspdM0->status()->setValueSync(status);
+    }
+    if (tmpSspdM1){
+        tmpSspdM1->shortEnable()->setValueSync(false, nullptr, 5);
+        auto params = tmpSspdM1->params()->getValueSync();
+        mTimer->setInterval(static_cast<int>(static_cast<double>(params.Time_Const)*2000.0));
+
+        auto status = tmpSspdM1->status()->getValueSync();
+        status.stAmplifierOn = true;
+        status.stComparatorOn = true;
+        status.stCounterOn = true;
+
+        tmpSspdM1->status()->setValueSync(status);
+    }
 
     disconnect(mTimer, nullptr, nullptr, nullptr);
 
@@ -491,8 +666,17 @@ void MainWindow::on_cbType_currentIndexChanged(int index)
 
 void MainWindow::on_pbGetSecretParams_clicked()
 {
-    bool ok;
-    bool tmpBool = mDriver->PIDEnableStatus()->getValueSync(&ok, 5);
+    qDebug()<<"MainWindow::on_pbGetSecretParams_clicked";
+    bool ok = false;
+    bool tmpBool = false;
+    auto tmpSspdM0 = qobject_cast<SspdDriverM0*>(mDriver);
+    auto tmpSspdM1 = qobject_cast<SspdDriverM1*>(mDriver);
+
+    if (tmpSspdM0)
+        tmpBool = tmpSspdM0->PIDEnableStatus()->getValueSync(&ok, 5);
+    if (tmpSspdM1)
+        tmpBool = tmpSspdM1->PIDEnableStatus()->getValueSync(&ok, 5);
+
     if (!ok){
         ui->lbSecretStatus->setText("Error at PIDEnableStatus()->getValueSequence");
         return;
@@ -504,8 +688,15 @@ void MainWindow::on_pbGetSecretParams_clicked()
 
 void MainWindow::on_pbSetSecretParams_clicked()
 {
-    bool ok;
-    mDriver->PIDEnableStatus()->setValueSync(ui->cbPID->isChecked(), &ok, 5);
+    bool ok = false;
+    auto tmpSspdM0 = qobject_cast<SspdDriverM0*>(mDriver);
+    auto tmpSspdM1 = qobject_cast<SspdDriverM1*>(mDriver);
+
+    if (tmpSspdM0)
+        tmpSspdM0->PIDEnableStatus()->setValueSync(ui->cbPID->isChecked(), &ok, 5);
+    if (tmpSspdM1)
+        tmpSspdM1->PIDEnableStatus()->setValueSync(ui->cbPID->isChecked(), &ok, 5);
+
     if (!ok){
         ui->lbSecretStatus->setText("Error at PIDEnableStatus()->setValueSequence");
         return;
@@ -515,6 +706,7 @@ void MainWindow::on_pbSetSecretParams_clicked()
 
 void MainWindow::on_pbReading_clicked()
 {
+    qDebug()<<"MainWindow::on_pbReading_clicked";
     mTimer->stop();
     disconnect(mTimer, nullptr, nullptr, nullptr);
     if (ui->pbReading->isChecked()){
@@ -532,7 +724,6 @@ void MainWindow::on_pbRecording_clicked()
                                                  tr("Save File..."),
                                                  "output.txt",
                                                  tr("Text files (*.txt)"));
-        qDebug()<<mFileName;
         if (mFileName.isEmpty())
             ui->pbRecording->setChecked(false);
     }
@@ -542,26 +733,47 @@ void MainWindow::updateSecureData()
 {
     static int i = 0;
     qDebug()<<i++;
-    bool ok;
-    auto data = mDriver->data()->getValueSync(&ok);
+    bool ok = false;
+    QString labelString, fileString;
+    if (deviceType == dtSspdM0){
+        auto data = qobject_cast<SspdDriverM0*>(mDriver)->data()->getValueSync(&ok, 5);
+        if (ok){
+            labelString = QString("I: %1 uA<br>U: %2 mV<br>Count: %3")
+                    .arg(static_cast<double>(data.Current)*1e6, 6,'f', 1)
+                    .arg(static_cast<double>(data.Voltage)*1e3, 6, 'f', 2)
+                    .arg(static_cast<double>(data.Counts), 6, 'f', 2);
+            fileString = QString("%1\t%2\t%3\r\n")
+                    .arg(static_cast<double>(data.Current)*1e6, 6,'f', 1)
+                    .arg(static_cast<double>(data.Voltage)*1e3, 6, 'f', 2)
+                    .arg(static_cast<double>(data.Counts), 6, 'f', 2);
+        }
+    }
+    else if (deviceType == dtSspdM1){
+        auto data = qobject_cast<SspdDriverM1*>(mDriver)->data()->getValueSync(&ok, 5);
+        if (ok){
+            labelString = QString("I: %1 uA<br>Imon: %2 uA<br>U: %3 mV<br>Count: %4")
+                    .arg(static_cast<double>(data.Current)*1e6, 6,'f', 1)
+                    .arg(static_cast<double>(data.CurrentMonitor)*1e6, 6,'f', 1)
+                    .arg(static_cast<double>(data.Voltage)*1e3, 6, 'f', 2)
+                    .arg(static_cast<double>(data.Counts), 6, 'f', 2);
+            fileString = QString("%1\t%2\t%3\t%4\r\n")
+                    .arg(static_cast<double>(data.Current)*1e6, 6,'f', 1)
+                    .arg(static_cast<double>(data.CurrentMonitor)*1e6, 6,'f', 1)
+                    .arg(static_cast<double>(data.Voltage)*1e3, 6, 'f', 2)
+                    .arg(static_cast<double>(data.Counts), 6, 'f', 2);
+        }
+    }
+
     if (ok){
-        ui->lbSecretStatus->setText(QString("I: %1 uA<br>U: %2 mV<br>Count: %3")
-                                    .arg(static_cast<double>(data.Current)*1e6, 6,'f', 1)
-                                    .arg(static_cast<double>(data.Voltage)*1e3, 6, 'f', 2)
-                                    .arg(static_cast<double>(data.Counts), 6, 'f', 2));
+        ui->lbSecretStatus->setText(labelString);
         if (ui->pbRecording->isChecked()){
             QFile m_File(mFileName);
             m_File.open(QIODevice::WriteOnly | QIODevice::Append);
             QTextStream out(&m_File);
-            out<<QString("%1\t%2\t%3\r\n")
-                 .arg(static_cast<double>(data.Current)*1e6, 6,'f', 1)
-                 .arg(static_cast<double>(data.Voltage)*1e3, 6, 'f', 2)
-                 .arg(static_cast<double>(data.Counts), 6, 'f', 2);
+            out<<fileString;
             m_File.close();
         }
     }
-    else qDebug()<<"error at getting data";
-
     mTimer->start();
 }
 
@@ -570,19 +782,16 @@ void MainWindow::updateControlUnitList()
     setDisabled(true);
     qApp->processEvents();
     QStringList list = availableControlUnits();
-    qDebug()<<"test1";
     ui->cbTcpIpAddress->clear();
     if (!list.isEmpty())
         ui->cbTcpIpAddress->addItems(list);
     ui->cbTcpIpAddress->addItems(QStringList()<<"Update..."<<"Manual...");
-    qDebug()<<"test2";
 
     setEnabled(true);
 }
 
 void MainWindow::on_cbTcpIpAddress_activated(const QString &arg1)
 {
-    qDebug()<<"activated";
     if (arg1.contains("Update")){
         updateControlUnitList();
         ui->cbTcpIpAddress->setCurrentIndex(0);
@@ -616,4 +825,13 @@ void MainWindow::on_cbTcpIpAddress_activated(const QString &arg1)
             }
         }
     }
+}
+
+void MainWindow::on_cbHFMode_clicked(bool checked)
+{
+    bool ok = false;
+    auto tmpSspdM1 = qobject_cast<SspdDriverM1*>(mDriver);
+    if (tmpSspdM1)
+        tmpSspdM1->highFrequencyModeEnable()->setValueSync(checked, &ok);
+    if (!ok) qDebug()<<"can't set HF Mode";
 }

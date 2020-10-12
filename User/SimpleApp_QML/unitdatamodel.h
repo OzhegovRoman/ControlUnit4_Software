@@ -1,17 +1,17 @@
-#ifndef SSPDDATAMODEL_H
-#define SSPDDATAMODEL_H
+#ifndef UNITDATAMODEL_H
+#define UNITDATAMODEL_H
 
 #include <QAbstractListModel>
 
 class UnitData;
 
-class SspdDataModel : public QAbstractListModel
+class UnitDataModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(UnitData *data READ data WRITE setData)
 
 public:
-    explicit SspdDataModel(QObject *parent = nullptr);
+    explicit UnitDataModel(QObject *parent = nullptr);
 
     enum {
         NameRole = Qt::UserRole,
@@ -46,4 +46,4 @@ private:
     UnitData *mData;
 };
 
-#endif // SSPDDATAMODEL_H
+#endif // UNITDATAMODEL_H

@@ -5,6 +5,7 @@
 #include <QSettings>
 #include "Interfaces/curs485iointerface.h"
 #include "../qCustomLib/qCustomLib.h"
+#include "sspdwidgetm1.h"
 
 MainDialog::MainDialog(QWidget *parent)
     : QDialog(parent)
@@ -35,28 +36,16 @@ void MainDialog::on_stackedWidget_currentChanged(int arg1)
     if (!mInited) return;
     // закрываем старое окно
     if (lastWidgetIndex>-1){
-        if (lastWidgetIndex == ui->stackedWidget->count()-1)
-            aWidget->closeWidget();
-        else {
-            auto* tWidget = qobject_cast<TempWidget*>(ui->stackedWidget->widget(lastWidgetIndex));
-            auto* tM1Widget = qobject_cast<TempM1Widget*>(ui->stackedWidget->widget(lastWidgetIndex));
-            auto* sWidget = qobject_cast<SspdWidget*>(ui->stackedWidget->widget(lastWidgetIndex));
-            if (tWidget) tWidget->closeWidget();
-            if (tM1Widget) tM1Widget->closeWidget();
-            if (sWidget) sWidget->closeWidget();
-        }
+        auto * tmpWidget = qobject_cast<CommonWidget *>(ui->stackedWidget->widget(lastWidgetIndex));
+        if (tmpWidget)
+            tmpWidget->closeWidget();
     }
+
     lastWidgetIndex = arg1;
-    if (arg1 == ui->stackedWidget->count() - 1)
-        aWidget->openWidget();
-    else {
-        auto* tWidget = qobject_cast<TempWidget*>(ui->stackedWidget->widget(arg1));
-        auto* tM1Widget = qobject_cast<TempM1Widget*>(ui->stackedWidget->widget(arg1));
-        auto* sWidget = qobject_cast<SspdWidget*>(ui->stackedWidget->widget(arg1));
-        if (tWidget) tWidget->openWidget();
-        if (tM1Widget) tM1Widget->openWidget();
-        if (sWidget) sWidget->openWidget();
-    }
+
+    auto *tmpWidget = qobject_cast<CommonWidget *>(ui->stackedWidget->widget(arg1));
+    if (tmpWidget)
+        tmpWidget->openWidget();
 }
 
 void MainDialog::changeTimeOut(int msecs)
@@ -66,18 +55,10 @@ void MainDialog::changeTimeOut(int msecs)
 
 void MainDialog::timerTimeOut()
 {
-    int i = ui->stackedWidget->currentIndex();
-    if (i == ui->stackedWidget->count() - 1){
-        aWidget->updateWidget();
-    }
-    else {
-        auto* tWidget = qobject_cast<TempWidget*>(ui->stackedWidget->widget(i));
-        auto* tM1Widget = qobject_cast<TempM1Widget*>(ui->stackedWidget->widget(i));
-        auto* sWidget = qobject_cast<SspdWidget*>(ui->stackedWidget->widget(i));
-        if (tWidget) tWidget->updateWidget();
-        if (tM1Widget) tM1Widget->updateWidget();
-        if (sWidget) sWidget->updateWidget();
-    }
+    auto *tmpWidget = qobject_cast<CommonWidget *>(ui->stackedWidget->currentWidget());
+    if (tmpWidget)
+        tmpWidget->updateWidget();
+
     mTimer->start(mTimerTimeOut);
 }
 
@@ -193,13 +174,22 @@ bool MainDialog::createUI(const QString& deviceList)
             quint8 address = static_cast<quint8>(lList[1].split('=')[1].toInt());
             QString type = lList[2].split('=')[1];
             CommonDriver * tmpDriver = nullptr;
-            if (type.contains("CU4SD")){
+            if (type.contains("CU4SDM0")){
                 //данное устройство - SspdDriver
                 tmpDriver = new SspdDriverM0(this);
 
                 ui->listWidget->addItem(QString("Sspd Driver\nAddress: %1").arg(address));
                 auto* widget = new SspdWidget(this);
                 widget->setDriver(qobject_cast<SspdDriverM0*>(tmpDriver));
+                ui->stackedWidget->addWidget(widget);
+            }
+            else if (type.contains("CU4SDM1")){
+                //данное устройство - SspdDriver
+                tmpDriver = new SspdDriverM1(this);
+
+                ui->listWidget->addItem(QString("Sspd Driver\nAddress: %1").arg(address));
+                auto* widget = new SspdWidgetM1(this);
+                widget->setDriver(qobject_cast<SspdDriverM1*>(tmpDriver));
                 ui->stackedWidget->addWidget(widget);
             }
             else if (type.contains("CU4TDM0")){

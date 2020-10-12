@@ -49,7 +49,9 @@ QtApplication {
         ]
         cpp.linkerFlags:[
             "-z",
-            "relro"
+            "relro",
+            "-rpath",
+            "/home/roman/raspi/sysroot/opt/vc/lib/"
         ]
     }
 

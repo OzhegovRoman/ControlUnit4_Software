@@ -84,7 +84,7 @@
        <bool>true</bool>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="pInitialize">
        <layout class="QVBoxLayout" name="verticalLayout">
@@ -263,6 +263,16 @@
           </property>
           <property name="text">
            <string>Comparator</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="cbHFMode">
+          <property name="styleSheet">
+           <string notr="true">font: 12pt &quot;MS Shell Dlg 2&quot;;</string>
+          </property>
+          <property name="text">
+           <string>HF Mode</string>
           </property>
          </widget>
         </item>

@@ -62,8 +62,11 @@ qreal cAgilent34401aVisaInterface::readAgilent()
         mVisaInited = false;
         return false;
     }
-    typedef ViStatus (*lviRead) (ViSession, ViBuf, ViUInt32, ViPUInt32);
+    qDebug()<<"read agilent";
+    using lviRead = ViStatus (*) (ViSession, ViBuf, ViUInt32, ViPUInt32);
+//    typedef ViStatus (*lviRead) (ViSession, ViBuf, ViUInt32, ViPUInt32);
     auto read = reinterpret_cast<lviRead> (lib.resolve("viRead"));
+    qDebug()<<"read function resolved:"<<read;
 
     ViStatus status = read(visaSession, rdBuff, MAX_SCPI_LEN, &retCount);
     if (status> VI_SUCCESS){

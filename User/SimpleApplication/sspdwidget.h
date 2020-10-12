@@ -2,13 +2,15 @@
 #define SSPDWIDGET_H
 
 #include <QWidget>
+#include "commonwidget.h"
+
 #include "Drivers/sspddriverm0.h"
 
 namespace Ui {
 class SspdWidget;
 }
 
-class SspdWidget : public QWidget
+class SspdWidget : public CommonWidget
 {
     Q_OBJECT
 
@@ -16,12 +18,10 @@ public:
     explicit SspdWidget(QWidget *parent = nullptr);
     ~SspdWidget() override;
 
-    void updateWidget();
     void setDriver(SspdDriverM0 *driver);
-    void openWidget();
-    void closeWidget();
 
-public:
+    void updateWidget() override;
+    void openWidget() override;
 
 signals:
     void dataUpdated(CU4SDM0V1_Data_t data);

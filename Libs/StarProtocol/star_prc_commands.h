@@ -89,9 +89,10 @@ enum enum_CU4SDM0V1 {
     //    SD_SetPWMShortCircuitDuty       ,
 
     // расширение команд для CU4SDM1
-    //    SD_GetCurrentMonitor            ,
-    //    SD_GetCurrentMonitorAdcCoeff    ,
-    //    SD_SetCurrentMonitorAdcCoeff
+    SD_GetCurrentMonitor            ,
+    SD_GetCurrentMonitorAdcCoeff    ,
+    SD_SetCurrentMonitorAdcCoeff    ,
+
     SD_SetHFModeEnable        ,      // HighFrequency mode
 
     SD_SetHFPulseWidth  ,       //HighFrequency PulseWidth. Нужен для правильного расчета ошибки тока

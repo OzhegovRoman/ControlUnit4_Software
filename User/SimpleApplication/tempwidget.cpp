@@ -1,9 +1,9 @@
 #include "tempwidget.h"
 #include "ui_tempwidget.h"
 
-TempWidget::TempWidget(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::TempWidget)
+TempWidget::TempWidget(QWidget *parent)
+    : CommonWidget(parent)
+    , ui(new Ui::TempWidget)
 {
     ui->setupUi(this);
 }
@@ -15,7 +15,7 @@ TempWidget::~TempWidget()
 
 void TempWidget::updateWidget()
 {
-    bool ok;
+    bool ok = false;
     auto data = mDriver->data()->getValueSync(&ok, 5);
     if (ok) dataUpDated(data);
 }

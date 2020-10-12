@@ -4,7 +4,6 @@ import qbs.Process
 
 CppApplication{
     name: "cu-simpleapp"
-    consoleApplication: false
 
     // preparation RC_File
     Depends {name: "RC_Prepare"}
@@ -87,7 +86,9 @@ CppApplication{
         ]
         cpp.linkerFlags:[
             "-z",
-            "relro"
+            "relro",
+            "-rpath",
+            "/home/roman/raspi/sysroot/opt/vc/lib/"
         ]
     }
 

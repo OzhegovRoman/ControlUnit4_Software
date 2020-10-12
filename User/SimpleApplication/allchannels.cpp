@@ -2,17 +2,18 @@
 #include "ui_allchannels.h"
 #include <QDebug>
 #include <Drivers/sspddriverm0.h>
+#include <Drivers/sspddriverm1.h>
 #include <Drivers/tempdriverm0.h>
 #include <Drivers/tempdriverm1.h>
 #include <QSettings>
 #include <QDir>
 #include <QDateTime>
 
-AllChannels::AllChannels(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::AllChannels),
-    model(new AllChannelsDataModel(this)),
-    delegate(new AllChannelsDataDelegate(this))
+AllChannels::AllChannels(QWidget *parent)
+    : CommonWidget(parent)
+    , ui(new Ui::AllChannels)
+    , model(new AllChannelsDataModel(this))
+    , delegate(new AllChannelsDataDelegate(this))
 {
     ui->setupUi(this);
 
@@ -51,6 +52,32 @@ void AllChannels::updateWidget()
             if (driver){
                 bool ok;
                 CU4SDM0V1_Data_t data = driver->data()->getValueSync(&ok, 5);
+                if (ok){
+                    if (data.Status.stAutoResetOn && ui->cbLogEnable->isChecked()){
+                        auto lastTriggerCount = driver->params()->currentValue().AutoResetCounts;
+                        auto param = driver->params()->getValueSync(&ok, 5);
+                        if (ok && (param.AutoResetCounts != lastTriggerCount)){
+                            QFile m_File(QString("%1\\TriggerLog.txt").arg(ui->leLogPath->text()));
+                            m_File.open(QIODevice::ReadWrite | QIODevice::Append);
+                            QTextStream out(&m_File);
+                            QString tmpStr = QString("[%1]: SSPD Unit Triggered. Adress: %2. Trigger counts: %3\r\n")
+                                    .arg(QDateTime::currentDateTime().toString("MM-dd-yyyy HH-mm-ss"))
+                                    .arg(driver->devAddress())
+                                    .arg(param.AutoResetCounts);
+                            qDebug()<<tmpStr;
+                            out<<tmpStr;
+                            m_File.close();
+                        }
+                    }
+                }
+
+            }
+        }
+        {
+            auto driver = qobject_cast<SspdDriverM1*>(model->drivers[idx]);
+            if (driver){
+                bool ok;
+                CU4SDM1_Data_t data = driver->data()->getValueSync(&ok, 5);
                 if (ok){
                     if (data.Status.stAutoResetOn && ui->cbLogEnable->isChecked()){
                         auto lastTriggerCount = driver->params()->currentValue().AutoResetCounts;

@@ -12,15 +12,19 @@ wSspdDriver::wSspdDriver(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->leCmpRefDacIntercept    -> setValidator(new QDoubleValidator());
-    ui->leCmpRefDacSlope        -> setValidator(new QDoubleValidator());
-    ui->leCurrentAdcIntercept   -> setValidator(new QDoubleValidator());
-    ui->leCurrentAdcSlope       -> setValidator(new QDoubleValidator());
-    ui->leCurrentDacIntercept   -> setValidator(new QDoubleValidator());
-    ui->leCurrentDacSlope       -> setValidator(new QDoubleValidator());
-    ui->leVoltageAdcIntercept   -> setValidator(new QDoubleValidator());
-    ui->leVoltageAdcSlope       -> setValidator(new QDoubleValidator());
-    ui->lePulseWidth            -> setValidator(new QDoubleValidator());
+    ui->leCmpRefDacIntercept        -> setValidator(new QDoubleValidator());
+    ui->leCmpRefDacSlope            -> setValidator(new QDoubleValidator());
+    ui->leCurrentAdcIntercept       -> setValidator(new QDoubleValidator());
+    ui->leCurrentAdcSlope           -> setValidator(new QDoubleValidator());
+    ui->leCurrentDacIntercept       -> setValidator(new QDoubleValidator());
+    ui->leCurrentDacSlope           -> setValidator(new QDoubleValidator());
+    ui->leVoltageAdcIntercept       -> setValidator(new QDoubleValidator());
+    ui->leVoltageAdcSlope           -> setValidator(new QDoubleValidator());
+    ui->lePulseWidth                -> setValidator(new QDoubleValidator());
+
+    ui->leCurrentMonitorSlope       -> setValidator(new QDoubleValidator());
+    ui->leCurrentMonitorIntercept   -> setValidator(new QDoubleValidator());
+
 }
 
 wSspdDriver::~wSspdDriver()
@@ -35,11 +39,19 @@ void wSspdDriver::setDriver(CommonDriver *driver)
         mDeviceType = dtSspdDriverM0;
         ui->lPulseWidth->setVisible(false);
         ui->lePulseWidth->setVisible(false);
+        ui->lCurrentMonitorIntercept->setVisible(false);
+        ui->lCurrentMonitorSlope->setVisible(false);
+        ui->leCurrentMonitorIntercept->setVisible(false);
+        ui->leCurrentMonitorSlope->setVisible(false);
     }
     if (qobject_cast<SspdDriverM1*>(driver)){
         mDeviceType = dtSspdDriverM1;
         ui->lPulseWidth->setVisible(true);
         ui->lePulseWidth->setVisible(true);
+        ui->lCurrentMonitorIntercept->setVisible(true);
+        ui->lCurrentMonitorSlope->setVisible(true);
+        ui->leCurrentMonitorIntercept->setVisible(true);
+        ui->leCurrentMonitorSlope->setVisible(true);
     }
 
     if (mDeviceType == dtUnknown)
@@ -69,6 +81,8 @@ void wSspdDriver::setDriver(CommonDriver *driver)
             ui->leCmpRefDacSlope        -> setText(QString::number(eepromConst.Cmp_Ref_DAC.first));
             ui->leCurrentAdcIntercept   -> setText(QString::number(eepromConst.Current_ADC.second));
             ui->leCurrentAdcSlope       -> setText(QString::number(eepromConst.Current_ADC.first));
+            ui->leCurrentMonitorIntercept   -> setText(QString::number(eepromConst.CurrentMonitor_ADC.second));
+            ui->leCurrentMonitorSlope       -> setText(QString::number(eepromConst.CurrentMonitor_ADC.first));
             ui->leCurrentDacIntercept   -> setText(QString::number(eepromConst.Current_DAC.second));
             ui->leCurrentDacSlope       -> setText(QString::number(eepromConst.Current_DAC.first));
             ui->leVoltageAdcIntercept   -> setText(QString::number(eepromConst.Voltage_ADC.second));
@@ -85,15 +99,17 @@ void wSspdDriver::setDriver(CommonDriver *driver)
 
 void wSspdDriver::enableGUI(bool enable)
 {
-    ui->leCmpRefDacIntercept    -> setEnabled(enable);
-    ui->leCmpRefDacSlope        -> setEnabled(enable);
-    ui->leCurrentAdcIntercept   -> setEnabled(enable);
-    ui->leCurrentAdcSlope       -> setEnabled(enable);
-    ui->leCurrentDacIntercept   -> setEnabled(enable);
-    ui->leCurrentDacSlope       -> setEnabled(enable);
-    ui->leVoltageAdcIntercept   -> setEnabled(enable);
-    ui->leVoltageAdcSlope       -> setEnabled(enable);
-    ui->lePulseWidth            -> setEnabled(enable);
+    ui->leCmpRefDacIntercept        -> setEnabled(enable);
+    ui->leCmpRefDacSlope            -> setEnabled(enable);
+    ui->leCurrentAdcIntercept       -> setEnabled(enable);
+    ui->leCurrentAdcSlope           -> setEnabled(enable);
+    ui->leCurrentDacIntercept       -> setEnabled(enable);
+    ui->leCurrentDacSlope           -> setEnabled(enable);
+    ui->leVoltageAdcIntercept       -> setEnabled(enable);
+    ui->leVoltageAdcSlope           -> setEnabled(enable);
+    ui->lePulseWidth                -> setEnabled(enable);
+    ui->leCurrentMonitorIntercept   -> setEnabled(enable);
+    ui->leCurrentMonitorSlope       -> setEnabled(enable);
 }
 
 void wSspdDriver::getEeprom()
@@ -120,28 +136,30 @@ void wSspdDriver::setEeprom()
     switch (mDeviceType) {
     case dtSspdDriverM0:{
         CU4SDM0V1_EEPROM_Const_t eepromConst;
-        eepromConst.Cmp_Ref_DAC.second  = ui->leCmpRefDacIntercept->text().toFloat();
-        eepromConst.Cmp_Ref_DAC.first   = ui->leCmpRefDacSlope->text().toFloat();
-        eepromConst.Current_ADC.second  = ui->leCurrentAdcIntercept->text().toFloat();
-        eepromConst.Current_ADC.first   = ui->leCurrentAdcSlope->text().toFloat();
-        eepromConst.Current_DAC.second  = ui->leCurrentDacIntercept->text().toFloat();
-        eepromConst.Current_DAC.first   = ui->leCurrentDacSlope->text().toFloat();
-        eepromConst.Voltage_ADC.second  = ui->leVoltageAdcIntercept->text().toFloat();
-        eepromConst.Voltage_ADC.first   = ui->leVoltageAdcSlope->text().toFloat();
+        eepromConst.Cmp_Ref_DAC.second          = ui->leCmpRefDacIntercept->text().toFloat();
+        eepromConst.Cmp_Ref_DAC.first           = ui->leCmpRefDacSlope->text().toFloat();
+        eepromConst.Current_ADC.second          = ui->leCurrentAdcIntercept->text().toFloat();
+        eepromConst.Current_ADC.first           = ui->leCurrentAdcSlope->text().toFloat();
+        eepromConst.Current_DAC.second          = ui->leCurrentDacIntercept->text().toFloat();
+        eepromConst.Current_DAC.first           = ui->leCurrentDacSlope->text().toFloat();
+        eepromConst.Voltage_ADC.second          = ui->leVoltageAdcIntercept->text().toFloat();
+        eepromConst.Voltage_ADC.first           = ui->leVoltageAdcSlope->text().toFloat();
         qobject_cast<SspdDriverM0*>(driver())->eepromConst()->setValueSync(eepromConst, &ok, 5);
         break;
     }
     case dtSspdDriverM1:{
         CU4SDM1_EEPROM_Const_t eepromConst;
-        eepromConst.Cmp_Ref_DAC.second  = ui->leCmpRefDacIntercept->text().toFloat();
-        eepromConst.Cmp_Ref_DAC.first   = ui->leCmpRefDacSlope->text().toFloat();
-        eepromConst.Current_ADC.second  = ui->leCurrentAdcIntercept->text().toFloat();
-        eepromConst.Current_ADC.first   = ui->leCurrentAdcSlope->text().toFloat();
-        eepromConst.Current_DAC.second  = ui->leCurrentDacIntercept->text().toFloat();
-        eepromConst.Current_DAC.first   = ui->leCurrentDacSlope->text().toFloat();
-        eepromConst.Voltage_ADC.second  = ui->leVoltageAdcIntercept->text().toFloat();
-        eepromConst.Voltage_ADC.first   = ui->leVoltageAdcSlope->text().toFloat();
-        eepromConst.PulseWidth          = ui->lePulseWidth->text().toFloat();
+        eepromConst.Cmp_Ref_DAC.second          = ui->leCmpRefDacIntercept->text().toFloat();
+        eepromConst.Cmp_Ref_DAC.first           = ui->leCmpRefDacSlope->text().toFloat();
+        eepromConst.Current_ADC.second          = ui->leCurrentAdcIntercept->text().toFloat();
+        eepromConst.Current_ADC.first           = ui->leCurrentAdcSlope->text().toFloat();
+        eepromConst.Current_DAC.second          = ui->leCurrentDacIntercept->text().toFloat();
+        eepromConst.Current_DAC.first           = ui->leCurrentDacSlope->text().toFloat();
+        eepromConst.Voltage_ADC.second          = ui->leVoltageAdcIntercept->text().toFloat();
+        eepromConst.Voltage_ADC.first           = ui->leVoltageAdcSlope->text().toFloat();
+        eepromConst.PulseWidth                  = ui->lePulseWidth->text().toFloat();
+        eepromConst.CurrentMonitor_ADC.first    = ui->leCurrentMonitorSlope->text().toFloat();
+        eepromConst.CurrentMonitor_ADC.second   = ui->leCurrentMonitorIntercept->text().toFloat();
         qobject_cast<SspdDriverM1*>(driver())->eepromConst()->setValueSync(eepromConst, &ok, 5);
         break;
     }
@@ -174,6 +192,9 @@ QJsonObject wSspdDriver::eepromToJson()
     calibrObject["leCmpRefDacCoeffs"] = value;
 
     if (mDeviceType == dtSspdDriverM1){
+        value[0] = ui->leCurrentMonitorSlope->text().toDouble();
+        value[1] = ui->leCurrentMonitorIntercept->text().toDouble();
+        calibrObject["CurrentMonitorAdcCoeffs"] = value;
         calibrObject["PulseWidth"] = ui->lePulseWidth->text().toDouble();
     }
     return calibrObject;
@@ -198,6 +219,10 @@ void wSspdDriver::eepromFromJson(QJsonObject data)
     ui->leCmpRefDacIntercept    -> setText(QString::number(value[1].toDouble()));
 
     if (mDeviceType == dtSspdDriverM1){
+        value = data["CurrentMonitorAdcCoeffs"].toArray();
+        ui->leCurrentMonitorSlope        -> setText(QString::number(value[0].toDouble()));
+        ui->leCurrentMonitorIntercept    -> setText(QString::number(value[1].toDouble()));
+
         ui->lePulseWidth->setText(QString::number(data["PulseWidth"].toDouble()));
     }
 }

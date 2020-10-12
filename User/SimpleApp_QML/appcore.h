@@ -4,8 +4,7 @@
 #include <QObject>
 #include <QQmlEngine>
 #include <QJSEngine>
-#include "Drivers/sspddriverm0.h"
-#include "Drivers/tempdriverm0.h"
+#include "Drivers/commondriver.h"
 
 class DeviceList;
 class TemperatureData;
@@ -18,9 +17,7 @@ class AppCore : public QObject
     Q_PROPERTY(bool reconnectEnable READ reconnectEnable)
     Q_PROPERTY(QString lastIpAddress READ lastIpAddress NOTIFY lastIpAddressChanged)
     Q_PROPERTY(DeviceList *devList READ devList WRITE setDevList)
-    Q_PROPERTY(TemperatureData *mTempData READ getTempData WRITE setTempData)
-    Q_PROPERTY(UnitData *mSspdData READ getSspdData WRITE setSspdData)
-    Q_PROPERTY(int currentAddress WRITE setCurrentAddress)
+    Q_PROPERTY(UnitData *mUnitData READ getUnitData WRITE setUnitData)
     Q_PROPERTY(QStringList controlUnits READ controlUnits WRITE setControlUnits NOTIFY controlUnitsListChanged)
 
 public:
@@ -36,14 +33,8 @@ public:
 
     QStringList controlUnits() const;
 
-    TemperatureData *getTempData() const;
-    void setTempData(TemperatureData *tempData);
-
-    UnitData *getSspdData() const;
-    void setSspdData(UnitData *sspdData);
-
-    int getCurrentAddress() const;
-    void setCurrentAddress(int currentAddress);
+    UnitData *getUnitData() const;
+    void setUnitData(UnitData *unitData);
 
     void setControlUnits(const QStringList &controlUnitsList);
 
@@ -57,23 +48,19 @@ signals:
 public slots:
     Q_INVOKABLE void coreConnectToDefaultIpAddress();
     Q_INVOKABLE void coreConnectToIpAddress(const QString& ipAddress);
-    Q_INVOKABLE void getTemperatureDriverData(quint8 address);
-    Q_INVOKABLE void connectTemperatureSensor(quint8 address, bool state);
-    Q_INVOKABLE void getSspdDriverData(quint8 address);
-    Q_INVOKABLE void getSspdDriverParameters(quint8 address);
+    Q_INVOKABLE void updateDriverData(quint8 address, QString type);
+    Q_INVOKABLE void updateDriverParameters(quint8 address, QString type);
     Q_INVOKABLE void updateControlUnitsList();
+    Q_INVOKABLE void prepareUnitData(quint8 address, QString type);
 
     void setNewData(int dataListIndex, double value);
 
 private:
     QString mLastIpAddress;
     DeviceList *mDevList;
-    TemperatureData *mTempData;
-    UnitData * mSspdData;
-    int mCurrentAddress;
+    UnitData * mUnitData;
     cuTcpSocketIOInterface *mInterface;
-    TempDriverM0 *mTempDriver;
-    SspdDriverM0 *mSspdDriver;
+    CommonDriver * mDriver;
     QStringList mControlUnitsList;
 };
 

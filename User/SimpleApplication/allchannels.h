@@ -6,12 +6,13 @@
 #include "allchannelsdatadelegate.h"
 #include "Interfaces/cuiointerface.h"
 #include "Drivers/commondriver.h"
+#include "commonwidget.h"
 
 namespace Ui {
 class AllChannels;
 }
 
-class AllChannels : public QWidget
+class AllChannels : public CommonWidget
 {
     Q_OBJECT
 
@@ -20,7 +21,7 @@ public:
     ~AllChannels() override;
 
     void openWidget();
-    void closeWidget();
+    void closeWidget() override;
     void updateWidget();
 
     void initialize(const QVector<CommonDriver *> &mDrivers);

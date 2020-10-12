@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <cmath>
 #include "Drivers/sspddriverm0.h"
+#include "Drivers/sspddriverm1.h"
 #include "Drivers/tempdriverm0.h"
 #include "Drivers/tempdriverm1.h"
 
@@ -36,6 +37,21 @@ QVariant AllChannelsDataModel::data(const QModelIndex &index, int role) const
     int idx = index.row();
     {
         auto driver = qobject_cast<SspdDriverM0*>(drivers[idx]);
+        if (driver){
+            if (role == Qt::DisplayRole)
+                return QString("%1 uA").arg(driver->current()->currentValue()*1e6, 6, 'f', 1);
+            if (role == Qt::BackgroundRole){
+                if (!driver->status()->currentValue().stShorted){
+                    if (qAbs(driver->voltage()->currentValue())<0.01)
+                        return QBrush(Qt::green);
+                    return QBrush(Qt::red);
+                }
+            }
+        }
+    }
+
+    {
+        auto driver = qobject_cast<SspdDriverM1*>(drivers[idx]);
         if (driver){
             if (role == Qt::DisplayRole)
                 return QString("%1 uA").arg(driver->current()->currentValue()*1e6, 6, 'f', 1);
@@ -91,6 +107,8 @@ QVariant AllChannelsDataModel::headerData(int section, Qt::Orientation orientati
     if (orientation == Qt::Vertical){
         if (qobject_cast<SspdDriverM0*>(drivers[section]))
             return QString("SSPD#%1").arg(section);
+        if (qobject_cast<SspdDriverM1*>(drivers[section]))
+            return QString("SSPD#%1").arg(section);
         if (qobject_cast<TempDriverM0*>(drivers[section]))
             return ("Temperature");
         if (qobject_cast<TempDriverM1*>(drivers[section]))
@@ -110,6 +128,8 @@ bool AllChannelsDataModel::setData(const QModelIndex &index, const QVariant &val
 Qt::ItemFlags AllChannelsDataModel::flags(const QModelIndex &index) const
 {
     if (qobject_cast<SspdDriverM0*>(drivers[index.row()]))
+        return Qt::ItemIsSelectable |  Qt::ItemIsEditable | Qt::ItemIsEnabled ;
+    if (qobject_cast<SspdDriverM1*>(drivers[index.row()]))
         return Qt::ItemIsSelectable |  Qt::ItemIsEditable | Qt::ItemIsEnabled ;
     return Qt::NoItemFlags;
 }

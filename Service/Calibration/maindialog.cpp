@@ -8,15 +8,16 @@
 #include <QDebug>
 #include <QLayout>
 
-MainDialog::MainDialog(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::MainDialog),
-    mDriverType(CU4DriverType::dtUnknown),
-    mDriver(nullptr),
-    mInterface(nullptr),
-    mSaveDialog(new SaveDialog(this)),
-    mOpenDialog(new OpenDialog(this)),
-    mCalibrate(new CalibrateDialog(this))
+MainDialog::MainDialog(QWidget *parent)
+    : QDialog(parent)
+    , ui(new Ui::MainDialog)
+    , mDriverWidget(nullptr)
+    , mDriverType(CU4DriverType::dtUnknown)
+    , mDriver(nullptr)
+    , mInterface(nullptr)
+    , mSaveDialog(new SaveDialog(this))
+    , mOpenDialog(new OpenDialog(this))
+    , mCalibrate(new CalibrateDialog(this))
 {
     ui->setupUi(this);
 }
@@ -167,8 +168,10 @@ void MainDialog::initializeUI()
 
     mDriver->setIOInterface(mInterface);
     mDriver->setDevAddress(static_cast<quint8>(mDeviceAddress));
+    bool ok = false;
+    mDriver->deviceType()->getValueSync(&ok, 5);
     setWindowTitle(QString("%1 EEPROM data")
-                   .arg(mDriver->deviceType()->getValueSync(nullptr, 5)));
+                   .arg(mDriver->deviceType()->currentValue()));
 
     on_pbGetEeprom_clicked();
 }

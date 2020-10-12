@@ -1,5 +1,5 @@
-import QtQuick 2.13
-import QtQuick.Controls 2.13
+import QtQuick 2.11
+import QtQuick.Controls 2.0
 import QtQuick.Controls.Material 2.0
 
 Item {

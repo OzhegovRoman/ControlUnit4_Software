@@ -25,7 +25,7 @@ defineReplace(droidVersionCode) {
         return($$first(vCode)$$first(suffix))
 }
 
-VERSION = 1.1.8
+VERSION = 1.2.1
 
 ANDROID_VERSION_NAME = $$VERSION
 
@@ -33,26 +33,24 @@ ANDROID_VERSION_CODE = $$droidVersionCode($$ANDROID_VERSION_NAME)
 
 
 DEFINES += \
-     VERSION=\\\"1.1.8\\\"
+     VERSION=\\\"1.2.1\\\"
 
 HEADERS += \
     appcore.h \
     devicelist.h \
     devicemodel.h \
-    sspddata.h \
-    sspddatamodel.h \
     tcpipvalidator.h \
-    temperaturedata.h
+    unitdata.h \
+    unitdatamodel.h
 
 SOURCES += \
         devicelist.cpp \
         devicemodel.cpp \
         main.cpp \
         appcore.cpp \
-        sspddata.cpp \
-        sspddatamodel.cpp \
         tcpipvalidator.cpp \
-        temperaturedata.cpp
+        unitdata.cpp \
+        unitdatamodel.cpp
 win32:{
     CONFIG(debug, debug|release){
         LIBS += \

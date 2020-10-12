@@ -41,7 +41,9 @@ CppApplication{
     ]
     cpp.linkerFlags:[
         "-z",
-        "relro"
+        "relro",
+        "-rpath",
+        "/home/roman/raspi/sysroot/opt/vc/lib/"
     ]
 
     // зависимости для сборки под RaspberryPi

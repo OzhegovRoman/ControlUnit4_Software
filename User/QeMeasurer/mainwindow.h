@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include <QTimer>
-#include "Drivers/sspddriverm0.h"
+#include "Drivers/commondriver.h"
 
 #ifdef FAKE
 #include "Interfaces/fiointerface.h"
@@ -80,9 +80,18 @@ private slots:
 
     void on_cbTcpIpAddress_activated(const QString &arg1);
 
+    void on_cbHFMode_clicked(bool checked);
+
 private:
+
     Ui::MainWindow *ui;
-    SspdDriverM0 *mDriver;
+    enum {
+        dtSspdM0,
+        dtSspdM1,
+        dtUnknown
+    } deviceType;
+
+    CommonDriver *mDriver;
     IOInterface_t *mInterface;
     QTimer *mTimer;
     QString mLastTcpIpAddress;

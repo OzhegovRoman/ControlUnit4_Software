@@ -6,9 +6,9 @@ CppApplication {
     name: "cu-simpleapp_qml"
     consoleApplication: false
 
-    condition: project.target === "win_x86"     ||
-               project.target === "win_x86_64"  ||
-               project.target === "android"
+//    condition: project.target === "win_x86"     ||
+//               project.target === "win_x86_64"  ||
+//               project.target === "android"
 
     Depends { name: "Qt.core" }
     Depends { name: "Qt.widgets"}
@@ -55,12 +55,27 @@ CppApplication {
         ]
     }
 
+    Properties {
+        condition: project.target === "raspberryPi"
+        cpp.driverFlags: [
+            "-fPIE",
+            "-pie"
+        ]
+        cpp.linkerFlags:[
+            "-z",
+            "relro",
+            "-rpath",
+            "/home/roman/raspi/sysroot/opt/vc/lib/"
+        ]
+    }
+
     // деплой проекта для raspberryPi
     Group {
         condition: project.target === "raspberryPi"
         fileTagsFilter: "application"
         qbs.install: true
-        qbs.installDir: "/home/pi/Software"
+        qbs.installPrefix: "/home/pi"
+        qbs.installDir: "Software"
     }
 }
 

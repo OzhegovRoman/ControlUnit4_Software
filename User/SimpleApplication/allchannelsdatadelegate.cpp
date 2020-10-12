@@ -2,6 +2,7 @@
 #include <QDebug>
 #include "editwidget.h"
 #include "Drivers/sspddriverm0.h"
+#include "Drivers/sspddriverm1.h"
 
 AllChannelsDataDelegate::AllChannelsDataDelegate(QObject *parent):
     QItemDelegate (parent)
@@ -14,12 +15,23 @@ QWidget *AllChannelsDataDelegate::createEditor(QWidget *parent, const QStyleOpti
     Q_UNUSED(option)
     qDebug()<<"create Editor";
     auto *widget = new EditWidget(parent);
-    auto* driver = qobject_cast<SspdDriverM0*>(model->drivers[index.row()]);
-    if (driver){
-        widget->setCurrent(driver->current()->currentValue()*1e6);
-        widget->setChecked(driver->status()->currentValue().stShorted);
-        widget->setInterface(interface);
-        widget->setIndex(driver->devAddress());
+    {
+        auto* driver = qobject_cast<SspdDriverM0*>(model->drivers[index.row()]);
+        if (driver){
+            widget->setCurrent(driver->current()->currentValue()*1e6);
+            widget->setChecked(driver->status()->currentValue().stShorted);
+            widget->setInterface(interface);
+            widget->setIndex(driver->devAddress());
+        }
+    }
+    {
+        auto* driver = qobject_cast<SspdDriverM1*>(model->drivers[index.row()]);
+        if (driver){
+            widget->setCurrent(driver->current()->currentValue()*1e6);
+            widget->setChecked(driver->status()->currentValue().stShorted);
+            widget->setInterface(interface);
+            widget->setIndex(driver->devAddress());
+        }
     }
     return widget;
 }

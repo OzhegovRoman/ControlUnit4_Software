@@ -1,6 +1,6 @@
-import QtQuick 2.13
-import QtQuick.Controls 2.13
-import QtQuick.Window 2.12
+import QtQuick 2.11
+import QtQuick.Controls 2.0
+import QtQuick.Window 2.11
 
 import AppCore 1.0
 
@@ -14,8 +14,7 @@ ApplicationWindow {
     AppCore {
         id: appcore
         devList: deviceList
-        mTempData: temperatureData
-        mSspdData: sspdData
+        mUnitData: unitData
 
         onConnectionReject: {
             rootItem.state = "tcpIpConnectScreen"

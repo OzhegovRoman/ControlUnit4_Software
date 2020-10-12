@@ -29,7 +29,7 @@ void CU4SDM1Calibrator::setDriver(CommonDriver *driver)
 
 QStringList CU4SDM1Calibrator::modeList()
 {
-    return QStringList()<<"U mode"<<"I mode";
+    return QStringList()<<"U mode"<<"I monitor mode"<<"I mode";
 }
 
 QString CU4SDM1Calibrator::driverType()
@@ -59,13 +59,19 @@ void CU4SDM1Calibrator::setDacValue(double value)
 
 void CU4SDM1Calibrator::setNewAdcEepromCoeffs(lineRegressionCoeff coeffs)
 {
-    if (modeIndex() == 0){
+    switch (modeIndex()) {
+    case 0:
         mLastEeprom.Voltage_ADC.first = coeffs.slope;
         mLastEeprom.Voltage_ADC.second = coeffs.intercept;
-    }
-    else{
+        break;
+    case 1:
+        mLastEeprom.CurrentMonitor_ADC.first = coeffs.slope;
+        mLastEeprom.CurrentMonitor_ADC.second = coeffs.intercept;
+        break;
+    case 2:
         mLastEeprom.Current_ADC.first = coeffs.slope;
         mLastEeprom.Current_ADC.second = coeffs.intercept;
+        break;
     }
 }
 
@@ -86,14 +92,10 @@ void CU4SDM1Calibrator::restoreEepromConsts()
 
 void CU4SDM1Calibrator::performAdcConsts()
 {
-    if (modeIndex() == 0){
-        mLastEeprom.Voltage_ADC.first = 1;
-        mLastEeprom.Voltage_ADC.second = 0;
-    }
-    else{
-        mLastEeprom.Current_ADC.first = 1;
-        mLastEeprom.Current_ADC.second = 0;
-    }
+    lineRegressionCoeff coeff;
+    coeff.slope = 1;
+    coeff.intercept = 0;
+    setNewAdcEepromCoeffs(coeff);
 }
 
 void CU4SDM1Calibrator::performDacConsts()
@@ -109,9 +111,20 @@ void CU4SDM1Calibrator::finish()
 
 double CU4SDM1Calibrator::readAdcValue()
 {
-    if (modeIndex())
+
+    switch (modeIndex()) {
+    case 0:
+        return mDriver->voltage()->getValueSync(nullptr, 5);
+        break;
+    case 1:
+        return mDriver->currentMonitor()->getValueSync(nullptr, 5);
+        break;
+    case 2:
         return mDriver->current()->getValueSync(nullptr, 5);
-    return mDriver->voltage()->getValueSync(nullptr, 5);
+        break;
+    }
+
+    return 0;
 }
 
 void CU4SDM1Calibrator::setNewDacEepromCoeffs(lineRegressionCoeff coeffs)

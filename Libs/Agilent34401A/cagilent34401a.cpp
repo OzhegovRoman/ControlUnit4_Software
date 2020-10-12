@@ -1,4 +1,5 @@
 #include "cagilent34401a.h"
+#include <QDebug>
 
 cAgilent34401A::cAgilent34401A() :
     mMode{Mode_U_DC},
@@ -47,6 +48,7 @@ bool cAgilent34401A::isInited() const
 
 qreal cAgilent34401A::singleRead()
 {
+    qDebug()<<"agilent initialize";
     if (!isInited()) initialize();
     QString str;
     switch (mMode) {
@@ -86,9 +88,11 @@ qreal cAgilent34401A::singleRead()
 
     str.append("\r\n");
 
+    qDebug()<<"set mode:"<<str;
     writeAgilent(str);
 
+    qDebug()<<"read data";
     qreal data = readAgilent();
-    emit dataReaded(data);
+    qDebug()<<"done"<<data;
     return data;
 }

@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QTimer>
 #include "Drivers/sspddriverm0.h"
+#include "Drivers/sspddriverm1.h"
 #include "Drivers/tempdriverm0.h"
 #include "Drivers/tempdriverm1.h"
 
@@ -15,6 +16,7 @@ using cInterface = cuTcpSocketIOInterface;
 #include "tempwidget.h"
 #include "tempm1widget.h"
 #include "sspdwidget.h"
+#include "sspdwidgetm1.h"
 #include "allchannels.h"
 
 #include <QElapsedTimer>

@@ -1,29 +1,29 @@
-#include "sspddatamodel.h"
-#include "sspddata.h"
+#include "unitdatamodel.h"
+#include "unitdata.h"
 #include <QDebug>
 
-SspdDataModel::SspdDataModel(QObject *parent)
+UnitDataModel::UnitDataModel(QObject *parent)
     : QAbstractListModel(parent)
     , mData(nullptr)
 {
 }
 
-int SspdDataModel::rowCount(const QModelIndex &parent) const
+int UnitDataModel::rowCount(const QModelIndex &parent) const
 {
     // For list models only the root node (an invalid parent) should return the list's size. For all
     // other (valid) parents, rowCount() should return 0 so that it does not become a tree model.
     if (parent.isValid() || !mData)
         return 0;
 
-    return mData->items().size();
+    return mData->items()->size();
 }
 
-QVariant SspdDataModel::data(const QModelIndex &index, int role) const
+QVariant UnitDataModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid() || !mData)
         return QVariant();
 
-    const DataItem item = mData->items().at(index.row());
+    const DataItem item = mData->items()->at(index.row());
     switch (role) {
     case NameRole:
         return QVariant(item.name);
@@ -44,7 +44,7 @@ QVariant SspdDataModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-bool SspdDataModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool UnitDataModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     if (data(index, role) != value) {
         if (role == ValueRole)
@@ -54,7 +54,7 @@ bool SspdDataModel::setData(const QModelIndex &index, const QVariant &value, int
     return false;
 }
 
-Qt::ItemFlags SspdDataModel::flags(const QModelIndex &index) const
+Qt::ItemFlags UnitDataModel::flags(const QModelIndex &index) const
 {
     if (!index.isValid())
         return Qt::NoItemFlags;
@@ -62,7 +62,7 @@ Qt::ItemFlags SspdDataModel::flags(const QModelIndex &index) const
     return Qt::ItemIsEditable; // FIXME: Implement me!
 }
 
-QHash<int, QByteArray> SspdDataModel::roleNames() const
+QHash<int, QByteArray> UnitDataModel::roleNames() const
 {
     QHash<int, QByteArray> names;
     names[NameRole]     = "name";
@@ -75,12 +75,12 @@ QHash<int, QByteArray> SspdDataModel::roleNames() const
     return names;
 }
 
-UnitData *SspdDataModel::data() const
+UnitData *UnitDataModel::data() const
 {
     return mData;
 }
 
-void SspdDataModel::setData(UnitData *data)
+void UnitDataModel::setData(UnitData *data)
 {
     if (mData)
         mData->disconnect(this);

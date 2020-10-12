@@ -2,9 +2,9 @@
 #include "ui_tempm1widget.h"
 #include <QDebug>
 
-TempM1Widget::TempM1Widget(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::TempM1Widget)
+TempM1Widget::TempM1Widget(QWidget *parent)
+    : CommonWidget(parent)
+    , ui(new Ui::TempM1Widget)
 {
     ui->setupUi(this);
     mTimer.setSingleShot(true);

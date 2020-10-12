@@ -1,4 +1,5 @@
 #include "sspddriverm1.h"
+#include <QDebug>
 
 SspdDriverM1::SspdDriverM1(QObject *parent)
     : CommonDriver(parent)
@@ -8,6 +9,7 @@ SspdDriverM1::SspdDriverM1(QObject *parent)
 
     //data of DeviceData :)
     , mCurrent(new DriverProperty<float>(this, cmd::SD_GetCurrent, cmd::SD_SetCurrent))
+    , mCurrentMonitor(new DriverPropertyReadOnly<float>(this, cmd::SD_GetCurrentMonitor))
     , mVoltage(new DriverPropertyReadOnly<float>(this, cmd::SD_GetVoltage))
     , mCounts(new DriverPropertyReadOnly<float>(this, cmd::SD_GetCounts))
     , mDeviceStatus(new DriverProperty<CU4SDM1_Status_t>(this, cmd::SD_GetStatus, cmd::SD_SetStatus))
@@ -35,6 +37,7 @@ SspdDriverM1::SspdDriverM1(QObject *parent)
 
     // const
     , mCurrentAdcCoeff(new DriverProperty<pair_t<float> >(this, cmd::SD_GetCurrentAdcCoeff, cmd::SD_SetCurrentAdcCoeff))
+    , mCurrentMonitorAdcCoeff(new DriverProperty<pair_t<float> >(this, cmd::SD_GetCurrentMonitorAdcCoeff, cmd::SD_SetCurrentMonitorAdcCoeff))
     , mVoltageAdcCoeff(new DriverProperty<pair_t<float> >(this, cmd::SD_GetVoltageAdcCoeff, cmd::SD_SetVoltageAdcCoeff))
     , mCurrentDacCoeff(new DriverProperty<pair_t<float> >(this, cmd::SD_GetCurrentDacCoeff, cmd::SD_SetCurrentDacCoeff))
     , mCmpReferenceCoeff(new DriverProperty<pair_t<float> >(this, cmd::SD_GetComparatorCoeff, cmd::SD_SetComparatorCoeff))
@@ -50,6 +53,7 @@ SspdDriverM1::SspdDriverM1(QObject *parent)
         //установить данные для всех частных
         auto data = mDeviceData->currentValue();
         mCurrent->setCurrentValue(data.Current);
+        mCurrentMonitor->setCurrentValue(data.CurrentMonitor);
         mVoltage->setCurrentValue(data.Voltage);
         mCounts->setCurrentValue(data.Counts);
         mDeviceStatus->setCurrentValue(data.Status);
@@ -65,6 +69,12 @@ SspdDriverM1::SspdDriverM1(QObject *parent)
     mCurrent->settedSignal()->connect([=](){ // в предыдущем драйвере этой функции почему то не было, К чему бы это
         auto data = mDeviceData->currentValue();
         data.Current = mCurrent->lastSettedValue();
+        updateData(data);
+    });
+
+    mCurrentMonitor->gettedSignal()->connect([=](){
+        auto data = mDeviceData->currentValue();
+        data.CurrentMonitor = mCurrentMonitor->currentValue();
         updateData(data);
     });
 
@@ -91,8 +101,10 @@ SspdDriverM1::SspdDriverM1(QObject *parent)
 
     // atomic function of status
     mShortEnable->settedSignal()->connect([=](){
+        qDebug()<<"mShortEnable setted";
         auto data = mDeviceStatus->currentValue();
         data.stShorted = mShortEnable->lastSettedValue();
+        qDebug()<<"status"<<data.Data;
         updateStatus(data);
     });
 
@@ -172,6 +184,7 @@ SspdDriverM1::SspdDriverM1(QObject *parent)
     mEepromConst->gettedSignal()->connect([=](){
        auto data = mEepromConst->currentValue();
        mCurrentAdcCoeff->setCurrentValue(data.Current_ADC);
+       mCurrentMonitorAdcCoeff->setCurrentValue(data.CurrentMonitor_ADC);
        mCurrentDacCoeff->setCurrentValue(data.Current_DAC);
        mVoltageAdcCoeff->setCurrentValue(data.Voltage_ADC);
        mCmpReferenceCoeff->setCurrentValue(data.Cmp_Ref_DAC);
@@ -182,6 +195,12 @@ SspdDriverM1::SspdDriverM1(QObject *parent)
     mCurrentAdcCoeff->gettedSignal()->connect([=](){
         auto data = mEepromConst->currentValue();
         data.Current_ADC = mCurrentAdcCoeff->currentValue();
+        updateEEPROM(data);
+    });
+
+    mCurrentMonitorAdcCoeff->gettedSignal()->connect([=](){
+        auto data = mEepromConst->currentValue();
+        data.CurrentMonitor_ADC = mCurrentMonitorAdcCoeff->currentValue();
         updateEEPROM(data);
     });
 
@@ -214,6 +233,7 @@ SspdDriverM1::~SspdDriverM1()
 {
     delete mDeviceData;
     delete mCurrent;
+    delete mCurrentMonitor;
     delete mVoltage;
     delete mCounts;
     delete mDeviceStatus;
@@ -231,6 +251,7 @@ SspdDriverM1::~SspdDriverM1()
     delete mAutoResetAlarmsCounts;
     delete mEepromConst;
     delete mCurrentAdcCoeff;
+    delete mCurrentMonitorAdcCoeff;
     delete mVoltageAdcCoeff;
     delete mCurrentDacCoeff;
     delete mCmpReferenceCoeff;
@@ -261,6 +282,16 @@ void SspdDriverM1::updateEEPROM(const CU4SDM1_EEPROM_Const_t &eeprom)
 {
     mEepromConst->setCurrentValue(eeprom);
     emit eepromConstUpdated(eeprom);
+}
+
+DriverProperty<pair_t<float> > *SspdDriverM1::currentMonitorAdcCoeff() const
+{
+    return mCurrentMonitorAdcCoeff;
+}
+
+DriverPropertyReadOnly<float> *SspdDriverM1::currentMonitor() const
+{
+    return mCurrentMonitor;
 }
 
 DriverProperty<bool> *SspdDriverM1::PIDEnableStatus() const

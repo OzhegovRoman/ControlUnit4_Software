@@ -5,13 +5,12 @@
 #include <QQmlContext>
 #include <QDebug>
 
-#include "temperaturedata.h"
 #include "appcore.h"
 #include "tcpipvalidator.h"
 #include "devicelist.h"
 #include "devicemodel.h"
-#include "sspddata.h"
-#include "sspddatamodel.h"
+#include "unitdata.h"
+#include "unitdatamodel.h"
 
 int main(int argc, char *argv[])
 {
@@ -40,11 +39,9 @@ int main(int argc, char *argv[])
     qmlRegisterType<DeviceModel>("AppCore", 1, 0, "DeviceModel");
     qmlRegisterUncreatableType<DeviceList>("AppCore", 1, 0, "DeviceList",
                                            QStringLiteral("DeviceList should not be created in QML"));
-    qmlRegisterUncreatableType<TemperatureData>("AppCore", 1, 0, "TemperatureData",
-                                           QStringLiteral("TemperatureData should not be created in QML"));
-    qmlRegisterType<SspdDataModel>("AppCore", 1, 0, "SspdDataModel");
-    qmlRegisterUncreatableType<UnitData>("AppCore", 1, 0, "SspdData",
-                                           QStringLiteral("SspdData should not be created in QML"));
+    qmlRegisterType<UnitDataModel>("AppCore", 1, 0, "UnitDataModel");
+    qmlRegisterUncreatableType<UnitData>("AppCore", 1, 0, "UnitData",
+                                           QStringLiteral("UnitData should not be created in QML"));
 
     qDebug()<<"reconnectEnableFlag"<<!parser.isSet(reconnectDisableOption);
     AppCore::setReconnectEnable(!parser.isSet(reconnectDisableOption));
@@ -58,11 +55,9 @@ int main(int argc, char *argv[])
     }, Qt::QueuedConnection);
 
     DeviceList devList;
-    TemperatureData tempData;
-    UnitData sspdData;
+    UnitData unitData;
     engine.rootContext()->setContextProperty(QStringLiteral("deviceList"), &devList);
-    engine.rootContext()->setContextProperty(QStringLiteral("temperatureData"), &tempData);
-    engine.rootContext()->setContextProperty(QStringLiteral("sspdData"), &sspdData);
+    engine.rootContext()->setContextProperty(QStringLiteral("unitData"), &unitData);
 
     engine.load(url);
 

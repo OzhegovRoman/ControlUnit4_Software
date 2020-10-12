@@ -1,5 +1,5 @@
-import QtQuick 2.13
-import QtQuick.Controls 2.13
+import QtQuick 2.11
+import QtQuick.Controls 2.0
 
 import AppCore 1.0
 
@@ -11,16 +11,19 @@ Item {
     property int pixelSize: dp(24)
 
     property int lDriverAddress: currentDriverAddress;
+    property string lDriverType: currentDriverType;
     property int timerTicks: 0
 
     Component.onCompleted: {
         //также добавляем и получение параметров. которые в принципе получать постоянно не надо
         // параметры получаем раз в 5 секунд, чаще не надо
-        appcore.getSspdDriverData(lDriverAddress);
-        appcore.getSspdDriverParameters(lDriverAddress);
+        appcore.prepareUnitData(lDriverAddress, lDriverType);
+        model_1.modelReset();
+        appcore.updateDriverData(lDriverAddress, lDriverType);
+        appcore.updateDriverParameters(lDriverAddress, lDriverType);
     }
 
-    ScrollView {
+    ScrollBar {
         id: scrollview
         anchors.fill: parent
         clip: true
@@ -37,8 +40,9 @@ Item {
 
             spacing: pixelSize * 0.2
 
-            model: SspdDataModel{
-                data: sspdData
+            model: UnitDataModel{
+                id: model_1
+                data: unitData
             }
 
             section {
@@ -120,10 +124,10 @@ Item {
         repeat: true;
         onTriggered: {
             timerTicks ++;
-            appcore.getSspdDriverData(lDriverAddress)
+            appcore.updateDriverData(lDriverAddress, lDriverType)
             // параметры обновляем раз в 5 секунд. Этого достаточно (я думаю)
             if (timerTicks % 10 === 0 )
-                appcore.getSspdDriverParameters(lDriverAddress);
+                appcore.updateDriverParameters(lDriverAddress, lDriverType);
         }
     }
 }

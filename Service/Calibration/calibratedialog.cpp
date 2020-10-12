@@ -42,6 +42,7 @@ void CalibrateDialog::on_pbStart_clicked()
 
 void CalibrateDialog::messagePerform(QString str)
 {
+    qDebug()<<"message:"<<str;
     ui->lStatus->setText(QString("Status: %1").arg(str));
 }
 

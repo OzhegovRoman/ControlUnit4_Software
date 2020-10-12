@@ -18,6 +18,7 @@ public:
     DriverPropertyReadOnly<CU4SDM1_Data_t>  * data() const;
 
     DriverProperty<float>                   * current() const;
+    DriverPropertyReadOnly<float>           * currentMonitor() const;
     DriverPropertyReadOnly<float>           * voltage() const;
     DriverPropertyReadOnly<float>           * counts() const;
     DriverProperty<CU4SDM1_Status_t>        * status() const;
@@ -39,6 +40,7 @@ public:
     DriverProperty<CU4SDM1_EEPROM_Const_t>  * eepromConst() const;
 
     DriverProperty<pair_t<float> >          * currentAdcCoeff() const;
+    DriverProperty<pair_t<float> >          * currentMonitorAdcCoeff() const;
     DriverProperty<pair_t<float> >          * voltageAdcCoeff() const;
     DriverProperty<pair_t<float> >          * currentDacCoeff() const;
     DriverProperty<pair_t<float> >          * cmpReferenceCoeff() const;
@@ -61,6 +63,7 @@ private:
     //DeviceData
     DriverPropertyReadOnly<CU4SDM1_Data_t>  * mDeviceData;
     DriverProperty<float>                   * mCurrent;
+    DriverPropertyReadOnly<float>           * mCurrentMonitor;
     DriverPropertyReadOnly<float>           * mVoltage;
     DriverPropertyReadOnly<float>           * mCounts;
     DriverProperty<CU4SDM1_Status_t>        * mDeviceStatus;
@@ -84,6 +87,7 @@ private:
     //Device EEPROM
     DriverProperty<CU4SDM1_EEPROM_Const_t>  * mEepromConst;
     DriverProperty<pair_t<float> >          * mCurrentAdcCoeff;
+    DriverProperty<pair_t<float> >          * mCurrentMonitorAdcCoeff;
     DriverProperty<pair_t<float> >          * mVoltageAdcCoeff;
     DriverProperty<pair_t<float> >          * mCurrentDacCoeff;
     DriverProperty<pair_t<float> >          * mCmpReferenceCoeff;

@@ -1,5 +1,5 @@
-import QtQuick 2.13
-import QtQuick.Controls 2.13
+import QtQuick 2.11
+import QtQuick.Controls 2.0
 
 import AppCore 1.0
 
@@ -12,6 +12,7 @@ Item {
     property int titleTextSize: dp(24)
     property string titleText: ""
     property int currentDriverAddress: -1
+    property string currentDriverType: ""
     property bool reconnectFlag: false
 
     Component.onCompleted: {
@@ -146,19 +147,14 @@ Item {
                     anchors.fill: devListItemButton
                     onClicked: {
                         drawer.close();
-                        if (type == "Temperature"){
-                            currentDriverAddress = address
-                            workPageLoader.setSource("./WorkForms/Temperature.qml");
+                        currentDriverAddress = address
+                        currentDriverType = type;
+                        if (type.includes("Temperature")){
+                            workPageLoader.setSource("./WorkForms/Data.qml");
                             titleText = qsTr("Temperature") + " (" + address + ")";
                         }
-                        if (type == "Temperature M1"){
-                            currentDriverAddress = address
-                            workPageLoader.setSource("./WorkForms/TemperatureM1.qml");
-                            titleText = qsTr("Temperature") + " (" + address + ")";
-                        }
-                        else if (type == "SSPD Driver"){
-                            currentDriverAddress = address
-                            workPageLoader.setSource("./WorkForms/Sspd.qml");
+                        else if (type.includes("SSPD Driver")){
+                            workPageLoader.setSource("./WorkForms/Data.qml");
                             titleText = qsTr("SSPD Driver") + " (" + address + ")";
                         }
                         else {

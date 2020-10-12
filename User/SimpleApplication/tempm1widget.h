@@ -4,12 +4,13 @@
 #include <QWidget>
 #include "Drivers/tempdriverm1.h"
 #include <QTimer>
+#include "commonwidget.h"
 
 namespace Ui {
 class TempM1Widget;
 }
 
-class TempM1Widget : public QWidget
+class TempM1Widget : public CommonWidget
 {
     Q_OBJECT
 
@@ -17,9 +18,9 @@ public:
     explicit TempM1Widget(QWidget *parent = nullptr);
     ~TempM1Widget();
 
-    void updateWidget();
-    void openWidget();
-    void closeWidget();
+    void updateWidget() override;
+    void openWidget() override;
+    void closeWidget() override;
 
     void setDriver(TempDriverM1 *driver);
 

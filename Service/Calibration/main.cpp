@@ -6,6 +6,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    qDebug()<<"Start";
     StartDialog w;
     MainDialog w2;
     if (w.exec()) {
