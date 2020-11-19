@@ -48,7 +48,6 @@ bool cAgilent34401A::isInited() const
 
 qreal cAgilent34401A::singleRead()
 {
-    qDebug()<<"agilent initialize";
     if (!isInited()) initialize();
     QString str;
     switch (mMode) {
@@ -88,11 +87,8 @@ qreal cAgilent34401A::singleRead()
 
     str.append("\r\n");
 
-    qDebug()<<"set mode:"<<str;
     writeAgilent(str);
 
-    qDebug()<<"read data";
     qreal data = readAgilent();
-    qDebug()<<"done"<<data;
     return data;
 }

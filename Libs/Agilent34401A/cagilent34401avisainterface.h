@@ -9,6 +9,9 @@
 #define MAX_SCPI_LEN    255
 #define DEFAULT_TMO     5000
 
+using lviWrite = ViStatus (*)(ViSession, ViBuf, ViUInt32, ViPUInt32);
+using lviRead  = ViStatus (*)(ViSession, ViBuf, ViUInt32, ViPUInt32);
+
 class cAgilent34401aVisaInterface : public cAgilent34401A
 {
     Q_OBJECT

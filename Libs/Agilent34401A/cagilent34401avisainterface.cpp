@@ -1,5 +1,6 @@
 #include "cagilent34401avisainterface.h"
 #include <QDebug>
+#include <QThread>
 
 cAgilent34401aVisaInterface::cAgilent34401aVisaInterface():
     mVisaInited{false}
@@ -38,8 +39,6 @@ quint64 cAgilent34401aVisaInterface::writeAgilent(QString str)
         return false;
     }
 
-
-    using lviWrite = ViStatus (*)(ViSession, ViBuf, ViUInt32, ViPUInt32);
     auto write = reinterpret_cast<lviWrite> (lib.resolve("viWrite"));
 
     ViStatus status = write(visaSession,
@@ -55,24 +54,28 @@ quint64 cAgilent34401aVisaInterface::writeAgilent(QString str)
 qreal cAgilent34401aVisaInterface::readAgilent()
 {
     ViByte rdBuff[MAX_SCPI_LEN];
-    long unsigned int retCount = 0;
+    unsigned long retCount = 0;
     QLibrary lib("visa32");
 
     if (!lib.load()){
         mVisaInited = false;
         return false;
     }
-    qDebug()<<"read agilent";
-    using lviRead = ViStatus (*) (ViSession, ViBuf, ViUInt32, ViPUInt32);
-//    typedef ViStatus (*lviRead) (ViSession, ViBuf, ViUInt32, ViPUInt32);
-    auto read = reinterpret_cast<lviRead> (lib.resolve("viRead"));
-    qDebug()<<"read function resolved:"<<read;
+    volatile lviRead read = reinterpret_cast<lviRead> (lib.resolve("viRead"));
+    if (!read)
+        return 0;
 
     ViStatus status = read(visaSession, rdBuff, MAX_SCPI_LEN, &retCount);
-    if (status> VI_SUCCESS){
+
+    if (status > VI_SUCCESS){
         qDebug()<<"error at read some data to agilent";
         return 0;
     }
+
+    // я не понимаю, какая то магическачя хрень
+    // без qDebuq() код вылетает в релизе в ошибку
+    qDebug();
+
     QString dataBuffer;
     dataBuffer.append(QByteArray(reinterpret_cast<char*> (rdBuff),
                                  static_cast<int>(retCount)));
@@ -100,7 +103,6 @@ bool cAgilent34401aVisaInterface::initialize()
     lviOpen open = reinterpret_cast<lviOpen> (lib.resolve("viOpen"));
     lviSetAttribute setAttribute = reinterpret_cast<lviSetAttribute> (lib.resolve("viSetAttribute"));
 
-    qDebug()<<"Try to Open session";
     ViStatus status = openDefaultRM(&rmSession);
     if (status > VI_SUCCESS) {
         qDebug()<<"error at opening default RM";
@@ -114,14 +116,10 @@ bool cAgilent34401aVisaInterface::initialize()
     }
 
 
-    qDebug()<<"Try to set attributes";
     /* set visa Format */
     status = setAttribute(visaSession, VI_ATTR_TMO_VALUE, DEFAULT_TMO);
-    qDebug()<<"status"<<status;
     status = setAttribute(visaSession, VI_ATTR_SUPPRESS_END_EN, VI_FALSE);
-    qDebug()<<"Try to set attributes";
     status = setAttribute(visaSession, VI_ATTR_SEND_END_EN, VI_FALSE);
-    qDebug()<<"Try to set attributes";
 
     return cAgilent34401A::initialize();
 }
