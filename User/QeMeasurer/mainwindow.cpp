@@ -56,13 +56,23 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->wCounterPlot->xAxis->setDateTimeFormat("hh:mm:ss");
     ui->wCounterPlot->xAxis->setAutoTickStep(false);
     ui->wCounterPlot->xAxis->setTickStep(10);
+//    ui->wCounterPlot->xAxis->setRange(0,50,Qt::AlignLeading);
     ui->wCounterPlot->axisRect()->setupFullAxesBox();
+
+    ui->wCounterPlot->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->wCounterPlot, &QCustomPlot::customContextMenuRequested,
+            this, &MainWindow::counterContextMenuRequest);
 
     ui->wMeasurerPlot->yAxis->setScaleType(QCPAxis::stLogarithmic);
     // setup policy and connect slot for context menu popup:
     ui->wMeasurerPlot->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->wMeasurerPlot, SIGNAL(customContextMenuRequested(QPoint)),
-            this, SLOT(contextMenuRequest(QPoint)));
+            this, SLOT(measurerContextMenuRequest(QPoint)));
+
+    ui->SB_YMin->setVisible(false);
+    ui->SB_YMax->setVisible(false);
+    ui->L_YMin->setVisible(false);
+    ui->L_YMax->setVisible(false);
 }
 
 MainWindow::~MainWindow()
@@ -71,9 +81,9 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::contextMenuRequest(QPoint pos)
+void MainWindow::measurerContextMenuRequest(QPoint pos)
 {
-    qDebug()<<"MainWindow::contextMenuRequest";
+    qDebug()<<"MainWindow::measurerContextMenuRequest";
 
     if (ui->wMeasurerPlot->graphCount() == 0) return;
 
@@ -84,7 +94,61 @@ void MainWindow::contextMenuRequest(QPoint pos)
     menu->addAction("Save data", this, SLOT(saveData()));
 
     menu->popup(ui->wMeasurerPlot->mapToGlobal(pos));
-}
+   }
+
+void MainWindow::counterContextMenuRequest(QPoint pos)
+   {
+   qDebug()<<"MainWindow::counterContextMenuRequest";
+
+//   if (ui->wCounterPlot->graphCount() == 0) return;
+
+   auto *menu = new QMenu(this);
+   menu->setAttribute(Qt::WA_DeleteOnClose);
+
+   QAction *autoScale = new QAction("Auto scale",menu);
+   autoScale->setCheckable(true);
+   autoScale->setChecked(isEnabledCounterAutoscale);
+
+   connect(autoScale,&QAction::triggered,this,&MainWindow::setAutoScaleCounterPlot);
+
+   menu->addAction("Clear", this, [=](){
+      ui->wCounterPlot->graph()->removeDataAfter(0);
+      ui->wCounterPlot->replot();
+      });
+
+   menu->addAction(autoScale);
+//   menu->addAction("Auto Limits", this, &MainWindow::setAutoScaleCounterPlot);
+
+   menu->popup(ui->wCounterPlot->mapToGlobal(pos));
+   }
+
+void MainWindow::setAutoScaleCounterPlot(bool isAuto)
+   {
+   qDebug()<<"MainWindow::setAutoScaleCounterPlot";
+
+   isEnabledCounterAutoscale = isAuto;
+   ui->SB_YMin->setVisible(!isAuto);
+   ui->SB_YMax->setVisible(!isAuto);
+   ui->L_YMin->setVisible(!isAuto);
+   ui->L_YMax->setVisible(!isAuto);
+   }
+
+void MainWindow::controlAutoScaleCounter()
+   {
+   if (isEnabledCounterAutoscale){
+      auto range = ui->wCounterPlot->yAxis->range();
+      ui->SB_YMin->setValue(range.lower);
+      ui->SB_YMax->setValue(range.upper);
+      }
+   else
+      {
+      if (ui->SB_YMin->value() >= ui->SB_YMax->value())
+         ui->SB_YMin->setValue(ui->SB_YMax->value() - 1);
+      if (ui->SB_YMax->value() <= ui->SB_YMin->value())
+         ui->SB_YMax->setValue(ui->SB_YMin->value() + 1);
+      ui->wCounterPlot->yAxis->setRange(ui->SB_YMin->value(),ui->SB_YMax->value());
+      }
+   }
 
 void MainWindow::on_pbInitialize_clicked()
 {
@@ -284,6 +348,8 @@ void MainWindow::updateCountsGraph()
     // make key axis range scroll with the data (at a constant range size of 8):
     //    ui->wCustomPlot->rescaleAxes();
     ui->wCounterPlot->xAxis->setRange(key+2, 30, Qt::AlignRight);
+    controlAutoScaleCounter();
+    ui->wCounterPlot->graph()->removeDataBefore(key-29);
     ui->wCounterPlot->replot();
 
     ui->lbCounts->setText(QString("Counts per second: %1").arg(counts));
@@ -834,4 +900,6 @@ void MainWindow::on_cbHFMode_clicked(bool checked)
     if (tmpSspdM1)
         tmpSspdM1->highFrequencyModeEnable()->setValueSync(checked, &ok);
     if (!ok) qDebug()<<"can't set HF Mode";
-}
+   }
+
+

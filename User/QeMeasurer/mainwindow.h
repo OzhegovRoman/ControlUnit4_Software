@@ -58,7 +58,10 @@ private slots:
     void deleteMeasureData();
     void saveData();
     void enableControlsAtMeasure(bool value);
-    void contextMenuRequest(QPoint pos);
+    void measurerContextMenuRequest(QPoint pos);
+    void counterContextMenuRequest(QPoint pos);
+    void setAutoScaleCounterPlot(bool isAuto);
+    void controlAutoScaleCounter();
     void on_pbSetI_clicked();
     void on_pbSetCmp_clicked();
     void on_cbShort_clicked(bool checked);
@@ -99,6 +102,10 @@ private:
     int mTimerCount_Interval;
     int mMode{};
     double mCurrentValue{};
+
+    bool isEnabledCounterAutoscale = true;
+
+
 };
 
 #endif // MAINWINDOW_H
