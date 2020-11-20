@@ -69,10 +69,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->wMeasurerPlot, SIGNAL(customContextMenuRequested(QPoint)),
             this, SLOT(measurerContextMenuRequest(QPoint)));
 
-    ui->SB_YMin->setVisible(false);
-    ui->SB_YMax->setVisible(false);
-    ui->L_YMin->setVisible(false);
-    ui->L_YMax->setVisible(false);
+   setAutoScaleCounterPlot(true);
 }
 
 MainWindow::~MainWindow()
@@ -109,15 +106,20 @@ void MainWindow::counterContextMenuRequest(QPoint pos)
    autoScale->setCheckable(true);
    autoScale->setChecked(isEnabledCounterAutoscale);
 
+   QAction *rangesVisibility = new QAction("Show Y range",menu);
+   rangesVisibility->setCheckable(true);
+   rangesVisibility->setChecked(isRangesVisible);
+
    connect(autoScale,&QAction::triggered,this,&MainWindow::setAutoScaleCounterPlot);
+   connect(rangesVisibility, &QAction::triggered, this, &MainWindow::setRangesVisible);
+
+   menu->addAction(autoScale);
+   menu->addAction(rangesVisibility);
 
    menu->addAction("Clear", this, [=](){
       ui->wCounterPlot->graph()->removeDataAfter(0);
       ui->wCounterPlot->replot();
       });
-
-   menu->addAction(autoScale);
-//   menu->addAction("Auto Limits", this, &MainWindow::setAutoScaleCounterPlot);
 
    menu->popup(ui->wCounterPlot->mapToGlobal(pos));
    }
@@ -127,10 +129,9 @@ void MainWindow::setAutoScaleCounterPlot(bool isAuto)
    qDebug()<<"MainWindow::setAutoScaleCounterPlot";
 
    isEnabledCounterAutoscale = isAuto;
-   ui->SB_YMin->setVisible(!isAuto);
-   ui->SB_YMax->setVisible(!isAuto);
-   ui->L_YMin->setVisible(!isAuto);
-   ui->L_YMax->setVisible(!isAuto);
+   setRangesVisible(!isAuto);
+   ui->SB_YMin->setDisabled(isAuto);
+   ui->SB_YMax->setDisabled(isAuto);
    }
 
 void MainWindow::controlAutoScaleCounter()
@@ -148,6 +149,15 @@ void MainWindow::controlAutoScaleCounter()
          ui->SB_YMax->setValue(ui->SB_YMin->value() + 1);
       ui->wCounterPlot->yAxis->setRange(ui->SB_YMin->value(),ui->SB_YMax->value());
       }
+   }
+
+void MainWindow::setRangesVisible(bool isVisible)
+   {
+   isRangesVisible = isVisible;
+   ui->SB_YMin->setVisible(isRangesVisible);
+   ui->SB_YMax->setVisible(isRangesVisible);
+   ui->L_YMin-> setVisible(isRangesVisible);
+   ui->L_YMax-> setVisible(isRangesVisible);
    }
 
 void MainWindow::on_pbInitialize_clicked()
