@@ -6,7 +6,8 @@ AbstractDriver::AbstractDriver(QObject *parent)
     : cuIODeviceImpl(parent)
     , mTimer(new QTimer(this))
 {
-
+    mTimer->setSingleShot(true);
+    connect(mTimer, &QTimer::timeout, this, [=](){mTimeOut = true;});
 }
 
 bool AbstractDriver::waitingAnswer()
@@ -41,7 +42,7 @@ void AbstractDriver::appendProperty(DriverProperty_p *property)
 
 void AbstractDriver::sendMsg(quint8 command, QByteArray data)
 {
-    mTimer->singleShot(mDriverTimeOut, this, [=](){mTimeOut = true;});//start(mDriverTimeOut);
+    mTimer->start(mDriverTimeOut);
     mTimeOut = false;
     mAnswerReceive = false;
     cuIODeviceImpl::sendMsg(command,

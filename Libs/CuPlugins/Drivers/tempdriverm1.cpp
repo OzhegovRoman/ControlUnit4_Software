@@ -76,7 +76,6 @@ bool TempDriverM1::setCurrent(uint8_t channel, float current)
         QByteArray ba;
         ba.append(channel);
         ba.append(reinterpret_cast<char*>(&current), sizeof(float));
-        qDebug()<<ba;
         mCurrentProperty->readWriteSync(mCurrentProperty->cmdSetter(), ba, &ok);
     }
     return ok;
@@ -131,7 +130,6 @@ bool TempDriverM1::readDefaultParams()
     QByteArray ba = mDefaultParams->readWriteSync(mDefaultParams->cmdGetter(), QByteArray(), &ok, 5);
     const int paramsize = sizeof(bool)+ sizeof(float);
     if (ok){
-        qDebug()<<ba.toHex();
         if (ba.size() != 4 * paramsize)
             return false;
         for (int i = 0; i< 4; ++i){
@@ -171,7 +169,6 @@ bool TempDriverM1::readEepromCoeffs()
     bool ok = false;
     QByteArray ba = mEepromCoeffs->readWriteSync(mEepromCoeffs->cmdGetter(), QByteArray(), &ok, 5);
     if (ok){
-        qDebug()<<ba.toHex();
         if (ba.size() != 8 * sizeof(pair_t<float>))
             return false;
         auto * p = reinterpret_cast<pair_t<float>*>(ba.data());
@@ -220,7 +217,7 @@ bool TempDriverM1::receiveTempTables()
             buffer.append(offset);
             buffer.append(static_cast<char>(count));
             bool ok = true;
-            mTempTableProperty->readWriteSync(mTempTableProperty->cmdGetter(), buffer, &ok, 5);
+            mTempTableProperty->readWriteSync(mTempTableProperty->cmdGetter(), buffer, &ok, 10);
             if (!ok) return false;
 
             auto* tmpData = reinterpret_cast<CU4TDM0V1_Temp_Table_Item_t*>(mTempTableProperty->data().data());
