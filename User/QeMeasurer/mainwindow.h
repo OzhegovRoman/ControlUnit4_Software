@@ -62,6 +62,7 @@ private slots:
     void counterContextMenuRequest(QPoint pos);
     void setAutoScaleCounterPlot(bool isAuto);
     void controlAutoScaleCounter();
+    void setRangesVisible(bool isVisible);
     void on_pbSetI_clicked();
     void on_pbSetCmp_clicked();
     void on_cbShort_clicked(bool checked);
@@ -104,6 +105,7 @@ private:
     double mCurrentValue{};
 
     bool isEnabledCounterAutoscale = true;
+    bool isRangesVisible = true;
 
 
 };
