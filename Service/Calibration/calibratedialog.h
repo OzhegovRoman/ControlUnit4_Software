@@ -34,6 +34,9 @@ public:
     CU4DriverType driverType() const;
     void setDriverType(const CU4DriverType &driverType);
 
+    int channel() const;
+    void setChannel(int channel);
+
 private slots:
     void on_pbStart_clicked();
     void messagePerform(QString str);
@@ -48,6 +51,7 @@ private:
     CommonDriver *mDriver{nullptr};
     cAgilent34401aVisaInterface *agilent;
     CommonCalibrator *mCalibrator;
+    int mChannel;
     void enableComponents(bool state);
 };
 

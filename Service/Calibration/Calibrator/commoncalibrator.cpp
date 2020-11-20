@@ -7,7 +7,7 @@
 CommonCalibrator::CommonCalibrator(QObject *parent)
     : QObject(parent)
     , mModeIndex (0)
-    , mPointCount (200)
+    , mPointCount (20) // вернуть на место 200
     , mCheckingPointCount(20)
     , stopFlag(false)
 {
@@ -190,6 +190,8 @@ void CommonCalibrator::run()
 
     if (stopFlag) return;
     lineRegressionCoeff tmpDacCoeff = lineRegression(points[0]);
+
+    qDebug()<<"tmpDacCoeff:"<<tmpDacCoeff.slope<<tmpDacCoeff.intercept;
     setNewDacEepromCoeffs(tmpDacCoeff);
     performAdcConsts();
     restoreEepromConsts();
