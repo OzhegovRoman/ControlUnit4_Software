@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
         device1->setAddress(2);
         device1->setLightOn(false);
 
-        device1->deviceInfo()->setModificationVersion("1");
+        device1->deviceInfo()->setModificationVersion("0");
         device1->deviceInfo()->setHardwareVersion("2");
         device1->deviceInfo()->setFirmwareVersion("0.1.2");
         device1->deviceInfo()->setDeviceType(DeviceInfo::dtSspdDevice);
