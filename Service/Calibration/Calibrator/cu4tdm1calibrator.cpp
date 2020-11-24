@@ -20,27 +20,28 @@ void CU4TDM1Calibrator::setChannel(int channel)
 
 void CU4TDM1Calibrator::setDriver(CommonDriver *driver)
 {
-    // придется создавать повторный драйвер и интерфейс для всей этой ерунды
-    if (mDriver){
-        mDriver->iOInterface()->deleteLater();
-        mDriver->deleteLater();
-    }
+//        // придется создавать повторный драйвер и интерфейс для всей этой ерунды
+//        if (mDriver){
+//            mDriver->iOInterface()->deleteLater();
+//            mDriver->deleteLater();
+//        }
 
-    auto * old_interface = qobject_cast<cuTcpSocketIOInterface*>(driver->iOInterface());
+//        auto * old_interface = qobject_cast<cuTcpSocketIOInterface*>(driver->iOInterface());
 
-    assert(old_interface != nullptr);
-    mDriver = new TempDriverM1(this);
-    mDriver->setDevAddress(driver->devAddress());
-    auto * interface = new cuTcpSocketIOInterface(this);
-    interface->setPort(old_interface->port());
-    interface->setAddress(old_interface->address());
-    mDriver->setIOInterface(interface);
+//        assert(old_interface != nullptr);
+//        mDriver = new TempDriverM1(this);
+//        mDriver->setDevAddress(driver->devAddress());
+//        auto * interface = new cuTcpSocketIOInterface(this);
+//        interface->setPort(old_interface->port());
+//        interface->setAddress(old_interface->address());
+//        mDriver->setIOInterface(interface);
+    mDriver = qobject_cast<TempDriverM1*>(driver);
 }
 
 QStringList CU4TDM1Calibrator::modeList()
 {
     return QStringList()<<"U mode"
-                       <<"I mode";
+                        <<"I mode";
 }
 
 QString CU4TDM1Calibrator::driverType()
@@ -70,10 +71,12 @@ void CU4TDM1Calibrator::saveEepromConsts()
         emit message("ERROR: can't receive/set calibration data");
         terminate();
     }
+    mLastEepromConst = mDriver->eepromCoeff(mChannel);
 }
 
 void CU4TDM1Calibrator::restoreEepromConsts()
 {
+    mDriver->setEepromCoeff(mChannel, mLastEepromConst);
     bool ok = mDriver->writeEepromCoeffs();
     if (!ok) {
         emit message("ERROR: can't receive/set calibration data");
@@ -104,7 +107,7 @@ void CU4TDM1Calibrator::setDacValue(double value)
 
 double CU4TDM1Calibrator::readAdcValue()
 {
-    if ((modeIndex() == 0) && (!mDriver->updateVoltage(mChannel)))
+    if ((modeIndex() == 0) && (mDriver->updateVoltage(mChannel)))
         return mDriver->currentVoltage(mChannel);
 
     // ток мы не измеряем, поэтому выводим 0ж
@@ -119,8 +122,10 @@ void CU4TDM1Calibrator::setNewDacEepromCoeffs(lineRegressionCoeff coeffs)
 
 void CU4TDM1Calibrator::setNewAdcEepromCoeffs(lineRegressionCoeff coeffs)
 {
-    mLastEepromConst.voltage.first  = coeffs.slope;
-    mLastEepromConst.voltage.second = coeffs.intercept;
+    if (modeIndex() == 0) { // только в режиме калибровки напряжения меняем коэффициенты
+        mLastEepromConst.voltage.first  = coeffs.slope;
+        mLastEepromConst.voltage.second = coeffs.intercept;
+    }
 }
 
 void CU4TDM1Calibrator::finish()

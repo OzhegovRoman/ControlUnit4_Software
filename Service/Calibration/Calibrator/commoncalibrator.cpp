@@ -7,7 +7,7 @@
 CommonCalibrator::CommonCalibrator(QObject *parent)
     : QObject(parent)
     , mModeIndex (0)
-    , mPointCount (20) // вернуть на место 200
+    , mPointCount (200)
     , mCheckingPointCount(20)
     , stopFlag(false)
 {
