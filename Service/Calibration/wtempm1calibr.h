@@ -31,6 +31,8 @@ public:
     virtual void setEeprom() override;
     virtual QJsonObject eepromToJson() override;
     virtual void eepromFromJson(QJsonObject data) override;
+
+    int currentChannel();
 };
 
 #endif // WTEMPM1CALIBR_H

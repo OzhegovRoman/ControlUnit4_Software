@@ -190,6 +190,8 @@ void CommonCalibrator::run()
 
     if (stopFlag) return;
     lineRegressionCoeff tmpDacCoeff = lineRegression(points[0]);
+
+    qDebug()<<"tmpDacCoeff:"<<tmpDacCoeff.slope<<tmpDacCoeff.intercept;
     setNewDacEepromCoeffs(tmpDacCoeff);
     performAdcConsts();
     restoreEepromConsts();
