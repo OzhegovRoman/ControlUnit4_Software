@@ -18,7 +18,6 @@ CppApplication{
     RC_Prepare.outputFileName:  name
     RC_Prepare.description:     "Quantum efficiecy measurement application"
     RC_Prepare.internalName:    "QEMeasurer"
-    RC_Prepare.isDefaultIcon: false
 
     Group {
         name: "Resources_tmp"
