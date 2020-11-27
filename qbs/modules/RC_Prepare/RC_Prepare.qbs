@@ -22,9 +22,11 @@ Module {
             cmd.sourceCode  =  function()  {
                 var  file  =  new  TextFile(input.filePath);
                 var  content  =  file.readAll();
+
+                var  iconPath = "/StandardSoftware/Icons/MainIcon" + ((!input.RC_Prepare.isDefaultIcon)?(input.RC_Prepare.internalName):"") + ".ico"
                 file.close();
 
-                content  =  content.replace(/%MainIconPath%/g, product.sourceDirectory+"/MainIcon.ico");
+                content  =  content.replace(/%MainIconPath%/g, project.sourceDirectory + iconPath);
                 content  =  content.replace(/%FILEVERSION%/g, project.softwareVersion.replace(/\./g,","));
                 content  =  content.replace(/%PRODUCTVERSION%/g, project.softwareVersion.replace(/\./g,","));
                 content  =  content.replace(/%FILEDESCRIPTION%/g, input.RC_Prepare.description);
