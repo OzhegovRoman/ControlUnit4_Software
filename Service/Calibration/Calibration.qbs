@@ -16,7 +16,6 @@ CppApplication{
     RC_Prepare.outputFileName:  name
     RC_Prepare.description:     "Calibration for Scontel's ControlUnits modules"
     RC_Prepare.internalName:    "Calibrator"
-    RC_Prepare.isDefaultIcon: false
     Group {
         name: "Resources_tmp"
         fileTags: "RC_TMPL"
