@@ -6,6 +6,7 @@ Module {
     property string outputFileName: ""
     property string description:    ""
     property string internalName:   ""
+    property bool isDefaultIcon: true
     Rule {
         condition: project.target === "win_x86" ||
                    project.target === "win_x86_64"
