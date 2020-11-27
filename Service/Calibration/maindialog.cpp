@@ -60,6 +60,11 @@ void MainDialog::on_pbCalibrate_clicked()
 {
     mCalibrate->setDriver(mDriver);
     mCalibrate->setDriverType(mDriverType);
+
+    auto tmpWidget = qobject_cast<wTempM1Calibr*>(mDriverWidget);
+    if (tmpWidget)
+        mCalibrate->setChannel(tmpWidget->currentChannel());
+
     int result = mCalibrate->exec();
     if (result == -1){
         //не смогли найти драйвера visa32

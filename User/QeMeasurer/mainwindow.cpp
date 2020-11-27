@@ -205,7 +205,11 @@ void MainWindow::on_pbInitialize_clicked()
         ui->cbHFMode->setVisible(true);
     }
 
-    assert(mDriver != nullptr);
+    if (mDriver == nullptr){
+        deviceType = dtUnknown;
+        mDriver = new CommonDriver(this);
+    }
+
 
     mDriver->setIOInterface(mInterface);
     mDriver->setDevAddress(driver.devAddress());
@@ -230,14 +234,22 @@ void MainWindow::on_pbInitialize_clicked()
             .arg(driver.deviceDescription()->currentValue())
             .arg(driver.UDID()->currentValue().toString());
 
+    ui->lbStatus->setText(tmpStr);
+
+    if (ui->lwActions->count()>4)
+        ui->lwActions->takeItem(4);
+
+    for (int i = 0; i<4; ++i) {
+        ui->lwActions->item(i)->setFlags(deviceType == dtUnknown ? Qt::NoItemFlags : Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+    }
+
+    if (deviceType == dtUnknown)
+        return;
+
     if (secretMode){
         tmpStr.append("<br>Secret Mode Activated");
         ui->lwActions->addItem("Secret Params");
         ui->lwActions->item(4)->setFont(ui->lwActions->item(3)->font());
-    }
-    ui->lbStatus->setText(tmpStr);
-    for (int i = 0; i<4; ++i) {
-        ui->lwActions->item(i)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
     }
 
     on_pbReadParams_clicked();

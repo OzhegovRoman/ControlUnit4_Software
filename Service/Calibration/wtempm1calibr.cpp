@@ -130,3 +130,8 @@ void wTempM1Calibr::eepromFromJson(QJsonObject data)
         mSupportWidget[i]->setTemperatureTable(mTable);
     }
 }
+
+int wTempM1Calibr::currentChannel()
+{
+    return ui->tabWidget->currentIndex();
+}

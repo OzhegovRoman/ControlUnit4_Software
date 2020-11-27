@@ -6,7 +6,6 @@ Module {
     property string outputFileName: ""
     property string description:    ""
     property string internalName:   ""
-    property bool isDefaultIcon: true
     Rule {
         condition: project.target === "win_x86" ||
                    project.target === "win_x86_64"
@@ -23,6 +22,7 @@ Module {
             cmd.sourceCode  =  function()  {
                 var  file  =  new  TextFile(input.filePath);
                 var  content  =  file.readAll();
+
                 var  iconPath = "/StandardSoftware/Icons/MainIcon" + ((!input.RC_Prepare.isDefaultIcon)?(input.RC_Prepare.internalName):"") + ".ico"
                 file.close();
 
