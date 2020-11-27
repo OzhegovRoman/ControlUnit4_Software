@@ -26,9 +26,6 @@ Module {
                 var  iconPath = "/StandardSoftware/Icons/MainIcon" + ((!input.RC_Prepare.isDefaultIcon)?(input.RC_Prepare.internalName):"") + ".ico"
                 file.close();
 
-//                console.log("iconPath");
-//                console.log(iconPath);
-
                 content  =  content.replace(/%MainIconPath%/g, project.sourceDirectory + iconPath);
                 content  =  content.replace(/%FILEVERSION%/g, project.softwareVersion.replace(/\./g,","));
                 content  =  content.replace(/%PRODUCTVERSION%/g, project.softwareVersion.replace(/\./g,","));
