@@ -8,5 +8,6 @@ Project {
         "cu-devmanager/cu-devmanager.qbs",
         "ServerSettings/ServerSettings.qbs",
         "cu-test/cu-test.qbs",
+        "cu-GeneralSetup/cu-GeneralSetup.qbs",
     ]
 }
