@@ -23,7 +23,7 @@ Module {
             cmd.sourceCode  =  function()  {
                 var  file  =  new  TextFile(input.filePath);
                 var  content  =  file.readAll();
-                var  iconPath = "/StandardSoftware/Icons/MainIcon" + ((!input.RC_Prepare.isDefaultIcon)?(input.RC_Prepare.internalName):"") + ".ico"
+                var  iconPath = "/Icons/MainIcon" + ((!input.RC_Prepare.isDefaultIcon)?(input.RC_Prepare.internalName):"") + ".ico"
                 file.close();
 
 //                console.log("iconPath");
