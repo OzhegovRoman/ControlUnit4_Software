@@ -16,6 +16,7 @@ QtApplication {
     RC_Prepare.outputFileName: name
     RC_Prepare.description: "Setting up Scontel's ControlUnit server"
     RC_Prepare.internalName: "ServerSettings"
+    RC_Prepare.isDefaultIcon: false
     Group {
         name: "Resources_tmp"
         fileTags: "RC_TMPL"
