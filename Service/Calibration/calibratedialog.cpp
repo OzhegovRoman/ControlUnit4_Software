@@ -7,12 +7,15 @@
 #include "Calibrator/cu4sdm0calibrator.h"
 #include "Calibrator/cu4sdm1calibrator.h"
 #include "Calibrator/cu4tdm0calibrator.h"
+#include "Calibrator/cu4tdm1calibrator.h"
 
 CalibrateDialog::CalibrateDialog(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::CalibrateDialog)
     , agilent(new cAgilent34401aVisaInterface())
     , mCalibrator(nullptr)
+    , mChannel(0)
+
 {
     ui->setupUi(this);
     connect(this, SIGNAL(rejected()), this, SLOT(stopCalibration()));
@@ -65,6 +68,16 @@ void CalibrateDialog::appendPoints(int graphIndex, double x, double y, bool upda
 void CalibrateDialog::stopCalibration()
 {
     mCalibrator->terminate();
+}
+
+int CalibrateDialog::channel() const
+{
+    return mChannel;
+}
+
+void CalibrateDialog::setChannel(int channel)
+{
+    mChannel = channel;
 }
 
 CU4DriverType CalibrateDialog::driverType() const
@@ -136,6 +149,10 @@ int CalibrateDialog::exec()
         break;
     case dtTempDriverM0:
         mCalibrator = new CU4TDM0Calibrator(this);
+        break;
+    case dtTempDriverM1:
+        mCalibrator = new CU4TDM1Calibrator(this);
+        qobject_cast<CU4TDM1Calibrator * >(mCalibrator)->setChannel(mChannel);
         break;
     default:
         mCalibrator = new CommonCalibrator(this);
