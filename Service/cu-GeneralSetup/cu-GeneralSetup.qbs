@@ -1,8 +1,12 @@
-﻿import qbs
+import qbs
 import qbs.TextFile
 import qbs.File
 
 CppApplication {
+    files: [
+        "appcore.cpp",
+        "appcore.h",
+    ]
     name: "cu-GeneralSetup"
     consoleApplication: false
 
