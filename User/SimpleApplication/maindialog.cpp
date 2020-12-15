@@ -177,7 +177,6 @@ bool MainDialog::createUI(const QString& deviceList)
             if (type.contains("CU4SDM0")){
                 //данное устройство - SspdDriver
                 tmpDriver = new SspdDriverM0(this);
-
                 ui->listWidget->addItem(QString("Sspd Driver\nAddress: %1").arg(address));
                 auto* widget = new SspdWidget(this);
                 widget->setDriver(qobject_cast<SspdDriverM0*>(tmpDriver));
@@ -186,7 +185,6 @@ bool MainDialog::createUI(const QString& deviceList)
             else if (type.contains("CU4SDM1")){
                 //данное устройство - SspdDriver
                 tmpDriver = new SspdDriverM1(this);
-
                 ui->listWidget->addItem(QString("Sspd Driver\nAddress: %1").arg(address));
                 auto* widget = new SspdWidgetM1(this);
                 widget->setDriver(qobject_cast<SspdDriverM1*>(tmpDriver));
@@ -207,6 +205,7 @@ bool MainDialog::createUI(const QString& deviceList)
 
                 auto* widget = new TempM1Widget(this);
                 widget->setDriver(qobject_cast<TempDriverM1*>(tmpDriver));
+                widget->setTempReset(new TemperatureRecycleInterface(qobject_cast<TempDriverM1*>(tmpDriver),&mDrivers,widget));
                 ui->stackedWidget->addWidget(widget);
             }
 
