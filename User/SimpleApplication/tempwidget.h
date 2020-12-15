@@ -2,34 +2,37 @@
 #define TEMPWIDGET_H
 
 #include <QWidget>
+
 #include "Drivers/tempdriverm0.h"
 #include "commonwidget.h"
 
+
+
 namespace Ui {
-class TempWidget;
-}
+   class TempWidget;
+   }
 
 class TempWidget : public CommonWidget
-{
-    Q_OBJECT
+   {
+   Q_OBJECT
 
 public:
-    explicit TempWidget(QWidget *parent = nullptr);
-    ~TempWidget() override;
+   explicit TempWidget(QWidget *parent = nullptr);
+   ~TempWidget() override;
 
-    void updateWidget() override;
-    void openWidget() override;
-    void closeWidget() override;
+   void updateWidget() override;
+   void openWidget() override;
+   void closeWidget() override;
 
-    void setDriver(TempDriverM0 *driver);
+   void setDriver(TempDriverM0 *driver);
 
 private slots:
-    void dataUpDated(CU4TDM0V1_Data_t data);
+   void dataUpDated(CU4TDM0V1_Data_t data);
 
 private:
-    Ui::TempWidget *ui;
-    TempDriverM0 *mDriver{nullptr};
-    bool mClosed{true};
-};
+   Ui::TempWidget *ui;
+   TempDriverM0 *mDriver{nullptr};
+   bool mClosed{true};
+   };
 
 #endif // TEMPWIDGET_H
