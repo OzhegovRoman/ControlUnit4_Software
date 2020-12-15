@@ -2,6 +2,9 @@
 #define TEMPERATURERESET_ADDON_H
 
 #include <QWidget>
+#include <QMouseEvent>
+#include <QDialog>
+#include <QLabel>
 
 #include "advancedrelaycontrol.h"
 #include "Drivers/tempdriverm1.h"
@@ -10,25 +13,34 @@ namespace Ui {
    class TemperatureResetAddon;
    }
 
-class TemperatureResetAddon : public QWidget
+class TemperatureResetAddon : public QDialog
    {
-   Q_OBJECT
+   Q_OBJECT   
 
-   QTimer *updateTimer;
+   bool mIsRuning = false;
+   uint32_t static const msecInMins = 60*1000;
+   TemperatureRecycleInterface* mTempRecycle;
+   QTimer* progressTimer;
+   QTimer* checkRelaysTimer;
+   const uint16_t msecToPress = 600;
+   uint8_t currentProgress;
 
-   Addon_TemperatureRecycle* tempRecycleAddon;
-//   AdvancedRelayControl* mRelay5v;
-//   AdvancedRelayControl* mRelay25v;
+   void mousePressEvent(QMouseEvent* event);
+   void mouseReleaseEvent(QMouseEvent* event);
 
 public:
-   explicit TemperatureResetAddon(TempDriverM1 *tDriver, QVector<CommonDriver*> drivers, QWidget *parent = nullptr);
-   ~TemperatureResetAddon();
+   explicit TemperatureResetAddon(TemperatureRecycleInterface *tempRecycle, QWidget *parent = nullptr);
+   ~TemperatureResetAddon();  
+
+   void setDriver(TempDriverM1 *driver);
+   void setTempRecycle(TemperatureRecycleInterface *value);
+   void toggleIndicator(QLabel* label, bool isEnabled);
+   void toggleInterface(bool isEnabled);
 
 public slots:
-   void updateElapsedTime();
-   void updateRelayState();
-//   void setRelay(bool isOn);
-//   void setupReset();
+   void updateProgressBar();
+   void progressBarClicked();
+   void changeAlgoritmState(bool isRuning);
 
 private:
    Ui::TemperatureResetAddon *ui;
