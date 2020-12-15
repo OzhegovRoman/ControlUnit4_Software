@@ -4,6 +4,7 @@ import qbs.Process
 
 CppApplication{
     name: "cu-simpleapp"
+    consoleApplication: false
 
     // preparation RC_File
     Depends {name: "RC_Prepare"}

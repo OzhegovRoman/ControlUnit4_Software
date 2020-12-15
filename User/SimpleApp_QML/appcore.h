@@ -64,13 +64,13 @@ private:
     QStringList mControlUnitsList;
 };
 
-static QObject *appCoreProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
-{
-    Q_UNUSED(engine)
-    Q_UNUSED(scriptEngine)
+//static QObject *appCoreProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
+//{
+//    Q_UNUSED(engine)
+//    Q_UNUSED(scriptEngine)
 
-    auto *singletonClass = new AppCore();
-    return singletonClass;
-}
+//    auto *singletonClass = new AppCore();
+//    return singletonClass;
+//}
 
 #endif // APPCORE_H

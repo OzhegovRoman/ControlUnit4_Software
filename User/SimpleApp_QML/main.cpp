@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 
     QCoreApplication::setApplicationName("cu-simpleapp_qml");
     //TODO: изменить версию софта
-    QCoreApplication::setApplicationVersion(QString("1.1.6"));
+    QCoreApplication::setApplicationVersion(QString(VERSION));
 
     QCommandLineParser parser;
     parser.setApplicationDescription("Simple application standard monitor support for Scontel\'s control unit (CU4) NOW with QtQuick graphics interface");
@@ -34,7 +34,6 @@ int main(int argc, char *argv[])
     parser.process(app);
 
     qmlRegisterType<AppCore>("AppCore", 1, 0, "AppCore");
-    //    qmlRegisterSingletonType<AppCore>("AppCore", 1, 0, "AppCore", appCoreProvider);
     qmlRegisterType<TcpIpValidator>("TcpIpValidator", 1, 0, "TcpIpValidator");
     qmlRegisterType<DeviceModel>("AppCore", 1, 0, "DeviceModel");
     qmlRegisterUncreatableType<DeviceList>("AppCore", 1, 0, "DeviceList",
