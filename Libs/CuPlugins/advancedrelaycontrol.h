@@ -138,4 +138,24 @@ signals:
 
    };
 
+
+class Averager{
+   uint32_t mMaxLen;
+   QList<double> buffer;
+   QList<double> avgBuffer;
+   double mSum;
+   double mTrend;
+   void calcTrend(double val);
+
+public:
+   Averager(uint32_t maxLen);
+
+   double average(double val);
+
+   double getAvg() const;
+   double getTrend() const;
+   void reset();
+   void setMaxLen(const uint32_t &maxLen);
+   };
+
 #endif // ADVANCEDRELAYCONTROL_H

@@ -13,10 +13,13 @@ TempM1Widget::TempM1Widget(QWidget *parent)
 
    mTimer.setSingleShot(true);
    connect(&mTimer, &QTimer::timeout, this, &TempM1Widget::onTimerTicker);
+
+   connect(&watcher, &QTimer::timeout, this, &TempM1Widget::checkTemperature);
    }
 
 TempM1Widget::~TempM1Widget()
    {
+   saveSettings();
    delete ui;
    }
 
@@ -28,6 +31,7 @@ void TempM1Widget::updateWidget()
 void TempM1Widget::openWidget()
    {
    mDriver->readDefaultParams();
+   watcher.start(1000);
    onTimerTicker();
    }
 
@@ -44,6 +48,17 @@ void TempM1Widget::setTempReset(TemperatureRecycleInterface *value)
    connect(ui->PB_RecycleTemp,&QPushButton::clicked,tempReset,[=](){
       tempReset->show();
       });
+   connect(tempReset,&TemperatureResetAddon::aborted, ui->CB_TemperatureControl, &QCheckBox::setChecked);
+   connect(ui->CB_TemperatureControl, &QCheckBox::toggled, &watcher, [=](bool isChecked){
+      if (isChecked){
+         tempReset->resetAvg();
+         watcher.start();
+         }
+      else
+         watcher.stop();
+      });
+   ui->CB_SelectedTempSensor->setCurrentIndex(tempReset->settings->tempSensorIndex);
+   ui->DSB_TempThreshold->setValue(tempReset->settings->autoRecycleTreshold);
    }
 
 void TempM1Widget::setDriver(TempDriverM1 *driver)
@@ -51,10 +66,39 @@ void TempM1Widget::setDriver(TempDriverM1 *driver)
    mDriver = driver;
    }
 
+void TempM1Widget::checkTemperature()
+   {
+   mDriver->updateTemperature();
+   for (int i = 0; i < 4; ++i) {
+      tempReset->avg[i].average(mDriver->currentTemperature(i));
+      }
+   tempReset->toggleIndicator(ui->L_isOperating, (tempReset->avg[0].getAvg() < 10));
+
+   if (ui->CB_TemperatureControl->isChecked()
+       && tempReset->avg[0].getAvg() < tempReset->settings->workTemperatureT1
+       && tempReset->getRecycleState() == TRS_Idle)
+      {
+      uint8_t sensorIdx = ui->CB_SelectedTempSensor->currentText().right(1).toInt();
+      if (tempReset->avg[sensorIdx].getAvg() > ui->DSB_TempThreshold->value()
+          && tempReset->avg[sensorIdx].getTrend() > 0){
+         tempReset->showPreStartMsg();
+         }
+      }
+   }
+
+void TempM1Widget::saveSettings()
+   {
+   tempReset->settings->tempSensorIndex = ui->CB_SelectedTempSensor->currentIndex();
+   tempReset->settings->autoRecycleTreshold = ui->DSB_TempThreshold->value();
+   tempReset->saveSettings();
+   tempReset->settings->saveSettings();
+   }
+
 void TempM1Widget::onTimerTicker()
    {
    QString strTemperature, strVoltage;
-   mDriver->updateTemperature();
+   if (!ui->CB_TemperatureControl->isChecked())
+      mDriver->updateTemperature();
    mDriver->updateVoltage();
 
    for (int i = 0; i < 4; ++i){
@@ -63,6 +107,7 @@ void TempM1Widget::onTimerTicker()
          strVoltage += QString("U%1: %2V\n").arg(i) .arg(mDriver->currentVoltage(i), 0, 'g', 5);
          }
       }
+
    strTemperature.chop(1);
    strVoltage.chop(1);
    ui->lbTemperature->setText(strTemperature);
@@ -72,6 +117,7 @@ void TempM1Widget::onTimerTicker()
    ui->cb25V->setChecked(mDriver->relaysStatus()->currentValue()[0]);
    ui->cb5V->setChecked(mDriver->relaysStatus()->currentValue()[1]);
 
+//   checkTemperature();
    mTimer.start(1000);
    }
 

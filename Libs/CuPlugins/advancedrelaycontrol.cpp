@@ -343,10 +343,6 @@ uint32_t TemperatureRecycleInterface::getElapsed()
    return rv;
    }
 
-
-
-
-
 uint8_t TemperatureRecycleInterface::reportProgress()
    {
    uint32_t relay5Elapsed = mRelay5v->getElapsed();
@@ -356,5 +352,55 @@ uint8_t TemperatureRecycleInterface::reportProgress()
 
    //   emit stateChanged(currentState);
    emit progress(currentProgress);
+   }
+
+void Averager::setMaxLen(const uint32_t &maxLen)
+   {
+   mMaxLen = maxLen;
+   }
+
+Averager::Averager(uint32_t maxLen):mMaxLen(maxLen)
+   {
+
+   }
+
+double Averager::average(double val)
+   {
+   double rv = 0;
+   mSum+=val;
+   buffer.append(val);
+   if (buffer.count() > mMaxLen){
+      mSum -= buffer.takeLast();
+      }
+   rv = getAvg();
+   if (buffer.count() > (mMaxLen/2))
+      calcTrend(rv);
+
+   return rv;
+   }
+
+double Averager::getTrend() const
+   {
+   return mTrend;
+   }
+
+void Averager::calcTrend(double val)
+   {
+   avgBuffer.append(val);
+   if (avgBuffer.count() > mMaxLen){
+      buffer.removeLast();
+      }
+   mTrend = avgBuffer.first() - avgBuffer.last();
+   }
+
+double Averager::getAvg() const {
+   return mSum/buffer.count();
+   }
+
+void Averager::reset(){
+   buffer.clear();
+   avgBuffer.clear();
+   mSum = 0;
+   mTrend = 0;
    }
 
