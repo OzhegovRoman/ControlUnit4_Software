@@ -1,6 +1,7 @@
 #include <QTime>
 #include <QDebug>
 #include <QMessageBox>
+#include <QPushButton>
 
 #include "tempreset_addon.h"
 #include "ui_tempreset_addon.h"
@@ -10,6 +11,10 @@ TemperatureResetAddon::TemperatureResetAddon(TemperatureRecycleInterface *tempRe
    ui(new Ui::TemperatureResetAddon)
    {
    ui->setupUi(this);
+
+   settings = new TemperatureControlSettings();
+   applySettings();
+
    setWindowTitle("Temperature recycle settings");
 
    setTempRecycle(tempRecycle);
@@ -18,7 +23,24 @@ TemperatureResetAddon::TemperatureResetAddon(TemperatureRecycleInterface *tempRe
 
 TemperatureResetAddon::~TemperatureResetAddon()
    {
+   saveSettings();
+   settings->saveSettings();
+   delete settings;
    delete ui;
+   }
+
+void TemperatureResetAddon::saveSettings()
+   {
+   settings->heatingMins         = ui->SB_HeatingTime->value();
+   settings->thermalizationMins  = ui->SB_ThermalizationTime->value();
+   settings->coolingDownMins     = ui->SB_CoolingDown->value();
+   }
+
+void TemperatureResetAddon::resetAvg()
+   {
+   for (int i = 0; i < 4; ++i) {
+      avg[i].reset();
+      }
    }
 
 void TemperatureResetAddon::setTempRecycle(TemperatureRecycleInterface *value)
@@ -31,10 +53,10 @@ void TemperatureResetAddon::setTempRecycle(TemperatureRecycleInterface *value)
    checkRelaysTimer->start();
    connect(checkRelaysTimer,&QTimer::timeout,this,[=](){
       if (mIsRuning && !mTempRecycle->checkIntegrity()){
+         emit aborted(false);
          changeAlgoritmState(false);
          QMessageBox::critical(this,"Recycle procedure aborted","The temperature module relays have been modified externally.");
          }
-
       toggleIndicator(ui->L_25vIndicator,mTempRecycle->getRelayState(cRelaysStatus::ri25V));
       toggleIndicator(ui->L_5vIndicator,mTempRecycle->getRelayState(cRelaysStatus::ri5V));
       });
@@ -68,6 +90,54 @@ void TemperatureResetAddon::toggleInterface(bool isEnabled)
    ui->SB_CoolingDown->setEnabled(isEnabled);
    ui->SB_ThermalizationTime->setEnabled(isEnabled);
    ui->SB_HeatingTime->setEnabled(isEnabled);
+   }
+
+TemperatureRecycleState TemperatureResetAddon::getRecycleState()
+   {
+   return mTempRecycle->getCurrentState();
+   }
+
+void TemperatureResetAddon::showPreStartMsg()
+   {
+   QMessageBox msgBox;
+   msgBox.setWindowFlags(Qt::Window | Qt::WindowTitleHint);
+
+   QTimer countDown;
+   int counter = 9;
+   connect(&countDown,&QTimer::timeout, [&msgBox, &counter, &countDown]()->void {
+      if (--counter < 0){
+         countDown.stop();
+         msgBox.defaultButton()->click();
+      }else{
+         msgBox.setText(QString("Auto recycle starts in  %1 seconds").arg(counter));
+         }
+      });
+
+   msgBox.setWindowTitle("Recycle starting");
+   msgBox.setText("Auto recycle starts in 10 seconds");
+   msgBox.setStandardButtons(QMessageBox::Ok| QMessageBox::Abort);
+   msgBox.setDefaultButton(QMessageBox::Ok);
+   auto buttonY = msgBox.button(QMessageBox::Ok);
+   buttonY->setText("Start Now");
+   countDown.start(1000);
+   int ret = msgBox.exec();
+   switch (ret){
+      case QMessageBox::Ok: {
+         show();
+         changeAlgoritmState(true);
+         } break;
+      case QMessageBox::Abort: {
+         aborted(false);
+         }
+      default: break;
+      }
+   }
+
+void TemperatureResetAddon::applySettings()
+   {
+   ui->SB_HeatingTime->setValue(settings->heatingMins);
+   ui->SB_ThermalizationTime->setValue(settings->thermalizationMins);
+   ui->SB_CoolingDown->setValue(settings->coolingDownMins);
    }
 
 void TemperatureResetAddon::mousePressEvent(QMouseEvent *event)
@@ -119,6 +189,8 @@ void TemperatureResetAddon::updateProgressBar()
 
 void TemperatureResetAddon::progressBarClicked()
    {
+   if (mTempRecycle->getCurrentState() != TRS_Idle)
+      emit aborted(false);
    changeAlgoritmState(mTempRecycle->getCurrentState() == TRS_Idle);
    ui->progressBar->setStyleSheet("");
    }

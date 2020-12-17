@@ -28,6 +28,8 @@ public:
 
     void setTempReset(TemperatureRecycleInterface *value);
     void setDriver(TempDriverM1 *driver);
+    void checkTemperature();
+    void saveSettings();
 
 public slots:
     void onTimerTicker();
@@ -41,6 +43,7 @@ private:
     TempDriverM1 *mDriver{nullptr};
     bool mClosed{true};
     QTimer mTimer;
+    QTimer watcher;
 };
 
 #endif // TEMPM1WIDGET_H
