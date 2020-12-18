@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QSettings>
 
 #include "tempreset_addon.h"
 #include "ui_tempreset_addon.h"
@@ -12,7 +13,6 @@ TemperatureResetAddon::TemperatureResetAddon(TemperatureRecycleInterface *tempRe
    {
    ui->setupUi(this);
 
-   settings = new TemperatureControlSettings();
    applySettings();
 
    setWindowTitle("Temperature recycle settings");
@@ -24,16 +24,15 @@ TemperatureResetAddon::TemperatureResetAddon(TemperatureRecycleInterface *tempRe
 TemperatureResetAddon::~TemperatureResetAddon()
    {
    saveSettings();
-   settings->saveSettings();
-   delete settings;
    delete ui;
    }
 
 void TemperatureResetAddon::saveSettings()
    {
-   settings->heatingMins         = ui->SB_HeatingTime->value();
-   settings->thermalizationMins  = ui->SB_ThermalizationTime->value();
-   settings->coolingDownMins     = ui->SB_CoolingDown->value();
+   QSettings settings("Scontel", "cu-simpleapp");
+   settings.setValue("heatingMins", ui->SB_HeatingTime->value());
+   settings.setValue("thermalizationMins", ui->SB_ThermalizationTime->value());
+   settings.setValue("coolingDownMins", ui->SB_CoolingDown->value());
    }
 
 void TemperatureResetAddon::resetAvg()
@@ -135,9 +134,10 @@ void TemperatureResetAddon::showPreStartMsg()
 
 void TemperatureResetAddon::applySettings()
    {
-   ui->SB_HeatingTime->setValue(settings->heatingMins);
-   ui->SB_ThermalizationTime->setValue(settings->thermalizationMins);
-   ui->SB_CoolingDown->setValue(settings->coolingDownMins);
+   QSettings settings("Scontel", "cu-simpleapp");
+   ui->SB_HeatingTime->setValue(settings.value("heatingMins",12).toUInt());
+   ui->SB_ThermalizationTime->setValue(settings.value("thermalizationMins",10).toUInt());
+   ui->SB_CoolingDown->setValue(settings.value("coolingDownMins",25).toUInt());
    }
 
 void TemperatureResetAddon::mousePressEvent(QMouseEvent *event)
