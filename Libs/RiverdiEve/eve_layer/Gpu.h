@@ -60,6 +60,10 @@ constexpr uint32_t COLOR_RGB(uint32_t red, uint32_t green, uint32_t blue) {
     return ((4UL<<24)|(((red)&255UL)<<16)|(((green)&255UL)<<8)|(((blue)&255UL)<<0));
 }
 
+constexpr uint32_t COLOR(uint32_t color) {
+    return ((4UL<<24)|(0x00ffffff&color));
+}
+
 constexpr uint32_t BITMAP_HANDLE(uint32_t handle) {
     return ((5UL<<24)|(((handle)&31UL)<<0));
 }

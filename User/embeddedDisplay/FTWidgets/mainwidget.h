@@ -4,6 +4,9 @@
 #include "ftwidget.h"
 #include "../DataHarvester/dataharvester.h"
 #include "riverdieve.h"
+enum Colors{
+    Inactive = 0xbebebe,
+};
 
 class MainWidget: public FTWidget
 {

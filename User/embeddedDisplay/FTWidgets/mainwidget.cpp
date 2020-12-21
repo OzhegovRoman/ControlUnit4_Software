@@ -191,7 +191,7 @@ void MainWidget::loop()
                 // отрисовываем информацию по SSPD
                 if (!dataInfo[i+mTopIndex].channelInited || sspddriver->status()->currentValue().stShorted)
                     // серый
-                    App_WrCoCmd_Buffer(host(), COLOR_RGB(135, 135, 135));
+                    App_WrCoCmd_Buffer(host(), COLOR(Colors::Inactive));
                 else
                     if (qAbs(static_cast<double>(sspddriver->voltage()->currentValue()))<0.02){
                         // норм - белый
@@ -230,7 +230,7 @@ void MainWidget::loop()
                 // отрисовываем информацию по SSPD
                 if (!dataInfo[i+mTopIndex].channelInited || sspddriver->status()->currentValue().stShorted)
                     // серый
-                    App_WrCoCmd_Buffer(host(), COLOR_RGB(135, 135, 135));
+                    App_WrCoCmd_Buffer(host(), COLOR(Colors::Inactive));
                 else
                     if (qAbs(static_cast<double>(sspddriver->voltage()->currentValue()))<0.02){
                         // норм - белый
@@ -276,7 +276,7 @@ void MainWidget::loop()
                             arg(static_cast<double>(tempdriver->temperature()->currentValue()), 4, 'f', 2);
                 }
                 else {
-                    App_WrCoCmd_Buffer(host(), COLOR_RGB(135, 135, 135));
+                    App_WrCoCmd_Buffer(host(), COLOR(Colors::Inactive));
                     tempStr = "Not connected";
                 }
                 Gpu_CoCmd_Text(host(), 16, top + 16, 28, OPT_CENTERY,
@@ -341,7 +341,7 @@ void MainWidget::loop()
         }
         else
             //серый
-            App_WrCoCmd_Buffer(host(), COLOR_RGB(135, 135, 135));
+            App_WrCoCmd_Buffer(host(), COLOR(Colors::Inactive));
 
         App_WrCoCmd_Buffer(host(), BEGIN(POINTS));
         App_WrCoCmd_Buffer(host(), VERTEX2II(wideList ? 456: 420, static_cast<uint16_t>(top + 16), 0, 0));
