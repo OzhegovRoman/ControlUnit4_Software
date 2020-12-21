@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QTime>
 #include <QDialog>
+#include <QSettings>
 
 
 TempM1Widget::TempM1Widget(QWidget *parent)
@@ -19,6 +20,7 @@ TempM1Widget::TempM1Widget(QWidget *parent)
 
 TempM1Widget::~TempM1Widget()
    {
+   tempReset->saveSettings();
    saveSettings();
    delete ui;
    }
@@ -57,8 +59,9 @@ void TempM1Widget::setTempReset(TemperatureRecycleInterface *value)
       else
          watcher.stop();
       });
-   ui->CB_SelectedTempSensor->setCurrentIndex(tempReset->settings->tempSensorIndex);
-   ui->DSB_TempThreshold->setValue(tempReset->settings->autoRecycleTreshold);
+   QSettings settings("Scontel", "cu-simpleapp");
+   ui->CB_SelectedTempSensor->setCurrentIndex(settings.value("tempSensorIndex",0).toUInt());
+   ui->DSB_TempThreshold->setValue(settings.value("autoRecycleTreshold",1.5).toReal());
    }
 
 void TempM1Widget::setDriver(TempDriverM1 *driver)
@@ -74,8 +77,9 @@ void TempM1Widget::checkTemperature()
       }
    tempReset->toggleIndicator(ui->L_isOperating, (tempReset->avg[0].getAvg() < 10));
 
+   QSettings settings("Scontel", "cu-simpleapp");
    if (ui->CB_TemperatureControl->isChecked()
-       && tempReset->avg[0].getAvg() < tempReset->settings->workTemperatureT1
+       && tempReset->avg[0].getAvg() < settings.value("workTemperatureT1",10).toReal()
        && tempReset->getRecycleState() == TRS_Idle)
       {
       uint8_t sensorIdx = ui->CB_SelectedTempSensor->currentText().right(1).toInt();
@@ -88,10 +92,11 @@ void TempM1Widget::checkTemperature()
 
 void TempM1Widget::saveSettings()
    {
-   tempReset->settings->tempSensorIndex = ui->CB_SelectedTempSensor->currentIndex();
-   tempReset->settings->autoRecycleTreshold = ui->DSB_TempThreshold->value();
-   tempReset->saveSettings();
-   tempReset->settings->saveSettings();
+   QSettings settings("Scontel", "cu-simpleapp");
+   if (settings.value("workTemperatureT1",-1).toInt() == -1)
+      settings.setValue("workTemperatureT1",10.);
+   settings.setValue("tempSensorIndex", ui->CB_SelectedTempSensor->currentIndex());
+   settings.setValue("autoRecycleTreshold", ui->DSB_TempThreshold->value());
    }
 
 void TempM1Widget::onTimerTicker()
