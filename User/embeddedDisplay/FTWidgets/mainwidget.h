@@ -4,9 +4,7 @@
 #include "ftwidget.h"
 #include "../DataHarvester/dataharvester.h"
 #include "riverdieve.h"
-enum Colors{
-    Inactive = 0xbebebe,
-};
+#include "../compactdraw.h"
 
 class MainWidget: public FTWidget
 {
@@ -38,6 +36,7 @@ private:
         bool channelUpdated;
         bool channelError;
     };
+    CompactDraw* drawer;
 
     DataHarvester* mHarvester;
     quint16 dlOffset;
