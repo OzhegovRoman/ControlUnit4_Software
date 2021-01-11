@@ -240,10 +240,10 @@ void SspdWidgetM1::loop()
       App_WrCoCmd_Buffer(host(), TAG(BT_Minus));
       Gpu_CoCmd_Button(host(), 332, 215, 65, 45, 31, buttonTag == BT_Minus ? OPT_FLAT : 0, "-");
 
-      Gpu_CoCmd_FgColor(host(), 0xE67F43);
+      Gpu_CoCmd_FgColor(host(), 0xE67F43); //orange point color
 
       bool tmpBool = mDriver->status()->currentValue().stShorted;
-      CD::sliderButton(344,88,"Short""\xFF""Open",BT_Short,tmpBool,false);
+      CD::sliderButton(344,88,"Short""\xFF""Open",BT_Short,tmpBool,111,false);
 
       tmpBool = mDriver->status()->currentValue().stAmplifierOn;
       CD::sliderButton(344,121,"Amp""\xFF""Amp",BT_Amp,tmpBool);

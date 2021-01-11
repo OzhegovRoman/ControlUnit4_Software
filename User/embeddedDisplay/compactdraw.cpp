@@ -1,5 +1,6 @@
 #include "compactdraw.h"
 #include <QString>
+#include <QTimer>
 #include <QDebug>
 
 ThemeType CompactDraw::themeType = TT_Light;
@@ -59,7 +60,7 @@ void CompactDraw::headPanel(QString title, QString subtitle)
 
    App_WrCoCmd_Buffer(mHost, BEGIN(RECTS));
    //   App_WrCoCmd_Buffer(mHost, COLOR(0xC8CCCCC));
-   App_WrCoCmd_Buffer(mHost, COLOR(0xff0000));
+//   App_WrCoCmd_Buffer(mHost, COLOR(0xff0000));
    App_WrCoCmd_Buffer(mHost, VERTEX2II(0,0,0,0));
    App_WrCoCmd_Buffer(mHost, VERTEX2II(480,66,0,0));
    App_WrCoCmd_Buffer(mHost, COLOR(0));
@@ -83,8 +84,7 @@ void CompactDraw::mainBackground()
    App_WrCoCmd_Buffer(mHost, SCISSOR_XY(0,66));
 
    App_WrCoCmd_Buffer(mHost, BEGIN(RECTS));
-   //   App_WrCoCmd_Buffer(mHost, COLOR(0xC8CCCCC));
-   App_WrCoCmd_Buffer(mHost, COLOR(0xff0000));
+
    App_WrCoCmd_Buffer(mHost, VERTEX2II(0,66,0,0));
    App_WrCoCmd_Buffer(mHost, VERTEX2II(480,271,0,0));
    Gpu_CoCmd_Gradient(mHost,100,66,CD::themeColor(Grad_Top),
@@ -93,6 +93,7 @@ void CompactDraw::mainBackground()
    App_WrCoCmd_Buffer(mHost, SCISSOR_XY(0,0));
    App_WrCoCmd_Buffer(mHost, END());
 
+   App_WrCoCmd_Buffer(mHost, LINE_WIDTH(16));
    App_WrCoCmd_Buffer(mHost, COLOR(CD::themeColor(other)));  //info: horisontal Line (upper part)
    App_WrCoCmd_Buffer(mHost, BEGIN(LINES));
    App_WrCoCmd_Buffer(mHost, VERTEX2II(0, 68, 0, 0));
@@ -136,16 +137,16 @@ void CompactDraw::simpleListHeader(QStringList rows, uint16_t right)
    App_WrCoCmd_Buffer(mHost, LINE_WIDTH(16));
    App_WrCoCmd_Buffer(mHost, COLOR(CD::themeColor(TextInactive)));
    App_WrCoCmd_Buffer(mHost, BEGIN(LINES));
-   for (int i = 0; i < rows.count(); ++i) {
-      App_WrCoCmd_Buffer(mHost, VERTEX2II(18,  118+(i*increment), 0, 0));
-      App_WrCoCmd_Buffer(mHost, VERTEX2II(460, 118+(i*increment), 0, 0));
+   for (int i = 0; i < rows.count()-1; ++i) {
+      App_WrCoCmd_Buffer(mHost, VERTEX2II(18,  114+(i*increment), 0, 0));
+      App_WrCoCmd_Buffer(mHost, VERTEX2II(460, 114+(i*increment), 0, 0));
       }
    App_WrCoCmd_Buffer(mHost, END());
 
    App_WrCoCmd_Buffer(mHost, COLOR(CD::themeColor(TextNormal)));
 
    for (int i = 0; i < rows.count(); ++i) {
-      Gpu_CoCmd_Text(mHost, 18, 100+(i*increment), 29, OPT_CENTERY, rows.at(i).toLocal8Bit());
+      Gpu_CoCmd_Text(mHost, 18, 96+(i*increment), 29, OPT_CENTERY, rows.at(i).toLocal8Bit());
       }
    }
 
@@ -162,7 +163,7 @@ void CompactDraw::toggleButton(uint16_t x, uint16_t y, uint16_t w, uint16_t h, b
 
 void CompactDraw::sliderButton(uint16_t left, uint16_t top, const char* labels, uint16_t buttonTag, bool isEnabled, uint8_t width, bool isNormalyEnabled)
    {
-   Gpu_CoCmd_BgColor(mHost, (!(isEnabled^isNormalyEnabled)) ? 0xe6b08c : themeColor(Colors::InnerArea));
+   Gpu_CoCmd_BgColor(mHost, (!(isEnabled^isNormalyEnabled)) ? themeColor(Colors::TextFail) : themeColor(Colors::InnerArea));
    App_WrCoCmd_Buffer(mHost, TAG(buttonTag));
    Gpu_CoCmd_Toggle(mHost, left, top, width, 27, 0, (!(isEnabled^isNormalyEnabled)) ? 65535 : 0, labels);
    }
@@ -350,6 +351,7 @@ uint32_t CompactDraw::themeColor(Colors color)
             case TextShade:    rv = 0x828282;  break;
             case TextInactive: rv = 0x878787;  break;
             case TextNormal:   rv = 0xAAAAAA;  break;
+            case TextFail:     rv = 0x783508;  break;
             case LedWait:      rv = 0x1F1F1F;  break;
             case LedOk:        rv = 0x1dcc37;  break;
             case LedFail:      rv = 0xFF622E;  break;

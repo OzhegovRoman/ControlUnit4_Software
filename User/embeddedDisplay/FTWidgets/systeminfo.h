@@ -21,7 +21,7 @@ protected:
 private:
    enum {
       BT_Back = 1,
-      BT_Theme = 2,
+      BT_Theme = 3,
 
       };
 

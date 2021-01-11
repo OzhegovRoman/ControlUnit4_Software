@@ -34,17 +34,18 @@ enum Colors{
    InnerArea,
    };
 
-//struct RGB{
-//   union {
-//      uint32_t color : 24;
-//      struct{
-//         uint8_t R;
-//         uint8_t G;
-//         uint8_t B;
-//         };
-//      };
+struct RGB{
+   union {
+      uint32_t color : 24;
+      uint8_t col[3];
+      struct{
+         uint8_t R;
+         uint8_t G;
+         uint8_t B;
+         };
 
-//   };
+      };
+   };
 
 class CompactDraw
    {

@@ -52,18 +52,8 @@ void SystemInfo::loop()
    static uint32_t lastButtonPressedTag = 0;
    uint8_t buttonTag = Gpu_Hal_Rd8(host(), REG_TOUCH_TAG);
 
-//   static uint8_t buttonTag = 0;
-//   QTimer* buttonPressTimer = new QTimer();
-//   buttonPressTimer->setSingleShot(true);
-//   auto a = [=]() -> int {buttonPressTimer->start(4000); return 0;};
-//   connect(buttonPressTimer, &QTimer::timeout,this,[=](){
-////      buttonTag = 0x80;
-//      qDebug() << "TimerTicked";
-//        buttonTag = 0;
-//        lastButtonPressedTag = 2;
-//   });
-//   static int b = a();
-
+   if (lastButtonPressedTag != 0 && buttonTag != lastButtonPressedTag)
+      qDebug() << "buttonPressed" << lastButtonPressedTag;
 
    if (buttonTag && (buttonTag  != 255))
       lastButtonPressedTag = buttonTag;
@@ -78,9 +68,11 @@ void SystemInfo::loop()
          case BT_Theme:{
             lastButtonPressedTag = 0;
             CD::cycleTheme();
-            setup();
+            terminate();
+            emit backClicked();
             break;
             }
+         default: {lastButtonPressedTag = 0;} break;
          }
       }
    FTWidget::loop();
