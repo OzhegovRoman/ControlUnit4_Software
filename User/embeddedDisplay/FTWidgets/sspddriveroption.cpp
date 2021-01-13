@@ -189,13 +189,13 @@ void SspdDriverOption::getOptions(Gpu_Hal_Context_t *host,  CommonDriver *driver
          if (tmpDriverM0) params = tmpDriverM0->params()->currentValue();
          if (tmpDriverM1) params = tmpDriverM1->params()->currentValue();
 
-         Gpu_CoCmd_Text(host, 450, 96, 29, OPT_CENTERY | OPT_RIGHTX,
+         Gpu_CoCmd_Text(host, 450, 98, 29, OPT_CENTERY | OPT_RIGHTX,
                         QString("%1 mV").arg(static_cast<double>(params.Cmp_Ref_Level) * 1000.0).toLocal8Bit());
-         Gpu_CoCmd_Text(host, 450, 132, 29, OPT_CENTERY | OPT_RIGHTX,
+         Gpu_CoCmd_Text(host, 450, 134, 29, OPT_CENTERY | OPT_RIGHTX,
                         QString("%1 sec").arg(static_cast<double>(params.Time_Const)).toLocal8Bit());
-         Gpu_CoCmd_Text(host, 450, 204, 29, OPT_CENTERY | OPT_RIGHTX,
+         Gpu_CoCmd_Text(host, 450, 206, 29, OPT_CENTERY | OPT_RIGHTX,
                         QString("%1 mV").arg(static_cast<double>(params.AutoResetThreshold) * 1000.0).toLocal8Bit());
-         Gpu_CoCmd_Text(host, 450, 240, 29, OPT_CENTERY | OPT_RIGHTX,
+         Gpu_CoCmd_Text(host, 450, 242, 29, OPT_CENTERY | OPT_RIGHTX,
                         QString("%1 sec").arg(static_cast<double>(params.AutoResetTimeOut)).toLocal8Bit());
 
          App_WrCoCmd_Buffer(host, TAG_MASK(1));
@@ -203,7 +203,7 @@ void SspdDriverOption::getOptions(Gpu_Hal_Context_t *host,  CommonDriver *driver
          if (tmpDriverM0) tmpBool = tmpDriverM0->status()->currentValue().stAutoResetOn;
          if (tmpDriverM1) tmpBool = tmpDriverM1->status()->currentValue().stAutoResetOn;
 
-         CD::sliderButton(396,162,"off""\xFF""on",BT_AutoresetEnable,tmpBool,48);
+         CD::sliderButton(396,164,"off""\xFF""on",BT_AutoresetEnable,tmpBool,48);
 
          App_WrCoCmd_Buffer(host, TAG_MASK(0));
 

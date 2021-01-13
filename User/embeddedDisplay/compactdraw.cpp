@@ -34,7 +34,7 @@ void CompactDraw::listButtonText(ColoredStatus cs,  int16_t top, QString col1, Q
          App_WrCoCmd_Buffer(mHost, COLOR(CD::statusColor(cs,true)));
          }
       sh = textShade*i;
-      Gpu_CoCmd_Text(mHost, 16, vLine[1]-10-sh, 28, OPT_CENTERY, col1.toLocal8Bit());
+      Gpu_CoCmd_Text(mHost, 16-sh, vLine[1]-10-sh, 28, OPT_CENTERY, col1.toLocal8Bit());
       if (col3.isEmpty()){
          Gpu_CoCmd_Text(mHost, isWideList ? 318-sh : 308-sh, top + 16 -sh, 28, OPT_CENTER, col2.toLocal8Bit());
          }
@@ -44,10 +44,10 @@ void CompactDraw::listButtonText(ColoredStatus cs,  int16_t top, QString col1, Q
          }
       App_WrCoCmd_Buffer(mHost, LINE_WIDTH(16));
       App_WrCoCmd_Buffer(mHost, BEGIN(LINES));
-      for (int i = 0; i < 3; ++i) {
-         for (int j = 0; j < 2; ++j) {
-            if (!(col3.isEmpty() && i == 1))
-               App_WrCoCmd_Buffer(mHost, VERTEX2II(isWideList ? col[i*2+2]-sh : col[i*2+1]-sh, vLine[j]-sh, 0, 0));
+      for (int j = 0; j < 3; ++j) {
+         for (int k = 0; k < 2; ++k) {
+            if (!(col3.isEmpty() && j == 1))
+               App_WrCoCmd_Buffer(mHost, VERTEX2II(isWideList ? col[j*2+2]-sh : col[j*2+1]-sh, vLine[k]-sh, 0, 0));
             }
          }
       App_WrCoCmd_Buffer(mHost, END());
@@ -56,7 +56,7 @@ void CompactDraw::listButtonText(ColoredStatus cs,  int16_t top, QString col1, Q
 
 void CompactDraw::animatedButtonText(ColoredStatus cs, int16_t top, int16_t center, uint32_t animVal, uint32_t animPeriod, QString text)
    {
-   uint16_t textLen = text.length();
+   uint16_t textLen = text.length()*11;
    int8_t sh;
 
    App_WrCoCmd_Buffer(mHost, SCISSOR_XY(180, top));
@@ -68,11 +68,11 @@ void CompactDraw::animatedButtonText(ColoredStatus cs, int16_t top, int16_t cent
          App_WrCoCmd_Buffer(mHost, COLOR(CD::statusColor(cs,true)));
          }
       sh = textShade*i;
-      Gpu_CoCmd_Text(mHost, 180 - animVal * textLen/animPeriod,
-                     top + 16, 28, OPT_CENTERY,
+      Gpu_CoCmd_Text(mHost, 180 - animVal * textLen/animPeriod - sh,
+                     top + 16 - sh, 28, OPT_CENTERY,
                      text.toLocal8Bit());
-      Gpu_CoCmd_Text(mHost, 180 - animVal * textLen/animPeriod + textLen,
-                     top + 16, 28, OPT_CENTERY,
+      Gpu_CoCmd_Text(mHost, 180 + textLen - animVal * textLen/animPeriod - sh,
+                     top + 16 - sh, 28, OPT_CENTERY,
                      text.toLocal8Bit());
       }
    App_WrCoCmd_Buffer(mHost, SCISSOR_XY(0, 0));
@@ -162,15 +162,15 @@ void CompactDraw::simpleListHeader(QStringList rows, uint16_t right)
    App_WrCoCmd_Buffer(mHost, COLOR(CD::themeColor(TextInactive)));
    App_WrCoCmd_Buffer(mHost, BEGIN(LINES));
    for (int i = 0; i < rows.count()-1; ++i) {
-      App_WrCoCmd_Buffer(mHost, VERTEX2II(18,  114+(i*increment), 0, 0));
-      App_WrCoCmd_Buffer(mHost, VERTEX2II(460, 114+(i*increment), 0, 0));
+      App_WrCoCmd_Buffer(mHost, VERTEX2II(18,  116+(i*increment), 0, 0));
+      App_WrCoCmd_Buffer(mHost, VERTEX2II(460, 116+(i*increment), 0, 0));
       }
    App_WrCoCmd_Buffer(mHost, END());
 
    App_WrCoCmd_Buffer(mHost, COLOR(CD::themeColor(TextNormal)));
 
    for (int i = 0; i < rows.count(); ++i) {
-      Gpu_CoCmd_Text(mHost, 18, 96+(i*increment), 29, OPT_CENTERY, rows.at(i).toLocal8Bit());
+      Gpu_CoCmd_Text(mHost, 18, 98+(i*increment), 29, OPT_CENTERY, rows.at(i).toLocal8Bit());
       }
    }
 
@@ -181,8 +181,9 @@ void CompactDraw::simpleListValues(QStringList rows, uint16_t right)
 
 void CompactDraw::toggleButton(uint16_t x, uint16_t y, uint16_t w, uint16_t h, bool isEnabled, bool isFlat, const char *caption)
    {
-   Gpu_CoCmd_FgColor(mHost, (isEnabled) ? CD::themeColor(Grad_Buttons) : CD::themeColor(Grad_Center));
-   Gpu_CoCmd_Button(mHost, x,y,w,h, 27, isFlat ? OPT_FLAT : 0, caption);
+   App_WrCoCmd_Buffer(mHost, COLOR(themeColor(Colors::TextNormal)));
+   Gpu_CoCmd_FgColor(mHost, (isEnabled) ? CD::themeColor(Colors::SliderPoint) : CD::themeColor(Grad_Bottom));
+   Gpu_CoCmd_Button(mHost, x,y,w,h, 28, isFlat ? OPT_FLAT : 0, caption);
    }
 
 void CompactDraw::sliderButton(uint16_t left, uint16_t top, const char* labels, uint16_t buttonTag, bool isEnabled, uint8_t width, bool isNormalyEnabled)
@@ -215,27 +216,6 @@ void CompactDraw::buttonBack(uint16_t leftX, uint16_t centY)
    App_WrCoCmd_Buffer(mHost, END());
    }
 
-void CompactDraw::buttonInfo(uint16_t leftX, uint16_t centY)
-   {
-   //info: сделать адекватное использование параметов.
-   App_WrCoCmd_Buffer(mHost, LINE_WIDTH(200));
-   App_WrCoCmd_Buffer(mHost, BEGIN(RECTS));
-   App_WrCoCmd_Buffer(mHost, VERTEX2II(442, 26, 0, 0));
-   App_WrCoCmd_Buffer(mHost, VERTEX2II(462, 46, 0, 0));
-   App_WrCoCmd_Buffer(mHost, END());
-
-   App_WrCoCmd_Buffer(mHost, COLOR(CD::themeColor(Grad_Center)));
-   App_WrCoCmd_Buffer(mHost, BEGIN(RECTS));
-   App_WrCoCmd_Buffer(mHost, VERTEX2II(443, 27, 0, 0));
-   App_WrCoCmd_Buffer(mHost, VERTEX2II(461, 45, 0, 0));
-   App_WrCoCmd_Buffer(mHost, END());
-   App_WrCoCmd_Buffer(mHost, COLOR(CD::themeColor(TextNormal)));
-   App_WrCoCmd_Buffer(mHost, LINE_WIDTH(16));
-
-   Gpu_CoCmd_Text(mHost, 452, 36, 30, OPT_CENTER, "i");
-
-   }
-
 void CompactDraw::buttonMenu(uint16_t leftX, uint16_t centY)
    {
    App_WrCoCmd_Buffer(mHost, LINE_WIDTH(32));
@@ -250,40 +230,41 @@ void CompactDraw::buttonMenu(uint16_t leftX, uint16_t centY)
    App_WrCoCmd_Buffer(mHost, END());
    }
 
+void CompactDraw::buttonInfo()
+   {
+   uint16_t side = 18;
+   uint16_t top = 33-side/2;
+   uint16_t left = 470-top-side/2;
+
+   fastButton(top,left,side);
+
+   Gpu_CoCmd_Text(mHost, left+side/2, top+side/2, 30, OPT_CENTER, "i");
+
+   }
+
 void CompactDraw::buttonChangeTheme()
    {
-   App_WrCoCmd_Buffer(mHost, LINE_WIDTH(200));
-   App_WrCoCmd_Buffer(mHost, BEGIN(RECTS));
-   App_WrCoCmd_Buffer(mHost, VERTEX2II(442, 26, 0, 0));
-   App_WrCoCmd_Buffer(mHost, VERTEX2II(462, 46, 0, 0));
-   App_WrCoCmd_Buffer(mHost, END());
+   uint16_t side = 18;
+   uint16_t top = 33-side/2;
+   uint16_t left = 470-top-side/2;
 
-   App_WrCoCmd_Buffer(mHost, COLOR(CD::themeColor(Grad_Center)));   //info: "Info" Button Color
-   App_WrCoCmd_Buffer(mHost, BEGIN(RECTS));
-   App_WrCoCmd_Buffer(mHost, VERTEX2II(443, 27, 0, 0));
-   App_WrCoCmd_Buffer(mHost, VERTEX2II(461, 45, 0, 0));
-   App_WrCoCmd_Buffer(mHost, END());
-   App_WrCoCmd_Buffer(mHost, COLOR(CD::themeColor(TextNormal)));
-   App_WrCoCmd_Buffer(mHost, LINE_WIDTH(16));
-
-
+   fastButton(top,left,side);
 
    switch (themeType) {
       case TT_Dark:  {
-         drawSun();
+         drawSun(top, left, side);
          } break;
       case TT_Light: {
-         drawMoon();
+         drawMoon(top, left, side);
          } break;
       }
-   //   Gpu_CoCmd_Text(mHost, 452, 36, 30, OPT_CENTER, "T");
    }
 
 void CompactDraw::setThemeType(const ThemeType &value)
    {
    themeType = value;
    panelShade = (themeType == TT_Light)?-2:2;
-   textShade = (themeType == TT_Light)?1:-1;
+   textShade = (themeType == TT_Light)?-1:1;
    }
 
 void CompactDraw::cycleTheme()
@@ -292,17 +273,35 @@ void CompactDraw::cycleTheme()
    CD::setThemeType((ThemeType)((CD::themeType+1)%_TT_Count));
    }
 
-void CompactDraw::drawSun()
+void CompactDraw::fastButton(uint16_t top, uint16_t left, uint16_t side)
    {
-   uint16_t centY = 36 + textShade;
-   uint16_t centX = 452 + textShade;
+   App_WrCoCmd_Buffer(mHost, COLOR(CD::themeColor(TextNormal)));
+   App_WrCoCmd_Buffer(mHost, LINE_WIDTH(200));
+   App_WrCoCmd_Buffer(mHost, BEGIN(RECTS));
+   App_WrCoCmd_Buffer(mHost, VERTEX2II(left-1, top-1, 0, 0));
+   App_WrCoCmd_Buffer(mHost, VERTEX2II(left+side+1, top+side+1, 0, 0));
+   App_WrCoCmd_Buffer(mHost, END());
+
+   App_WrCoCmd_Buffer(mHost, COLOR(CD::themeColor(Grad_Center)));
+   App_WrCoCmd_Buffer(mHost, BEGIN(RECTS));
+   App_WrCoCmd_Buffer(mHost, VERTEX2II(left, top, 0, 0));
+   App_WrCoCmd_Buffer(mHost, VERTEX2II(left+side, top+side, 0, 0));
+   App_WrCoCmd_Buffer(mHost, END());
+   App_WrCoCmd_Buffer(mHost, COLOR(CD::themeColor(TextNormal)));
+   App_WrCoCmd_Buffer(mHost, LINE_WIDTH(16));
+   }
+
+void CompactDraw::drawSun(uint16_t top, uint16_t left, uint16_t side)
+   {
+   uint16_t centY = top+(side/2) + textShade;
+   uint16_t centX = left+(side/2) + textShade;
    App_WrCoCmd_Buffer(mHost, LINE_WIDTH(16));
    for (int i = 0; i < 2; ++i) {
       App_WrCoCmd_Buffer(mHost, BEGIN(LINES));
       if (i == 1){
          centX-=textShade;
          centY-=textShade;
-         App_WrCoCmd_Buffer(mHost, COLOR(CD::themeColor(TextInactive)));
+         App_WrCoCmd_Buffer(mHost, COLOR(CD::themeColor(TextNormal)));
          }
       else
          App_WrCoCmd_Buffer(mHost, COLOR(CD::themeColor(TextShade)));
@@ -324,21 +323,24 @@ void CompactDraw::drawSun()
 
    }
 
-void CompactDraw::drawMoon()
+void CompactDraw::drawMoon(uint16_t top, uint16_t left, uint16_t side)
    {
+   uint16_t centY = top+(side/2) + textShade;
+   uint16_t centX = left+(side/2) + textShade;
+
    App_WrCoCmd_Buffer(mHost,    BEGIN(POINTS));
    App_WrCoCmd_Buffer(mHost,    COLOR(themeColor(TextShade)));
    App_WrCoCmd_Buffer(mHost,    POINT_SIZE(241));
-   App_WrCoCmd_Buffer(mHost,    VERTEX2II(450, 36, 0, 0));
-   App_WrCoCmd_Buffer(mHost,    COLOR(themeColor(TextInactive)));
-   App_WrCoCmd_Buffer(mHost,    VERTEX2II(449, 36, 0, 0));
+   App_WrCoCmd_Buffer(mHost,    VERTEX2II(centX, centY, 0, 0));
+   App_WrCoCmd_Buffer(mHost,    COLOR(themeColor(TextNormal)));
+   App_WrCoCmd_Buffer(mHost,    VERTEX2II(centX-1, centY, 0, 0));
 
    App_WrCoCmd_Buffer(mHost,    COLOR(themeColor(TextShade)));
    App_WrCoCmd_Buffer(mHost,    POINT_SIZE(222));
-   App_WrCoCmd_Buffer(mHost,    VERTEX2II(445, 36, 0, 0));
+   App_WrCoCmd_Buffer(mHost,    VERTEX2II(centX-5, centY, 0, 0));
    App_WrCoCmd_Buffer(mHost,    COLOR(themeColor(Grad_Center)));
    App_WrCoCmd_Buffer(mHost,    POINT_SIZE(223));
-   App_WrCoCmd_Buffer(mHost,    VERTEX2II(444, 36, 0, 0));
+   App_WrCoCmd_Buffer(mHost,    VERTEX2II(centX-6, centY, 0, 0));
    App_WrCoCmd_Buffer(mHost,    END());
    }
 
@@ -377,7 +379,7 @@ uint32_t CompactDraw::themeColor(Colors color)
             case Main:         rv = 0x000000;  break;
             case TextShade:    rv = 0x828282;  break;
             case TextInactive: rv = 0x878787;  break;
-            case TextNormal:   rv = 0xBBBBBB;  break;
+            case TextNormal:   rv = 0xCCCCCC;  break;
             case TextFail:     rv = 0xDD610E;  break;
             case LedWait:      rv = 0x1F1F1F;  break;
             case LedOk:        rv = 0x1dcc37;  break;

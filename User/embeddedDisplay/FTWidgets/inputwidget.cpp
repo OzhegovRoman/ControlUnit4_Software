@@ -87,17 +87,17 @@ double InputWidget::getDouble(Gpu_Hal_Context_t *host, QString title)
             Gpu_CoCmd_Text(host, 240, 102, 30, OPT_CENTER, str.toLocal8Bit());
 
 
-            App_WrCoCmd_Buffer(host, COLOR(CD::themeColor(Colors::Main)));
+            App_WrCoCmd_Buffer(host, COLOR(CD::themeColor(Colors::Grad_Center )));
             Gpu_CoCmd_FgColor(host,CD::themeColor(Colors::TextFail));
             Gpu_CoCmd_GradColor(host,CD::themeColor(Grad_Buttons));
 
             Gpu_CoCmd_Keys(host, 10, 132, 460, 40, 29, static_cast<char>(lastButtonPressedTag), "12345");
             Gpu_CoCmd_Keys(host, 10, 178, 459, 40, 29, static_cast<char>(lastButtonPressedTag), "67890");
-            Gpu_CoCmd_Keys(host, 10, 224, 273, 40, 29, static_cast<char>(lastButtonPressedTag), "<.-");
+            Gpu_CoCmd_Keys(host, 10, 224, 274, 40, 29, static_cast<char>(lastButtonPressedTag), "<.-");
             Gpu_CoCmd_FgColor(host, CD::themeColor(Colors::LedOk));
             App_WrCoCmd_Buffer(host, TAG_MASK(1));
             App_WrCoCmd_Buffer(host, TAG(BT_Ok));
-            Gpu_CoCmd_Button(host, 288, 224, 182, 40, 29, buttonTag == BT_Ok ? OPT_FLAT: 0, "Ok");
+            Gpu_CoCmd_Button(host, 287, 224, 182, 40, 29, buttonTag == BT_Ok ? OPT_FLAT: 0, "Ok");
             App_WrCoCmd_Buffer(host, TAG_MASK(0));
 
             App_WrCoCmd_Buffer(host, DISPLAY());
