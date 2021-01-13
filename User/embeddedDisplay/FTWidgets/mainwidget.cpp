@@ -39,6 +39,8 @@ void MainWidget::setup()
 
    Gpu_CoCmd_Dlstart(host());
    App_WrCoCmd_Buffer(host(), TAG_MASK(1));
+   App_WrCoCmd_Buffer(host(), TAG(BT_Dummy));
+   Gpu_CoCmd_Button(host(), 0, 0, 480, 270, 27, 0, "");
    App_WrCoCmd_Buffer(host(), TAG(BT_Info));
    Gpu_CoCmd_Button(host(), 430, 13, 44, 45, 27, 0, "");
    App_WrCoCmd_Buffer(host(), TAG_MASK(0));
@@ -263,16 +265,8 @@ void MainWidget::loop()
 
 //         Gpu_CoCmd_Text(host(), 16, top + 16, 28, OPT_CENTERY,
 //                        QString("#%1 Temperature").arg(tempdriver->devAddress()).toLocal8Bit());
-         CD::listButtonText(CS_Normal,top,QString("#%1 Temperature").arg(tempdriver->devAddress()), tempStr);
-
-         App_WrCoCmd_Buffer(host(), SCISSOR_XY(180, top));
-         App_WrCoCmd_Buffer(host(), SCISSOR_SIZE(2 * (center-180), 32));
-         Gpu_CoCmd_Text(host(), 180 - animationProcess * textLength/animationPeriod, top + 16, 28, OPT_CENTERY,
-                        tempStr.toLocal8Bit());
-         Gpu_CoCmd_Text(host(), 180 + textLength - animationProcess * textLength/animationPeriod, top + 16, 28, OPT_CENTERY,
-                        tempStr.toLocal8Bit());
-         App_WrCoCmd_Buffer(host(), SCISSOR_XY(0, 0));
-         App_WrCoCmd_Buffer(host(), SCISSOR_SIZE(512, 512));
+         CD::listButtonText(CS_Normal,top,QString("#%1 Temperature").arg(tempdriver->devAddress()), QString());
+         CD::animatedButtonText(CS_Normal, top, center, animationProcess, animationPeriod, tempStr);
          }
 
       // общая для всех точка моргания сетодиодом

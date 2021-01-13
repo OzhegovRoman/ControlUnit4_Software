@@ -1,6 +1,8 @@
 #include "inputwidget.h"
 #include "../compactdraw.h"
 
+#include <QDebug>
+
 double InputWidget::getDouble(Gpu_Hal_Context_t *host, QString title)
 {
     if (host == nullptr)
@@ -8,6 +10,8 @@ double InputWidget::getDouble(Gpu_Hal_Context_t *host, QString title)
 
     Gpu_CoCmd_Dlstart(host);
     App_WrCoCmd_Buffer(host, TAG_MASK(1));
+    App_WrCoCmd_Buffer(host, TAG(BT_Dummy));
+    Gpu_CoCmd_Button(host, 0, 0, 480, 270, 27, 0, "");
     App_WrCoCmd_Buffer(host, TAG(BT_Back));
     Gpu_CoCmd_Button(host, 17, 8, 48, 48, 27, 0, "");
     App_WrCoCmd_Buffer(host, TAG_MASK(0));
@@ -36,6 +40,7 @@ double InputWidget::getDouble(Gpu_Hal_Context_t *host, QString title)
         // отрисовываем
         buttonTag = Gpu_Hal_Rd8(host, REG_TOUCH_TAG);
         if (buttonTag && buttonTag != 255){
+           qDebug() << "buttonPressed" << buttonTag;
             if (buttonTag != lastButtonPressedTag){
                 lastButtonPressedTag = buttonTag;
                 update = true;
@@ -83,7 +88,7 @@ double InputWidget::getDouble(Gpu_Hal_Context_t *host, QString title)
 
 
             App_WrCoCmd_Buffer(host, COLOR(CD::themeColor(Colors::Main)));
-            Gpu_CoCmd_FgColor(host,CD::themeColor(Colors::LedFail));
+            Gpu_CoCmd_FgColor(host,CD::themeColor(Colors::TextFail));
             Gpu_CoCmd_GradColor(host,CD::themeColor(Grad_Buttons));
 
             Gpu_CoCmd_Keys(host, 10, 132, 460, 40, 29, static_cast<char>(lastButtonPressedTag), "12345");

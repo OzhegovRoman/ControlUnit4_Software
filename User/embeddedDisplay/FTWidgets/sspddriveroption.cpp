@@ -14,6 +14,8 @@ void SspdDriverOption::getOptions(Gpu_Hal_Context_t *host,  CommonDriver *driver
 
    Gpu_CoCmd_Dlstart(host);
    App_WrCoCmd_Buffer(host, TAG_MASK(1));
+   App_WrCoCmd_Buffer(host, TAG(BT_Dummy));
+   Gpu_CoCmd_Button(host, 0, 0, 480, 270, 27, 0, "");
    App_WrCoCmd_Buffer(host, TAG(BT_Back));
    Gpu_CoCmd_Button(host, 16, 8, 48, 48, 27, 0, "");
    App_WrCoCmd_Buffer(host, TAG(BT_ComparatorLevel));
@@ -195,9 +197,6 @@ void SspdDriverOption::getOptions(Gpu_Hal_Context_t *host,  CommonDriver *driver
                         QString("%1 mV").arg(static_cast<double>(params.AutoResetThreshold) * 1000.0).toLocal8Bit());
          Gpu_CoCmd_Text(host, 450, 240, 29, OPT_CENTERY | OPT_RIGHTX,
                         QString("%1 sec").arg(static_cast<double>(params.AutoResetTimeOut)).toLocal8Bit());
-
-         Gpu_CoCmd_FgColor(host, 0xC8510B);
-         Gpu_CoCmd_BgColor(host, 0x783508);
 
          App_WrCoCmd_Buffer(host, TAG_MASK(1));
          bool tmpBool = false;

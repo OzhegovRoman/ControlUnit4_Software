@@ -31,6 +31,8 @@ void TempM1Widget::setup()
 
     Gpu_CoCmd_Dlstart(host());
     App_WrCoCmd_Buffer(host(), TAG_MASK(1));
+    App_WrCoCmd_Buffer(host(), TAG(BT_Dummy));
+    Gpu_CoCmd_Button(host(), 0, 0, 480, 270, 27, 0, "");
     App_WrCoCmd_Buffer(host(), TAG(BT_Back));
     Gpu_CoCmd_Button(host(), 17, 8, 48, 48, 27, 0, "");
     App_WrCoCmd_Buffer(host(), TAG_MASK(0));
@@ -65,7 +67,7 @@ void TempM1Widget::setup()
     CD::headPanel("Temperature Unit",QString("Address: %1").arg(mDriver->devAddress()));
     CD::buttonBack();
     CD::mainBackground();
-    CD::mainArea(74,262,12,318);
+    CD::mainArea(82,262,12,318);
 
 //    App_WrCoCmd_Buffer(host(), LINE_WIDTH(40));
 
@@ -82,11 +84,11 @@ void TempM1Widget::setup()
 //    App_WrCoCmd_Buffer(host(), END());
 
     App_WrCoCmd_Buffer(host(), COLOR(CD::themeColor(TextNormal)));
-    int16_t top = 97;
+    int16_t top = 105;
     for (int i = 0; i < 4; ++i)
         if (mDriver->defaultParam(i).enable){
             Gpu_CoCmd_Text(host(), 20, top, 31, OPT_CENTERY, QString("T%1:").arg(i).toLocal8Bit());
-            top += 47;
+            top += 45;
         }
 
     App_WrCoCmd_Buffer(host(), POINT_SIZE(100));
@@ -162,11 +164,11 @@ void TempM1Widget::loop()
         Gpu_CoCmd_Dlstart(host());
         Gpu_CoCmd_Append(host(), 100000L, dlOffset);
 
-        int16_t top = 97;
+        int16_t top = 105;
         for (int i = 0; i < 4; ++i)
             if (mDriver->defaultParam(i).enable){
                 Gpu_CoCmd_Text(host(), 290, top, 31, OPT_CENTERY | OPT_RIGHTX, QString("%1 K").arg(mDriver->currentTemperature(i), 4, 'f', 2).toLocal8Bit());
-                top += 47;
+                top += 45;
             }
 
         App_WrCoCmd_Buffer(host(), TAG_MASK(1));
@@ -207,10 +209,7 @@ void TempM1Widget::loop()
            //серый
            cs = CS_Inactive;
 
-        App_WrCoCmd_Buffer(host(), COLOR(CD::statusColor(cs,false)));
-        App_WrCoCmd_Buffer(host(), BEGIN(POINTS));
-        App_WrCoCmd_Buffer(host(), VERTEX2II(308, 82, 0, 0));
-        App_WrCoCmd_Buffer(host(), END());
+        CD::updateIndicator(310,92,cs);
 
         App_WrCoCmd_Buffer(host(), DISPLAY());
         Gpu_CoCmd_Swap(host());

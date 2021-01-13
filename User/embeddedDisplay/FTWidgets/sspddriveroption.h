@@ -7,17 +7,18 @@
 #include "riverdieve.h"
 
 class SspdDriverOption
-{
+   {
 public:
-    enum {
-        BT_Back = 1,
-        BT_ComparatorLevel = 2,
-        BT_CounterTimeOut = 3,
-        BT_AutoresetEnable = 4,
-        BT_AutoresetThreshold = 5,
-        BT_AutoresetTimeOut = 6
-    };
-    static void getOptions(Gpu_Hal_Context_t *host, CommonDriver* driver);
-};
+   enum {
+      BT_Dummy = 254,
+      BT_Back = 1,
+      BT_ComparatorLevel = 2,
+      BT_CounterTimeOut = 3,
+      BT_AutoresetEnable = 4,
+      BT_AutoresetThreshold = 5,
+      BT_AutoresetTimeOut = 6
+      };
+   static void getOptions(Gpu_Hal_Context_t *host, CommonDriver* driver);
+   };
 
 #endif // SSPDDRIVEROPTION_H

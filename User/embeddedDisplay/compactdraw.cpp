@@ -21,8 +21,7 @@ CompactDraw::CompactDraw()
 
 void CompactDraw::listButtonText(ColoredStatus cs,  int16_t top, QString col1, QString col2, QString col3)
    {
-   uint8_t shadowThickness = 1;
-   uint8_t sh = shadowThickness;
+   int8_t sh;
 
    uint16_t vLine[2] = { static_cast<uint16_t>(top + 6),
                          static_cast<uint16_t>(top + 26)};
@@ -33,8 +32,8 @@ void CompactDraw::listButtonText(ColoredStatus cs,  int16_t top, QString col1, Q
          App_WrCoCmd_Buffer(mHost, COLOR(CD::themeColor(TextShade)));
       else{
          App_WrCoCmd_Buffer(mHost, COLOR(CD::statusColor(cs,true)));
-         sh = 0;
          }
+      sh = textShade*i;
       Gpu_CoCmd_Text(mHost, 16, vLine[1]-10-sh, 28, OPT_CENTERY, col1.toLocal8Bit());
       if (col3.isEmpty()){
          Gpu_CoCmd_Text(mHost, isWideList ? 318-sh : 308-sh, top + 16 -sh, 28, OPT_CENTER, col2.toLocal8Bit());
@@ -55,12 +54,37 @@ void CompactDraw::listButtonText(ColoredStatus cs,  int16_t top, QString col1, Q
       }
    }
 
+void CompactDraw::animatedButtonText(ColoredStatus cs, int16_t top, int16_t center, uint32_t animVal, uint32_t animPeriod, QString text)
+   {
+   uint16_t textLen = text.length();
+   int8_t sh;
+
+   App_WrCoCmd_Buffer(mHost, SCISSOR_XY(180, top));
+   App_WrCoCmd_Buffer(mHost, SCISSOR_SIZE(2 * (center-180), 32));
+   for (int i = 0; i < 2; ++i) {
+      if (i == 0)
+         App_WrCoCmd_Buffer(mHost, COLOR(CD::themeColor(TextShade)));
+      else{
+         App_WrCoCmd_Buffer(mHost, COLOR(CD::statusColor(cs,true)));
+         }
+      sh = textShade*i;
+      Gpu_CoCmd_Text(mHost, 180 - animVal * textLen/animPeriod,
+                     top + 16, 28, OPT_CENTERY,
+                     text.toLocal8Bit());
+      Gpu_CoCmd_Text(mHost, 180 - animVal * textLen/animPeriod + textLen,
+                     top + 16, 28, OPT_CENTERY,
+                     text.toLocal8Bit());
+      }
+   App_WrCoCmd_Buffer(mHost, SCISSOR_XY(0, 0));
+   App_WrCoCmd_Buffer(mHost, SCISSOR_SIZE(512, 512));
+   }
+
 void CompactDraw::headPanel(QString title, QString subtitle)
    {
 
    App_WrCoCmd_Buffer(mHost, BEGIN(RECTS));
    //   App_WrCoCmd_Buffer(mHost, COLOR(0xC8CCCCC));
-//   App_WrCoCmd_Buffer(mHost, COLOR(0xff0000));
+   //   App_WrCoCmd_Buffer(mHost, COLOR(0xff0000));
    App_WrCoCmd_Buffer(mHost, VERTEX2II(0,0,0,0));
    App_WrCoCmd_Buffer(mHost, VERTEX2II(480,66,0,0));
    App_WrCoCmd_Buffer(mHost, COLOR(0));
@@ -109,7 +133,7 @@ void CompactDraw::mainBackground()
 void CompactDraw::mainArea(uint16_t right, uint16_t bot)
    {
    qDebug() << bot;
-   if (bot == 0) bot = 254;
+   if (bot == 0) bot = 260;
    if (right == 0) right = 470;
    mainArea(82,bot,10,right);
    }
@@ -163,7 +187,8 @@ void CompactDraw::toggleButton(uint16_t x, uint16_t y, uint16_t w, uint16_t h, b
 
 void CompactDraw::sliderButton(uint16_t left, uint16_t top, const char* labels, uint16_t buttonTag, bool isEnabled, uint8_t width, bool isNormalyEnabled)
    {
-   Gpu_CoCmd_BgColor(mHost, (!(isEnabled^isNormalyEnabled)) ? themeColor(Colors::TextFail) : themeColor(Colors::InnerArea));
+   Gpu_CoCmd_FgColor(mHost, COLOR(CD::themeColor(Colors::SliderPoint)));
+   Gpu_CoCmd_BgColor(mHost, (!(isEnabled^isNormalyEnabled)) ? themeColor(Colors::SliderBG) : themeColor(Colors::InnerArea));
    App_WrCoCmd_Buffer(mHost, TAG(buttonTag));
    Gpu_CoCmd_Toggle(mHost, left, top, width, 27, 0, (!(isEnabled^isNormalyEnabled)) ? 65535 : 0, labels);
    }
@@ -336,6 +361,8 @@ uint32_t CompactDraw::themeColor(Colors color)
             case LedWait:      rv = 0xAAAAAA;  break;
             case LedOk:        rv = 0x00CC00;  break;
             case LedFail:      rv = 0xff672E;  break;
+            case SliderPoint:  rv = 0xff622E;  break;
+            case SliderBG:     rv = 0xff9b7d;  break;
             case Grad_Buttons:
             case Grad_Top:     rv = 0xC4C8C8;  break;
             case Grad_Center:  rv = 0xd7d7d7;  break;
@@ -350,11 +377,13 @@ uint32_t CompactDraw::themeColor(Colors color)
             case Main:         rv = 0x000000;  break;
             case TextShade:    rv = 0x828282;  break;
             case TextInactive: rv = 0x878787;  break;
-            case TextNormal:   rv = 0xAAAAAA;  break;
-            case TextFail:     rv = 0x783508;  break;
+            case TextNormal:   rv = 0xBBBBBB;  break;
+            case TextFail:     rv = 0xDD610E;  break;
             case LedWait:      rv = 0x1F1F1F;  break;
             case LedOk:        rv = 0x1dcc37;  break;
             case LedFail:      rv = 0xFF622E;  break;
+            case SliderPoint:  rv = 0xC8510b;  break;
+            case SliderBG:     rv = 0x783508;  break;
             case Grad_Buttons: rv = 0xffffff;  break;
             case Grad_Top:     rv = 0x3E3E3E;  break;
             case Grad_Center:  rv = 0x1F1F1F;  break;
@@ -382,7 +411,7 @@ uint32_t CompactDraw::statusColor(ColoredStatus cs, bool isText)
    else {
       switch(cs){
          case CS_Normal:     rv = themeColor(LedOk);     break;
-         case CS_Inactive:   rv = themeColor(LedWait);   break;
+         case CS_Inactive:   rv = themeColor(Grad_Center);   break;
          case CS_Fail:       rv = themeColor(LedFail);       break;
          }
       }

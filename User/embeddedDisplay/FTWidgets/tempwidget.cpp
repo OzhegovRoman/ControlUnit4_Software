@@ -27,6 +27,8 @@ void TempWidget::setup()
 
    Gpu_CoCmd_Dlstart(host());
    App_WrCoCmd_Buffer(host(), TAG_MASK(1));
+   App_WrCoCmd_Buffer(host(), TAG(BT_Dummy));
+   Gpu_CoCmd_Button(host(), 0, 0, 480, 270, 27, 0, "");
    App_WrCoCmd_Buffer(host(), TAG(BT_Back));
    Gpu_CoCmd_Button(host(), 17, 8, 48, 48, 27, 0, "");
    App_WrCoCmd_Buffer(host(), TAG_MASK(0));

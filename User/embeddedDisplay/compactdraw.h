@@ -26,6 +26,8 @@ enum Colors{
    LedWait,
    LedOk,
    LedFail,
+   SliderPoint,
+   SliderBG,
    Grad_Buttons,
    Grad_Top,
    Grad_Center,
@@ -67,6 +69,7 @@ public:
    CompactDraw();
 
    static void listButtonText(ColoredStatus cs, int16_t top, QString col1, QString col2, QString col3 = QString());
+   static void animatedButtonText(ColoredStatus cs, int16_t  top, int16_t center, uint32_t animVal, uint32_t animPeriod, QString text);
    static void headPanel(QString title, QString subtitle = QString());
    static void mainBackground();
    static void mainArea(uint16_t right = 470, uint16_t bot = 0);

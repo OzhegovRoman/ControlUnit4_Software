@@ -23,6 +23,7 @@ protected:
     void loop();
 private:
     enum {
+       BT_Dummy = 254,
         BT_Back = 1
     };
     quint16 dlOffset;
