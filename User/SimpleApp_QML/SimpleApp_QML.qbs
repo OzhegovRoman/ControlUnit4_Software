@@ -5,6 +5,7 @@ import qbs.File
 CppApplication {
     name: "cu-simpleapp_qml"
     consoleApplication: false
+    condition: project.target != "raspberryPi"
 
 //    condition: project.target === "win_x86"     ||
 //               project.target === "win_x86_64"  ||

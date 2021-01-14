@@ -35,16 +35,6 @@ CppApplication{
     }
 
     cpp.cxxLanguageVersion: "c++14"
-    cpp.driverFlags: [
-        "-fPIE",
-        "-pie"
-    ]
-    cpp.linkerFlags:[
-        "-z",
-        "relro",
-        "-rpath",
-        "/home/roman/raspi/sysroot/opt/vc/lib/"
-    ]
 
     // зависимости для сборки под RaspberryPi
     Properties{
@@ -67,6 +57,21 @@ CppApplication{
             "*.ui",
         ]
     }
+
+    Properties {
+        condition: project.target === "raspberryPi"
+        cpp.driverFlags: [
+            "-fPIE",
+            "-pie"
+        ]
+        cpp.linkerFlags:[
+            "-z",
+            "relro",
+            "-rpath",
+            "/home/roman/raspi/sysroot/opt/vc/lib/"
+        ]
+    }
+
     // деплой проекта для raspberryPi
     Group {
         fileTagsFilter: "application"
