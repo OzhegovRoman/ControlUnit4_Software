@@ -56,56 +56,6 @@ void SspdWidget::setup()
     CD::mainBackground();
     CD::mainArea(320);
 
-
-//    Gpu_CoCmd_Gradient(host(), 464, 73, 0x3E3E3E, 464, 283, 0x000000);
-//    App_WrCoCmd_Buffer(host(), LINE_WIDTH(16));
-
-//    App_WrCoCmd_Buffer(host(), COLOR_RGB(130, 130, 130));
-//    App_WrCoCmd_Buffer(host(), BEGIN(LINES));
-//    App_WrCoCmd_Buffer(host(), VERTEX2II(0, 68, 0, 0));
-//    App_WrCoCmd_Buffer(host(), VERTEX2II(480, 68, 0, 0));
-//    App_WrCoCmd_Buffer(host(), END());
-//    App_WrCoCmd_Buffer(host(), COLOR_RGB(0, 0, 0));
-//    App_WrCoCmd_Buffer(host(), BEGIN(LINES));
-//    App_WrCoCmd_Buffer(host(), VERTEX2II(0, 66, 0, 0));
-//    App_WrCoCmd_Buffer(host(), VERTEX2II(480, 66, 0, 0));
-//    App_WrCoCmd_Buffer(host(), END());
-
-//    App_WrCoCmd_Buffer(host(), COLOR_RGB(255, 255, 255));
-//    Gpu_CoCmd_Text(host(), 240, 24, 31, OPT_CENTER, "SSPD");
-//    Gpu_CoCmd_Text(host(), 240, 57, 26, OPT_CENTER, QString("Address: %1").arg(mDriver->devAddress()).toLocal8Bit());
-
-//    //кнопка назад и меню
-//    App_WrCoCmd_Buffer(host(), LINE_WIDTH(32));
-//    App_WrCoCmd_Buffer(host(), BEGIN(LINES));
-//    App_WrCoCmd_Buffer(host(), VERTEX2II(30, 32, 0, 0));
-//    App_WrCoCmd_Buffer(host(), VERTEX2II(58, 32, 0, 0));
-//    App_WrCoCmd_Buffer(host(), VERTEX2II(26, 32, 0, 0));
-//    App_WrCoCmd_Buffer(host(), VERTEX2II(40, 18, 0, 0));
-//    App_WrCoCmd_Buffer(host(), VERTEX2II(26, 32, 0, 0));
-//    App_WrCoCmd_Buffer(host(), VERTEX2II(40, 46, 0, 0));
-//    App_WrCoCmd_Buffer(host(), VERTEX2II(420, 32, 0, 0));
-//    App_WrCoCmd_Buffer(host(), VERTEX2II(452, 32, 0, 0));
-//    App_WrCoCmd_Buffer(host(), VERTEX2II(420, 20, 0, 0));
-//    App_WrCoCmd_Buffer(host(), VERTEX2II(452, 20, 0, 0));
-//    App_WrCoCmd_Buffer(host(), VERTEX2II(420, 44, 0, 0));
-//    App_WrCoCmd_Buffer(host(), VERTEX2II(452, 44, 0, 0));
-//    App_WrCoCmd_Buffer(host(), END());
-
-//    App_WrCoCmd_Buffer(host(), LINE_WIDTH(40));
-
-//    App_WrCoCmd_Buffer(host(), COLOR_RGB(102, 85, 102));
-//    App_WrCoCmd_Buffer(host(), BEGIN(RECTS));
-//    App_WrCoCmd_Buffer(host(), VERTEX2II(14, 85, 0, 0));
-//    App_WrCoCmd_Buffer(host(), VERTEX2II(320, 258, 0, 0));
-//    App_WrCoCmd_Buffer(host(), END());
-
-//    App_WrCoCmd_Buffer(host(), COLOR_RGB(0, 0, 0));
-//    App_WrCoCmd_Buffer(host(), BEGIN(RECTS));
-//    App_WrCoCmd_Buffer(host(), VERTEX2II(12, 83, 0, 0));
-//    App_WrCoCmd_Buffer(host(), VERTEX2II(318, 256, 0, 0));
-//    App_WrCoCmd_Buffer(host(), END());
-
     App_WrCoCmd_Buffer(host(), COLOR(CD::themeColor(TextNormal)));
     Gpu_CoCmd_Text(host(), 16,106,31, 1024, "I:");
     Gpu_CoCmd_Text(host(), 12, 166, 31, OPT_CENTERY, "U:");
@@ -289,17 +239,10 @@ void SspdWidget::loop()
 
         bool tmpBool = mDriver->status()->currentValue().stShorted;
         CD::sliderButton(348,88,"Short""\xFF""Open",BT_Short,tmpBool,100,false);
-        //        Gpu_CoCmd_BgColor(host(), tmpBool ? 0x525252 : 0x783508);
-//        App_WrCoCmd_Buffer(host(), TAG(BT_Short));
-//        Gpu_CoCmd_Toggle(host(), 348, 88, 100, 28, 0, tmpBool ? 0: 65535, "Short""\xFF""Open");
 
         tmpBool = mDriver->status()->currentValue().stAmplifierOn;
 
         CD::sliderButton(348,128,"Amp""\xFF""Amp",BT_Amp,tmpBool,100);
-
-//        Gpu_CoCmd_BgColor(host(), tmpBool ? 0x783508 : 0x525252);
-//        App_WrCoCmd_Buffer(host(), TAG(BT_Amp));
-//        Gpu_CoCmd_Toggle(host(), 348, 128, 100, 28, 0, tmpBool ? 65535 : 0, "Amp""\xFF""Amp");
 
         tmpBool = mDriver->status()->currentValue().stCounterOn &
                 mDriver->status()->currentValue().stRfKeyToCmp &
@@ -307,9 +250,7 @@ void SspdWidget::loop()
 
 
         CD::sliderButton(348,168,"Counter""\xFF""Counter",BT_Counter,tmpBool,100);
-//        Gpu_CoCmd_BgColor(host(), tmpBool ? 0x783508 : 0x525252);
-//        App_WrCoCmd_Buffer(host(), TAG(BT_Counter));
-//        Gpu_CoCmd_Toggle(host(), 348, 168, 100, 28, 0, tmpBool ? 65535 : 0, "Counter""\xFF""Counter");
+
         App_WrCoCmd_Buffer(host(), TAG_MASK(0));
 
         ColoredStatus cs;
@@ -330,10 +271,6 @@ void SspdWidget::loop()
            cs = CS_Inactive;
 
         CD::updateIndicator(310,92,cs);
-
-//        App_WrCoCmd_Buffer(host(), BEGIN(POINTS));
-//        App_WrCoCmd_Buffer(host(), VERTEX2II(310, 92, 0, 0));
-//        App_WrCoCmd_Buffer(host(), END());
 
         App_WrCoCmd_Buffer(host(), DISPLAY());
         Gpu_CoCmd_Swap(host());

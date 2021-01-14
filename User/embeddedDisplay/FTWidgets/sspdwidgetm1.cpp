@@ -282,10 +282,6 @@ void SspdWidgetM1::loop()
 
       CD::updateIndicator(310,92,cs);
 
-//      App_WrCoCmd_Buffer(host(), BEGIN(POINTS));
-//      App_WrCoCmd_Buffer(host(), VERTEX2II(310, 92, 0, 0));
-//      App_WrCoCmd_Buffer(host(), END());
-
       App_WrCoCmd_Buffer(host(), DISPLAY());
       Gpu_CoCmd_Swap(host());
       App_Flush_Co_Buffer(host());

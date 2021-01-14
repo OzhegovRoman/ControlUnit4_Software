@@ -40,7 +40,6 @@ double InputWidget::getDouble(Gpu_Hal_Context_t *host, QString title)
         // отрисовываем
         buttonTag = Gpu_Hal_Rd8(host, REG_TOUCH_TAG);
         if (buttonTag && buttonTag != 255){
-           qDebug() << "buttonPressed" << buttonTag;
             if (buttonTag != lastButtonPressedTag){
                 lastButtonPressedTag = buttonTag;
                 update = true;

@@ -84,8 +84,6 @@ void CompactDraw::headPanel(QString title, QString subtitle)
    {
 
    App_WrCoCmd_Buffer(mHost, BEGIN(RECTS));
-   //   App_WrCoCmd_Buffer(mHost, COLOR(0xC8CCCCC));
-   //   App_WrCoCmd_Buffer(mHost, COLOR(0xff0000));
    App_WrCoCmd_Buffer(mHost, VERTEX2II(0,0,0,0));
    App_WrCoCmd_Buffer(mHost, VERTEX2II(480,66,0,0));
    App_WrCoCmd_Buffer(mHost, COLOR(0));

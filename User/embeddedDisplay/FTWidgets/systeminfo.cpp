@@ -72,8 +72,6 @@ void SystemInfo::loop()
             CD::cycleTheme();
             CD::saveTheme();
             setup();
-//            terminate();
-//            emit backClicked();
             break;
             }
          default: {lastButtonPressedTag = 0;} break;

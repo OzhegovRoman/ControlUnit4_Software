@@ -71,20 +71,9 @@ void MainWidget::loop()
    {
    static uint32_t lastButtonPressedTag = 0;
 
-//   static uint8_t buttonTag = 0;
+
 
    uint8_t buttonTag = Gpu_Hal_Rd8(host(), REG_TOUCH_TAG);
-
-///   //info: I'ts dirty, sorry =D
-///   QTimer* buttonPressTimer = new QTimer();
-///   buttonPressTimer->setSingleShot(true);
-///   auto a = [=]() -> int {buttonPressTimer->start(1000); return 0;};
-///   connect(buttonPressTimer, &QTimer::timeout,this,[=](){
-///         buttonTag = 0x81;
-/////      buttonTag = 0x2;
-///   });
-///   static int b = a();
-///   //info: end of it
 
    if (buttonTag && (buttonTag != 255)){
       if (buttonTag != lastButtonPressedTag){
@@ -238,11 +227,6 @@ void MainWidget::loop()
             }
 
          CD::listButtonText(cs,top,QString("#%1 Temperature").arg(tempdriver->devAddress()),tempStr);
-//         Gpu_CoCmd_Text(host(), 16, top + 16, 28, OPT_CENTERY,
-//                        QString("#%1 Temperature").arg(tempdriver->devAddress()).toLocal8Bit());
-
-//         Gpu_CoCmd_Text(host(), wideList ? 318 : 300, top + 16, 28, OPT_CENTER,
-//                        tempStr.toLocal8Bit());
          }
       }
       auto tempdriver =qobject_cast<TempDriverM1*>(mHarvester->drivers()[i+mTopIndex]);
@@ -251,7 +235,6 @@ void MainWidget::loop()
          QString tempStr;
          static int tempStrPos = 0;
 
-//         App_WrCoCmd_Buffer(host(), COLOR_RGB(255, 255, 255));
          for (uint8_t i = 0; i < 4; ++i){
             if (tempdriver->defaultParam(i).enable)
                tempStr += QString("T%1: %2 K; ")
@@ -262,8 +245,6 @@ void MainWidget::loop()
          int textLength = tempStr.size()*11;
          int16_t center = wideList ? 309 : 291;
 
-//         Gpu_CoCmd_Text(host(), 16, top + 16, 28, OPT_CENTERY,
-//                        QString("#%1 Temperature").arg(tempdriver->devAddress()).toLocal8Bit());
          CD::listButtonText(CS_Normal,top,QString("#%1 Temperature").arg(tempdriver->devAddress()), QString());
          CD::animatedButtonText(CS_Normal, top, center, animationProcess, animationPeriod, tempStr);
          }
@@ -294,10 +275,6 @@ void MainWidget::loop()
    Gpu_Hal_WaitCmdfifo_empty(host());
    //    }
    animationProcess = (animationProcess + 1) % animationPeriod;
-
-///   //Info: delete after Debug
-//   buttonTag = 0;
-///   //Info: delete after Debug
 
    FTWidget::loop();
    }

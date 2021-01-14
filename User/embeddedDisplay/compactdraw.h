@@ -2,7 +2,6 @@
 #define COMPACTDRAW_H
 
 #include "riverdieve.h"
-//#include <stdint.h>
 
 enum ThemeType{
    TT_Dark = 0,
