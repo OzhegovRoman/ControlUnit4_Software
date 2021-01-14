@@ -2,6 +2,7 @@
 #include <QString>
 #include <QTimer>
 #include <QDebug>
+#include <QSettings>
 
 ThemeType CompactDraw::themeType = TT_Light;
 int16_t CD::panelShade = 0;
@@ -271,6 +272,18 @@ void CompactDraw::cycleTheme()
    {
    ThemeType tt = (ThemeType)((CD::themeType+1)%_TT_Count);
    CD::setThemeType((ThemeType)((CD::themeType+1)%_TT_Count));
+   }
+
+void CompactDraw::saveTheme()
+   {
+   QSettings settings("Scontel", "cu-embededDisplay");
+   settings.setValue("Theme", themeType);
+   }
+
+void CompactDraw::loadTheme()
+   {
+   QSettings settings("Scontel", "cu-embededDisplay");
+   setThemeType(static_cast<ThemeType>(settings.value("Theme", 0).toUInt()));
    }
 
 void CompactDraw::fastButton(uint16_t top, uint16_t left, uint16_t side)

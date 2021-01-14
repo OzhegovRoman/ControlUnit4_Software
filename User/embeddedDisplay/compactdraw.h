@@ -88,6 +88,9 @@ public:
    static void setIsWideList(bool value);
    static void setThemeType(const ThemeType &value);
    static void cycleTheme();
+
+   static void saveTheme();
+   static void loadTheme();
    };
 
 typedef CompactDraw CD;

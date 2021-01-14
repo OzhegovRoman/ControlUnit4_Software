@@ -70,6 +70,7 @@ void SystemInfo::loop()
          case BT_Theme:{
             lastButtonPressedTag = 0;
             CD::cycleTheme();
+            CD::saveTheme();
             setup();
 //            terminate();
 //            emit backClicked();

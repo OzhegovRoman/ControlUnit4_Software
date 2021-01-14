@@ -15,7 +15,7 @@ MainWidget::MainWidget(Gpu_Hal_Context_t *host, DataHarvester *harvester)
    {
    setHost(host);
    dataHarvesterTimer->setSingleShot(true);
-   CD::setThemeType(TT_Dark);
+   CD::loadTheme();
    connect(dataHarvesterTimer, &QTimer::timeout, this, &MainWidget::dataHarvest);
    }
 
