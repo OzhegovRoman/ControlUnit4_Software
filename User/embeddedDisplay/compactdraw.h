@@ -32,6 +32,8 @@ enum Colors{
    Grad_Top,
    Grad_Center,
    Grad_Bottom,
+   Grad_LogoTop,
+   Grad_LogoBot,
    other,
    InnerArea,
    };

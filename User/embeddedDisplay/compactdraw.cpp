@@ -378,9 +378,11 @@ uint32_t CompactDraw::themeColor(Colors color)
             case LedFail:      rv = 0xff672E;  break;
             case SliderPoint:  rv = 0xff622E;  break;
             case SliderBG:     rv = 0xff9b7d;  break;
+            case Grad_LogoTop: rv = 0xC4c8c8; break;
             case Grad_Buttons:
             case Grad_Top:     rv = 0xC4C8C8;  break;
             case Grad_Center:  rv = 0xd7d7d7;  break;
+            case Grad_LogoBot:
             case Grad_Bottom:  rv = 0xE2E6E6;  break;
             case other:        rv = 0x646666;  break;
             case InnerArea:    rv = 0xECF0F0;  break;
@@ -400,8 +402,10 @@ uint32_t CompactDraw::themeColor(Colors color)
             case SliderPoint:  rv = 0xC8510b;  break;
             case SliderBG:     rv = 0x783508;  break;
             case Grad_Buttons: rv = 0xffffff;  break;
+            case Grad_LogoTop: rv = 0x555555;  break;
             case Grad_Top:     rv = 0x3E3E3E;  break;
             case Grad_Center:  rv = 0x1F1F1F;  break;
+            case Grad_LogoBot: rv = 0x828282;  break;
             case Grad_Bottom:  rv = 0x000000;  break;
             case other:        rv = 0x828282;  break;
             case InnerArea:    rv = 0x000000;  break;

@@ -1,5 +1,6 @@
 #include "welcomepagewidget.h"
 #include <QThread>
+#include "../compactdraw.h"
 
 const uint8_t welcome_screen[]={
     #include "../Design/welcomepage_alt/images/LOGO_2.binh"
@@ -7,6 +8,7 @@ const uint8_t welcome_screen[]={
 
 WelcomePageWidget::WelcomePageWidget(Gpu_Hal_Context_t *host)
 {
+   CD::loadTheme();
     setHost(host);
 }
 
@@ -24,7 +26,7 @@ void WelcomePageWidget::setup()
 #endif
     while (pos < max){
         Gpu_CoCmd_Dlstart(host());
-        Gpu_CoCmd_Gradient(host(), 0, 0, 0xFEFFFF, 480, 272, 0xA5A5A5);
+        Gpu_CoCmd_Gradient(host(), 0, 0, 0xC4c8c8, 480, 272, 0xE2E6E6);
 
         App_WrCoCmd_Buffer(host(), BITMAP_HANDLE(0));
 
