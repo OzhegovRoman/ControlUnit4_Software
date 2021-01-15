@@ -6,6 +6,7 @@
 #include <signal.h>
 #include <unistd.h>
 
+#include "compactdraw.h"
 #include "FTWidgets/widgets.h"
 #include "DataHarvester/dataharvester.h"
 
@@ -125,6 +126,7 @@ int main(int argc, char *argv[])
     SspdWidget _SspdWidget(&host);
     SspdWidgetM1 _SspdWidgetM1(&host);
     WelcomePageWidget _WelcomePage(&host);
+    CD::mHost = &host;
 
     QObject::connect(&_DisplayInitializer, &DisplayInitializer::initialized, &_WelcomePage, &WelcomePageWidget::exec);
 
