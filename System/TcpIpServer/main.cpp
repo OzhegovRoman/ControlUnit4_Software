@@ -53,8 +53,9 @@ int main(int argc, char *argv[])
 
 
 #ifdef FAKE_DEVICES
-    if (parser.isSet(fakeOptions)) {
-        qDebug()<<"emulation mode";
+    if (parser.isSet(fakeOptions)) {       
+       QString ts = QTime::currentTime().toString("hh:mm:ss:zzz");
+        qDebug() << ts.toLatin1().data() <<"emulation mode";
         FakeIOInterface *tmpInterface = new FakeIOInterface();
 
         mInterface = tmpInterface;

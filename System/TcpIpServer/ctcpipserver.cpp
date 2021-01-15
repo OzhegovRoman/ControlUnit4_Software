@@ -83,20 +83,23 @@ void cTcpIpServer::stop()
 
 void cTcpIpServer::consoleWrite(QString string)
 {
+    QString ts = QTime::currentTime().toString("hh:mm:ss:zzz ");
     if (mInfoEnable)
-        std::cout<<string.toLatin1().data()<<std::endl;
+        std::cout<< ts.toLatin1().data()<<string.toLatin1().data()<<std::endl;
 }
 
 void cTcpIpServer::consoleWriteDebug(QString string)
 {
+    QString ts = QTime::currentTime().toString("hh:mm:ss:zzz ");
     if (mInfoEnable && mDebugInfoEnable)
-        std::cout<<"Debug: "<<string.toLatin1().data()<<std::endl;
+        std::cout<< ts.toLatin1().data()<<"Debug: "<<string.toLatin1().data()<<std::endl;
 }
 
 void cTcpIpServer::consoleWriteError(QString string)
 {
+    QString ts = QTime::currentTime().toString("hh:mm:ss:zzz ");
     if (mInfoEnable && mErrorInfoEnable)
-        std::cerr<<"Error: "<<string.toLatin1().data()<<std::endl;
+        std::cerr << ts.toLatin1().data() << "Error: "<<string.toLatin1().data()<<std::endl;
 }
 
 void cTcpIpServer::incomingConnection(qintptr handle)
