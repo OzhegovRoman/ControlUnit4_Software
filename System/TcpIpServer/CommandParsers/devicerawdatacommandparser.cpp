@@ -82,7 +82,7 @@ bool DeviceRawDataCommandParser::doIt(const QByteArray &ba)
 
         QElapsedTimer timer;
         timer.start();
-        while (!mStopFlag && (timer.elapsed()<1000)) //TODO: сделать правильную задержку
+        while (!mStopFlag && (timer.elapsed()<100)) //TODO: сделать ещё чуть более правильную задержку
             qApp->processEvents();
 
         return true;
