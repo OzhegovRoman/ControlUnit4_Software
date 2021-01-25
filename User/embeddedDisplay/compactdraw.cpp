@@ -62,6 +62,7 @@ void CompactDraw::animatedButtonText(ColoredStatus cs, int16_t top, int16_t cent
 
    App_WrCoCmd_Buffer(mHost, SCISSOR_XY(180, top));
    App_WrCoCmd_Buffer(mHost, SCISSOR_SIZE(2 * (center-180), 32));
+
    for (int i = 0; i < 2; ++i) {
       if (i == 0)
          App_WrCoCmd_Buffer(mHost, COLOR(CD::themeColor(TextShade)));
@@ -77,7 +78,7 @@ void CompactDraw::animatedButtonText(ColoredStatus cs, int16_t top, int16_t cent
                      text.toLocal8Bit());
       }
    App_WrCoCmd_Buffer(mHost, SCISSOR_XY(0, 0));
-   App_WrCoCmd_Buffer(mHost, SCISSOR_SIZE(512, 512));
+   App_WrCoCmd_Buffer(mHost, SCISSOR_SIZE(480, 272));
    }
 
 void CompactDraw::headPanel(QString title, QString subtitle)
@@ -215,6 +216,14 @@ void CompactDraw::buttonBack(uint16_t leftX, uint16_t centY)
    App_WrCoCmd_Buffer(mHost, END());
    }
 
+void CompactDraw::dummyButton(uint8_t tag)
+   {
+   if (!EVE1){
+      App_WrCoCmd_Buffer(mHost, TAG(tag));
+      Gpu_CoCmd_Button(mHost, 0, 0, 480, 270, 27, OPT_FLAT, "");
+      }
+   }
+
 void CompactDraw::buttonMenu(uint16_t leftX, uint16_t centY)
    {
    App_WrCoCmd_Buffer(mHost, LINE_WIDTH(32));
@@ -232,7 +241,7 @@ void CompactDraw::buttonMenu(uint16_t leftX, uint16_t centY)
 void CompactDraw::buttonInfo()
    {
    uint16_t side = 18;
-   uint16_t top = 33-side/2;
+   uint16_t top = 34-side/2;
    uint16_t left = 470-top-side/2;
 
    fastButton(top,left,side);
@@ -262,8 +271,8 @@ void CompactDraw::buttonChangeTheme()
 void CompactDraw::setThemeType(const ThemeType &value)
    {
    themeType = value;
-   panelShade = (themeType == TT_Light)?-2:2;
    textShade = (themeType == TT_Light)?-1:1;
+   panelShade = (themeType == TT_Light)?-2:2;
    }
 
 void CompactDraw::cycleTheme()
@@ -404,7 +413,7 @@ uint32_t CompactDraw::themeColor(Colors color)
             case Grad_Top:     rv = 0x3E3E3E;  break;
             case Grad_Center:  rv = 0x1F1F1F;  break;
             case Grad_LogoBot: rv = 0x828282;  break;
-            case Grad_Bottom:  rv = 0x000000;  break;
+            case Grad_Bottom:  rv = 0x111111;  break;
             case other:        rv = 0x828282;  break;
             case InnerArea:    rv = 0x000000;  break;
             default: break;

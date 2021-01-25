@@ -36,12 +36,11 @@ void SspdWidgetM1::setup()
 
    Gpu_CoCmd_Dlstart(host());
    App_WrCoCmd_Buffer(host(), TAG_MASK(1));
-   App_WrCoCmd_Buffer(host(), TAG(BT_Dummy));
-   Gpu_CoCmd_Button(host(), 0, 0, 480, 270, 27, 0, "");
+   CD::dummyButton(BT_Dummy);
    App_WrCoCmd_Buffer(host(), TAG(BT_Back));
-   Gpu_CoCmd_Button(host(), 17, 8, 48, 48, 27, 0, "");
+   Gpu_CoCmd_Button(host(), 10, 10, 50, 50, 27, 0, "");
    App_WrCoCmd_Buffer(host(), TAG(BT_Option));
-   Gpu_CoCmd_Button(host(), 412, 8, 48, 48, 27, 0, "");
+   Gpu_CoCmd_Button(host(), 420, 10, 50, 50, 27, 0, "");
    App_WrCoCmd_Buffer(host(), TAG(BT_SetCurrent));
    Gpu_CoCmd_Button(host(), 12, 84, 290, 173, 27, 0, "");
    App_WrCoCmd_Buffer(host(), TAG_MASK(0));
