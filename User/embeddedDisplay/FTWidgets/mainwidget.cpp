@@ -62,7 +62,6 @@ void MainWidget::setup()
    Gpu_Hal_WaitCmdfifo_empty(host());
 
    dlOffset = Gpu_Hal_Rd16(host(), REG_CMD_DL);
-   qDebug() << dlOffset;
    Gpu_CoCmd_Memcpy(host(), 100000L, RAM_DL, dlOffset);
 
    dataHarvesterTimer->start(100);
@@ -78,13 +77,11 @@ void MainWidget::loop()
       if (buttonTag != lastButtonPressedTag){
          update();
          lastButtonPressedTag = buttonTag;
-         qDebug()<<"Button pressed" << buttonTag;
          }
       }
    else {
       switch (lastButtonPressedTag) {
          case BT_Info:{
-            qDebug()<<"Button released" << lastButtonPressedTag;
             lastButtonPressedTag = 0;
             terminate();
             emit systemInfoClicked();
@@ -92,7 +89,6 @@ void MainWidget::loop()
             }
          default: {
             if (lastButtonPressedTag >= BT_DriverButton){
-               qDebug()<<"Button released" << lastButtonPressedTag;
                terminate();
                emit channelChoosen(static_cast<int>(lastButtonPressedTag - BT_DriverButton));
                lastButtonPressedTag = 0;

@@ -53,8 +53,8 @@ void SystemInfo::loop()
    static uint32_t lastButtonPressedTag = 0;
    uint8_t buttonTag = Gpu_Hal_Rd8(host(), REG_TOUCH_TAG);
 
-   if (lastButtonPressedTag != 0 && buttonTag != lastButtonPressedTag)
-      qDebug() << "buttonPressed" << lastButtonPressedTag;
+//   if (lastButtonPressedTag != 0 && buttonTag != lastButtonPressedTag)
+//      qDebug() << "buttonPressed" << lastButtonPressedTag;
 
    if (buttonTag && (buttonTag  != 255))
       lastButtonPressedTag = buttonTag;

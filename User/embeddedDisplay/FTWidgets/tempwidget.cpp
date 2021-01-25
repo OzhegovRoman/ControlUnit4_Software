@@ -64,7 +64,7 @@ void TempWidget::loop()
       lastButtonPressedTag = buttonTag;
    else {
       if (lastButtonPressedTag){
-         qDebug()<<"button pressed";
+//         qDebug()<<"button pressed";
 
          lastButtonPressedTag = 0;
          terminate();
