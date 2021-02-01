@@ -62,6 +62,7 @@ void CompactDraw::animatedButtonText(ColoredStatus cs, int16_t top, int16_t cent
 
    App_WrCoCmd_Buffer(mHost, SCISSOR_XY(180, top));
    App_WrCoCmd_Buffer(mHost, SCISSOR_SIZE(2 * (center-180), 32));
+
    for (int i = 0; i < 2; ++i) {
       if (i == 0)
          App_WrCoCmd_Buffer(mHost, COLOR(CD::themeColor(TextShade)));
@@ -77,7 +78,7 @@ void CompactDraw::animatedButtonText(ColoredStatus cs, int16_t top, int16_t cent
                      text.toLocal8Bit());
       }
    App_WrCoCmd_Buffer(mHost, SCISSOR_XY(0, 0));
-   App_WrCoCmd_Buffer(mHost, SCISSOR_SIZE(512, 512));
+   App_WrCoCmd_Buffer(mHost, SCISSOR_SIZE(480, 272));
    }
 
 void CompactDraw::headPanel(QString title, QString subtitle)
@@ -131,7 +132,7 @@ void CompactDraw::mainBackground()
 
 void CompactDraw::mainArea(uint16_t right, uint16_t bot)
    {
-   qDebug() << bot;
+//   qDebug() << bot;
    if (bot == 0) bot = 260;
    if (right == 0) right = 470;
    mainArea(82,bot,10,right);
@@ -139,7 +140,7 @@ void CompactDraw::mainArea(uint16_t right, uint16_t bot)
 
 void CompactDraw::mainArea(uint16_t top, uint16_t bot, uint16_t left, uint16_t right)
    {
-   qDebug() << top << bot << left << right;
+//   qDebug() << top << bot << left << right;
    App_WrCoCmd_Buffer(mHost, LINE_WIDTH(40));
    App_WrCoCmd_Buffer(mHost, COLOR(CD::themeColor(other)));  //info: button-area panelShade
    App_WrCoCmd_Buffer(mHost, BEGIN(RECTS));
@@ -215,6 +216,14 @@ void CompactDraw::buttonBack(uint16_t leftX, uint16_t centY)
    App_WrCoCmd_Buffer(mHost, END());
    }
 
+void CompactDraw::dummyButton(uint8_t tag)
+   {
+   if (!EVE1){
+      App_WrCoCmd_Buffer(mHost, TAG(tag));
+      Gpu_CoCmd_Button(mHost, 0, 0, 480, 270, 27, OPT_FLAT, "");
+      }
+   }
+
 void CompactDraw::buttonMenu(uint16_t leftX, uint16_t centY)
    {
    App_WrCoCmd_Buffer(mHost, LINE_WIDTH(32));
@@ -232,7 +241,7 @@ void CompactDraw::buttonMenu(uint16_t leftX, uint16_t centY)
 void CompactDraw::buttonInfo()
    {
    uint16_t side = 18;
-   uint16_t top = 33-side/2;
+   uint16_t top = 34-side/2;
    uint16_t left = 470-top-side/2;
 
    fastButton(top,left,side);
@@ -262,8 +271,8 @@ void CompactDraw::buttonChangeTheme()
 void CompactDraw::setThemeType(const ThemeType &value)
    {
    themeType = value;
+   textShade = (themeType == TT_Light)?-1:-1;
    panelShade = (themeType == TT_Light)?-2:2;
-   textShade = (themeType == TT_Light)?-1:1;
    }
 
 void CompactDraw::cycleTheme()
@@ -315,7 +324,7 @@ void CompactDraw::drawSun(uint16_t top, uint16_t left, uint16_t side)
          App_WrCoCmd_Buffer(mHost, COLOR(CD::themeColor(TextNormal)));
          }
       else
-         App_WrCoCmd_Buffer(mHost, COLOR(CD::themeColor(TextShade)));
+         App_WrCoCmd_Buffer(mHost, COLOR(CD::themeColor(other)));
       App_WrCoCmd_Buffer(mHost, VERTEX2II(centX,    centY+14, 0, 0));
       App_WrCoCmd_Buffer(mHost, VERTEX2II(centX,    centY-14, 0, 0));
       App_WrCoCmd_Buffer(mHost, VERTEX2II(centX+14, centY, 0, 0));
@@ -340,17 +349,17 @@ void CompactDraw::drawMoon(uint16_t top, uint16_t left, uint16_t side)
    uint16_t centX = left+(side/2) + textShade;
 
    App_WrCoCmd_Buffer(mHost,    BEGIN(POINTS));
-   App_WrCoCmd_Buffer(mHost,    COLOR(themeColor(TextShade)));
+   App_WrCoCmd_Buffer(mHost,    COLOR(themeColor(other)));
    App_WrCoCmd_Buffer(mHost,    POINT_SIZE(241));
    App_WrCoCmd_Buffer(mHost,    VERTEX2II(centX, centY, 0, 0));
    App_WrCoCmd_Buffer(mHost,    COLOR(themeColor(TextNormal)));
    App_WrCoCmd_Buffer(mHost,    VERTEX2II(centX-1, centY, 0, 0));
 
-   App_WrCoCmd_Buffer(mHost,    COLOR(themeColor(TextShade)));
-   App_WrCoCmd_Buffer(mHost,    POINT_SIZE(222));
+   App_WrCoCmd_Buffer(mHost,    COLOR(themeColor(other)));
+   App_WrCoCmd_Buffer(mHost,    POINT_SIZE(221));
    App_WrCoCmd_Buffer(mHost,    VERTEX2II(centX-5, centY, 0, 0));
    App_WrCoCmd_Buffer(mHost,    COLOR(themeColor(Grad_Center)));
-   App_WrCoCmd_Buffer(mHost,    POINT_SIZE(223));
+   App_WrCoCmd_Buffer(mHost,    POINT_SIZE(222));
    App_WrCoCmd_Buffer(mHost,    VERTEX2II(centX-6, centY, 0, 0));
    App_WrCoCmd_Buffer(mHost,    END());
    }
@@ -360,7 +369,7 @@ uint32_t CompactDraw::toBaseColor(uint32_t srcColor)
 
    }
 
-uint32_t CompactDraw::themeColor(Colors color)
+uint32_t CompactDraw::  themeColor(Colors color)
    {
    uint32_t rv = 0;
    switch (CompactDraw::themeType) {
@@ -390,7 +399,7 @@ uint32_t CompactDraw::themeColor(Colors color)
       case TT_Dark: {
          switch(color){
             case Main:         rv = 0x000000;  break;
-            case TextShade:    rv = 0x828282;  break;
+            case TextShade:    rv = 0x000000;  break;
             case TextInactive: rv = 0x878787;  break;
             case TextNormal:   rv = 0xCCCCCC;  break;
             case TextFail:     rv = 0xDD610E;  break;
@@ -404,7 +413,7 @@ uint32_t CompactDraw::themeColor(Colors color)
             case Grad_Top:     rv = 0x3E3E3E;  break;
             case Grad_Center:  rv = 0x1F1F1F;  break;
             case Grad_LogoBot: rv = 0x828282;  break;
-            case Grad_Bottom:  rv = 0x000000;  break;
+            case Grad_Bottom:  rv = 0x111111;  break;
             case other:        rv = 0x828282;  break;
             case InnerArea:    rv = 0x000000;  break;
             default: break;

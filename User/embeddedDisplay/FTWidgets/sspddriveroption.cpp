@@ -14,10 +14,9 @@ void SspdDriverOption::getOptions(Gpu_Hal_Context_t *host,  CommonDriver *driver
 
    Gpu_CoCmd_Dlstart(host);
    App_WrCoCmd_Buffer(host, TAG_MASK(1));
-   App_WrCoCmd_Buffer(host, TAG(BT_Dummy));
-   Gpu_CoCmd_Button(host, 0, 0, 480, 270, 27, 0, "");
+   CD::dummyButton(BT_Dummy);
    App_WrCoCmd_Buffer(host, TAG(BT_Back));
-   Gpu_CoCmd_Button(host, 16, 8, 48, 48, 27, 0, "");
+   Gpu_CoCmd_Button(host, 10, 10, 50, 50, 27, 0, "");
    App_WrCoCmd_Buffer(host, TAG(BT_ComparatorLevel));
    Gpu_CoCmd_Button(host, 16, 85, 442, 28, 29, 0, "");
    App_WrCoCmd_Buffer(host, TAG(BT_CounterTimeOut));

@@ -82,6 +82,7 @@ public:
    static void sliderButton(uint16_t left, uint16_t top, const char* labels, uint16_t buttonTag, bool isEnabled, uint8_t width = 111, bool isNormalyEnabled = true);
    static void updateIndicator(uint16_t left,uint16_t top, ColoredStatus cs);
    static void buttonBack(uint16_t leftX = 26, uint16_t centY = 32);
+   static void dummyButton(uint8_t tag);
    static void buttonInfo();
    static void buttonMenu(uint16_t leftX = 420, uint16_t centY = 32);
    static void buttonChangeTheme();

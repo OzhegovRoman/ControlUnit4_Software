@@ -37,19 +37,19 @@ void MainWidget::setup()
       }
 
    Gpu_CoCmd_Dlstart(host());
-   App_WrCoCmd_Buffer(host(), TAG_MASK(1));
-   App_WrCoCmd_Buffer(host(), TAG(BT_Dummy));
-   Gpu_CoCmd_Button(host(), 0, 0, 480, 270, 27, 0, "");
-   App_WrCoCmd_Buffer(host(), TAG(BT_Info));
-   Gpu_CoCmd_Button(host(), 430, 13, 44, 45, 27, 0, "");
-   App_WrCoCmd_Buffer(host(), TAG_MASK(0));
 
+   App_WrCoCmd_Buffer(host(), TAG_MASK(1));
+   CD::dummyButton(BT_Dummy);
+   App_WrCoCmd_Buffer(host(), TAG(BT_Info));
+   Gpu_CoCmd_Button(host(), 420, 10, 50, 50, 27, 0, "");
+   App_WrCoCmd_Buffer(host(), TAG_MASK(0));
 
    Gpu_CoCmd_FgColor(host(),CD::themeColor(Grad_Bottom));
    Gpu_CoCmd_GradColor(host(),CD::themeColor(Grad_Buttons));
 
    CD::headPanel("Control Unit","Available units list:");
    CD::buttonInfo();
+
    CD::mainBackground();
 
    uint16_t right = mHarvester->drivers().size() > maxDeviceListSize ? 434: 470;
@@ -71,21 +71,17 @@ void MainWidget::loop()
    {
    static uint32_t lastButtonPressedTag = 0;
 
-
-
    uint8_t buttonTag = Gpu_Hal_Rd8(host(), REG_TOUCH_TAG);
 
    if (buttonTag && (buttonTag != 255)){
       if (buttonTag != lastButtonPressedTag){
          update();
          lastButtonPressedTag = buttonTag;
-         qDebug()<<"Button pressed" << buttonTag;
          }
       }
    else {
       switch (lastButtonPressedTag) {
          case BT_Info:{
-            qDebug()<<"Button released" << lastButtonPressedTag;
             lastButtonPressedTag = 0;
             terminate();
             emit systemInfoClicked();
@@ -93,7 +89,6 @@ void MainWidget::loop()
             }
          default: {
             if (lastButtonPressedTag >= BT_DriverButton){
-               qDebug()<<"Button released" << lastButtonPressedTag;
                terminate();
                emit channelChoosen(static_cast<int>(lastButtonPressedTag - BT_DriverButton));
                lastButtonPressedTag = 0;
@@ -122,22 +117,26 @@ void MainWidget::loop()
    //    if (mUpdateFlag){
    //        mUpdateFlag = false;
    Gpu_CoCmd_Dlstart(host());
+
    Gpu_CoCmd_Append(host(), 100000L, dlOffset);
    //TODO: проверить на больших числах
    bool wideList = true;
 
    if (mHarvester->drivers().size() > maxDeviceListSize){
-      Gpu_CoCmd_FgColor(host(),0xFF7514);
-      Gpu_CoCmd_BgColor(host(),0x783508);
+      Gpu_CoCmd_FgColor(host(),CD::themeColor(Colors::SliderPoint));
+      Gpu_CoCmd_BgColor(host(),CD::themeColor(Colors::InnerArea));
 
       App_WrCoCmd_Buffer(host(), TAG_MASK(1));
       App_WrCoCmd_Buffer(host(), TAG(BT_SCROLLER));
-      Gpu_CoCmd_Scrollbar(host(), 444, 90, 26, 160, OPT_FLAT, mTopIndex, maxDeviceListSize, static_cast<uint16_t>(mHarvester->drivers().size()));
+      Gpu_CoCmd_Scrollbar(host(), 444, 90, 26, 160, 0, mTopIndex, maxDeviceListSize, static_cast<uint16_t>(mHarvester->drivers().size()));
       Gpu_CoCmd_Track(host(), 441, 79, 33, 183, BT_SCROLLER);
       App_WrCoCmd_Buffer(host(), TAG_MASK(0));
 
+      Gpu_CoCmd_FgColor(host(),CD::themeColor(Grad_Bottom));
+
       wideList = false;
       }
+   Gpu_CoCmd_BgColor(host(),CD::themeColor(Colors::InnerArea));
 
    drawer->setIsWideList(wideList);
 
@@ -216,13 +215,11 @@ void MainWidget::loop()
 
          if (dataInfo[i+mTopIndex].channelInited && isConnected){
             cs = CS_Normal;
-//            App_WrCoCmd_Buffer(host(), COLOR(CD::themeColor(TextNormal)));
             tempStr = QString("%1 K").
                       arg(static_cast<double>(tempdriver->temperature()->currentValue()), 4, 'f', 2);
             }
          else {
             cs = CS_Inactive;
-//            App_WrCoCmd_Buffer(host(), COLOR(CD::themeColor(TextInactive)));
             tempStr = "Not connected";
             }
 
@@ -273,8 +270,9 @@ void MainWidget::loop()
    Gpu_CoCmd_Swap(host());
    App_Flush_Co_Buffer(host());
    Gpu_Hal_WaitCmdfifo_empty(host());
-   //    }
-   animationProcess = (animationProcess + 1) % animationPeriod;
+
+
+   animationProcess= (animationProcess + 1) % animationPeriod;
 
    FTWidget::loop();
    }
