@@ -56,8 +56,8 @@ void TempM1Widget::setTempReset(TemperatureRecycleInterface *value)
          tempReset->resetAvg();
          watcher.start();
          }
-      else
-         watcher.stop();
+//      else
+//         watcher.stop();
       });
    QSettings settings("Scontel", "cu-simpleapp");
    ui->CB_SelectedTempSensor->setCurrentIndex(settings.value("tempSensorIndex",0).toUInt());
@@ -75,14 +75,18 @@ void TempM1Widget::checkTemperature()
    for (int i = 0; i < 4; ++i) {
       tempReset->avg[i].average(mDriver->currentTemperature(i));
       }
-   tempReset->toggleIndicator(ui->L_isOperating, (tempReset->avg[0].getAvg() < 10));
 
+   uint8_t sensorIdx = ui->CB_SelectedTempSensor->currentText().right(1).toInt();
+
+//   qDebug() << tempReset->avg[sensorIdx].getAvg() << tempReset->avg[sensorIdx].getTrend();
+
+   tempReset->toggleIndicator(ui->L_isOperating, (tempReset->avg[0].getAvg() < 10));
    QSettings settings("Scontel", "cu-simpleapp");
    if (ui->CB_TemperatureControl->isChecked()
-       && tempReset->avg[0].getAvg() < settings.value("workTemperatureT1",10).toReal()
+       && tempReset->avg[0].getAvg() < settings.value("workTemperatureT0",10).toReal()
        && tempReset->getRecycleState() == TRS_Idle)
       {
-      uint8_t sensorIdx = ui->CB_SelectedTempSensor->currentText().right(1).toInt();
+
       if (tempReset->avg[sensorIdx].getAvg() > ui->DSB_TempThreshold->value()
           && tempReset->avg[sensorIdx].getTrend() > 0){
          tempReset->showPreStartMsg();
@@ -93,8 +97,8 @@ void TempM1Widget::checkTemperature()
 void TempM1Widget::saveSettings()
    {
    QSettings settings("Scontel", "cu-simpleapp");
-   if (settings.value("workTemperatureT1",-1).toInt() == -1)
-      settings.setValue("workTemperatureT1",10.);
+   if (settings.value("workTemperatureT0",-1).toInt() == -1)
+      settings.setValue("workTemperatureT0",10.);
    settings.setValue("tempSensorIndex", ui->CB_SelectedTempSensor->currentIndex());
    settings.setValue("autoRecycleTreshold", ui->DSB_TempThreshold->value());
    }

@@ -359,9 +359,10 @@ void Averager::setMaxLen(const uint32_t &maxLen)
    mMaxLen = maxLen;
    }
 
-Averager::Averager(uint32_t maxLen):mMaxLen(maxLen)
+Averager::Averager(uint32_t maxLen):
+   mMaxLen(maxLen)
    {
-
+   reset();
    }
 
 double Averager::average(double val)
@@ -370,7 +371,7 @@ double Averager::average(double val)
    mSum+=val;
    buffer.append(val);
    if (buffer.count() > mMaxLen){
-      mSum -= buffer.takeLast();
+      mSum -= buffer.takeFirst();
       }
    rv = getAvg();
    if (buffer.count() > (mMaxLen/2))
@@ -388,9 +389,9 @@ void Averager::calcTrend(double val)
    {
    avgBuffer.append(val);
    if (avgBuffer.count() > mMaxLen){
-      buffer.removeLast();
+      avgBuffer.removeFirst();
       }
-   mTrend = avgBuffer.first() - avgBuffer.last();
+   mTrend = avgBuffer.last() - avgBuffer.first();
    }
 
 double Averager::getAvg() const {
