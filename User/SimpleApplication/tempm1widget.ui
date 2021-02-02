@@ -101,6 +101,9 @@ U4</string>
      </item>
      <item>
       <widget class="QLabel" name="label_3">
+       <property name="styleSheet">
+        <string notr="true">font: 12pt &quot;MS Shell Dlg 2&quot;; color: black</string>
+       </property>
        <property name="text">
         <string>T0 &lt; 10K :</string>
        </property>
