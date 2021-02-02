@@ -188,13 +188,15 @@ QString TemperatureRecycleInterface::toString(TemperatureRecycleState trs)
       case TRS_Heating:           { return QString("Heating"); } break;
       case TRS_Thermalization:    { return QString("Thermalization"); } break;
       case TRS_CoolingDown:       { return QString("Cooling Down"); } break;
-      case TRS_RestoreSSPDParams: { return QString("Restore SSPD parameters"); } break;
+      case TRS_RestoreSSPDParams: { return QString("Finish Recycling"); } break;
+      case TRS_Aborted:           { return QString("Process Aborted"); } break;
       default: return QString("");
       }
    }
 
 void TemperatureRecycleInterface::startProcess(uint32_t HeatingTime, uint32_t ThermalizationTime, uint32_t CoolingDownTime)
    {
+   emit stateChanged(TRS_StartRecycle);
    currentProgress = 0;
    saveSSPDParams();
    prepareSSPD();
@@ -277,7 +279,8 @@ void TemperatureRecycleInterface::prepareSSPD()
 
 void TemperatureRecycleInterface::restoreSSPDParams()
    {
-   emit stateChanged(TRS_RestoreSSPDParams);
+   if (currentState != TRS_Aborted)
+      emit stateChanged(TRS_RestoreSSPDParams);
    for(auto a : *mDrivers) {
       auto driver = qobject_cast<SspdDriverM1*>(a);
       if (driver){
@@ -320,6 +323,7 @@ void TemperatureRecycleInterface::startWaitCoolingDown()
 
 void TemperatureRecycleInterface::abortProcess()
    {
+//   emit stateChanged(TRS_Aborted);
    waitCoolingDownTimer->stop();
    progressReportTimer->stop();
    mRelay5v->stop();

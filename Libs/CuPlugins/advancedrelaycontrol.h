@@ -30,6 +30,7 @@ enum TemperatureRecycleState{
    TRS_Thermalization,
    TRS_CoolingDown,
    TRS_RestoreSSPDParams,
+   TRS_Aborted,
    _TRS_Count
    };
 
