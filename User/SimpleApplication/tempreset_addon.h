@@ -46,6 +46,8 @@ public:
 
    TemperatureRecycleState getRecycleState();
 
+   TemperatureRecycleInterface *getTempRecycle() const;
+
 public slots:
    void showPreStartMsg();
    void updateProgressBar();

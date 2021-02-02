@@ -132,6 +132,11 @@ void TemperatureResetAddon::showPreStartMsg()
       }
    }
 
+TemperatureRecycleInterface *TemperatureResetAddon::getTempRecycle() const
+   {
+   return mTempRecycle;
+   }
+
 void TemperatureResetAddon::applySettings()
    {
    QSettings settings("Scontel", "cu-simpleapp");

@@ -4,6 +4,8 @@
 #include <QTime>
 #include <QDialog>
 #include <QSettings>
+#include <QFileDialog>
+#include <QMessageBox>
 
 
 TempM1Widget::TempM1Widget(QWidget *parent)
@@ -16,6 +18,8 @@ TempM1Widget::TempM1Widget(QWidget *parent)
    connect(&mTimer, &QTimer::timeout, this, &TempM1Widget::onTimerTicker);
 
    connect(&watcher, &QTimer::timeout, this, &TempM1Widget::checkTemperature);
+   connect(ui->PB_SaveLogAs, &QPushButton::clicked, this, &TempM1Widget::saveLogToFile);
+   connect(ui->PB_ClearLog,&QPushButton::clicked, this, &TempM1Widget::clearLog);
    }
 
 TempM1Widget::~TempM1Widget()
@@ -56,8 +60,13 @@ void TempM1Widget::setTempReset(TemperatureRecycleInterface *value)
          tempReset->resetAvg();
          watcher.start();
          }
-//      else
-//         watcher.stop();
+      });
+   connect(tempReset->getTempRecycle(),&TemperatureRecycleInterface::stateChanged,this,[=](TemperatureRecycleState trs){
+      if(trs >= TRS_StartRecycle){
+         QString output = QDateTime::currentDateTime().toString("[dd.MM.yyyy hh:mm:ss] ");
+         output.append(TemperatureRecycleInterface::toString(trs));
+         ui->PTE_Log->appendPlainText(output);
+         }
       });
    QSettings settings("Scontel", "cu-simpleapp");
    ui->CB_SelectedTempSensor->setCurrentIndex(settings.value("tempSensorIndex",0).toUInt());
@@ -78,7 +87,7 @@ void TempM1Widget::checkTemperature()
 
    uint8_t sensorIdx = ui->CB_SelectedTempSensor->currentText().right(1).toInt();
 
-//   qDebug() << tempReset->avg[sensorIdx].getAvg() << tempReset->avg[sensorIdx].getTrend();
+   //   qDebug() << tempReset->avg[sensorIdx].getAvg() << tempReset->avg[sensorIdx].getTrend();
 
    tempReset->toggleIndicator(ui->L_isOperating, (tempReset->avg[0].getAvg() < 10));
    QSettings settings("Scontel", "cu-simpleapp");
@@ -101,6 +110,24 @@ void TempM1Widget::saveSettings()
       settings.setValue("workTemperatureT0",10.);
    settings.setValue("tempSensorIndex", ui->CB_SelectedTempSensor->currentIndex());
    settings.setValue("autoRecycleTreshold", ui->DSB_TempThreshold->value());
+   }
+
+void TempM1Widget::saveLogToFile()
+   {
+   QFile file(QFileDialog::getSaveFileName(this,tr("Save File"),QString(""),tr("Text (*.txt)")));
+   if (file.open(QIODevice::WriteOnly)){
+      QTextStream out(&file);
+      QString rv = ui->PTE_Log->toPlainText();
+      rv.replace("\n","\r\n");
+      out << rv;
+      file.close();
+      }
+   }
+
+void TempM1Widget::clearLog()
+   {
+   if (QMessageBox::Yes == QMessageBox::question(this,"Clear Log","Do you want to clear recycle log?",QMessageBox::Yes|QMessageBox::No))
+      ui->PTE_Log->clear();
    }
 
 void TempM1Widget::onTimerTicker()
@@ -126,7 +153,7 @@ void TempM1Widget::onTimerTicker()
    ui->cb25V->setChecked(mDriver->relaysStatus()->currentValue()[0]);
    ui->cb5V->setChecked(mDriver->relaysStatus()->currentValue()[1]);
 
-//   checkTemperature();
+   //   checkTemperature();
    mTimer.start(1000);
    }
 
