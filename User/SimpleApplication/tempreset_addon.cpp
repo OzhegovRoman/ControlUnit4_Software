@@ -56,8 +56,8 @@ void TemperatureResetAddon::setTempRecycle(TemperatureRecycleInterface *value)
          changeAlgoritmState(false);
          QMessageBox::critical(this,"Recycle procedure aborted","The temperature module relays have been modified externally.");
          }
-      toggleIndicator(ui->L_25vIndicator,mTempRecycle->getRelayState(cRelaysStatus::ri25V));
-      toggleIndicator(ui->L_5vIndicator,mTempRecycle->getRelayState(cRelaysStatus::ri5V));
+      toggleIndicator(ui->L_25vIndicator,mTempRecycle->getReadedRelayState(cRelaysStatus::ri25V));
+      toggleIndicator(ui->L_5vIndicator,mTempRecycle->getReadedRelayState(cRelaysStatus::ri5V));
       });
 
    mTempRecycle = value;
