@@ -67,6 +67,7 @@ void TemperatureResetAddon::setTempRecycle(TemperatureRecycleInterface *value)
          changeAlgoritmState(false);
       });
    connect(this->mTempRecycle,&TemperatureRecycleInterface::progress,this,[=](uint32_t progress){
+       Q_UNUSED(progress);
       //      ui->progressBar->setValue(progress);
       if (mIsRuning)
          ui->L_Time->setText(QTime::fromMSecsSinceStartOfDay(mTempRecycle->getElapsed()).toString("mm:ss"));
@@ -166,6 +167,7 @@ void TemperatureResetAddon::mousePressEvent(QMouseEvent *event)
 void TemperatureResetAddon::mouseReleaseEvent(QMouseEvent *event)
    {
 //   qDebug() << "released on Progress bar";
+    Q_UNUSED(event);
    progressTimer->stop();
    ui->progressBar->setValue(0);
    ui->progressBar->setStyleSheet("");

@@ -347,7 +347,7 @@ void MainWindow::updateCountsGraph()
 {
     qDebug()<<"MainWindow::updateCountsGraph";
     bool ok = false;
-    double counts;
+    double counts = 0;
     auto tmpSspdM0 = qobject_cast<SspdDriverM0*>(mDriver);
     auto tmpSspdM1 = qobject_cast<SspdDriverM1*>(mDriver);
     if (tmpSspdM0)
