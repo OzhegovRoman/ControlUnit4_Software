@@ -62,10 +62,15 @@ void TempM1Widget::setTempReset(TemperatureRecycleInterface *value)
          }
       });
    connect(tempReset->getTempRecycle(),&TemperatureRecycleInterface::stateChanged,this,[=](TemperatureRecycleState trs){
+      static QString prevStr = QString("");
       if(trs >= TRS_StartRecycle){
          QString output = QDateTime::currentDateTime().toString("[dd.MM.yyyy hh:mm:ss] ");
          output.append(TemperatureRecycleInterface::toString(trs));
-         ui->PTE_Log->appendPlainText(output);
+         if (prevStr.compare(output,Qt::CaseInsensitive)){
+            ui->PTE_Log->appendPlainText(output);
+            prevStr.clear();
+            prevStr.append(output);
+            }
          }
       });
    QSettings settings("Scontel", "cu-simpleapp");
