@@ -15,6 +15,7 @@ public:
         PA_Ok,
         PA_TimeOut,
         PA_ErrorData,
+        PA_WithoutAnswer,
         PA_None
     };
 
