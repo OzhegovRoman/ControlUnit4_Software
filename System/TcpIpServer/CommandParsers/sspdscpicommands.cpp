@@ -204,7 +204,7 @@ CommonScpiCommands::processingAnswer SspdScpiCommands::processingCommandSDM0(qui
     }
 
     if (command == "COUN?"){
-        auto data = driver.voltage()->getValueSync(&ok);
+        auto data = driver.counts()->getValueSync(&ok);
         if (ok) {
             executor()->prepareAnswer(QString("%1\r\n").arg(static_cast<int>(data)));
             return PA_WithoutAnswer;
@@ -679,7 +679,7 @@ CommonScpiCommands::processingAnswer SspdScpiCommands::processingCommandSDM1(qui
     }
 
     if (command == "COUN?"){
-        auto data = driver.voltage()->getValueSync(&ok);
+        auto data = driver.counts()->getValueSync(&ok);
         if (ok) {
             executor()->prepareAnswer(QString("%1\r\n").arg(static_cast<int>(data)));
             return PA_WithoutAnswer;
