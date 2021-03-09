@@ -66,8 +66,10 @@ void cCommandExecutor::process()
 
         if (!sameProcessFounded){
             bool done = false;
+            currentTcpIpProcess = cmdList.begin()->first;
             for (auto iter = parsers.begin(); iter<parsers.end() && !done; iter++)
                 done = (*iter)->parse(cmdList.begin()->second);
+
             if (!done)
                 prepareAnswer("UNKNOWN COMMAND\r\n");
         }
@@ -170,7 +172,8 @@ void cCommandExecutor::prepareAnswer(quint8 address, quint8 command, quint8 data
 
     cTcpIpServer::consoleWriteDebug(QString("Answer: %1").arg(ba.toHex().data()));
 
-    emit sendAnswer(cmdList.begin()->first, ba);
+    emit sendAnswer(currentTcpIpProcess, ba);
+//    emit sendAnswer(cmdList.begin()->first, ba);
 }
 
 void cCommandExecutor::prepareAnswer(QString answer)
@@ -178,7 +181,8 @@ void cCommandExecutor::prepareAnswer(QString answer)
     cTcpIpServer::consoleWriteDebug("Preparing answer as string");
     cTcpIpServer::consoleWriteDebug(QString("Answer: %1").arg(answer));
 
-    emit sendAnswer(cmdList.begin()->first, QByteArray(answer.toLocal8Bit()));
+//    emit sendAnswer(cmdList.begin()->first, QByteArray(answer.toLocal8Bit()));
+    emit sendAnswer(currentTcpIpProcess, QByteArray(answer.toLocal8Bit()));
 }
 
 bool cCommandExecutor::addDevice(quint8 address)
