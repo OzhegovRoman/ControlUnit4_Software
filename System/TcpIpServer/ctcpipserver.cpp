@@ -7,8 +7,10 @@
 #include <QString>
 #include "ctcpipprocess.h"
 #include "ccommandexecutor.h"
+#include <QTimer>
 #include <QThread>
 #include <QCoreApplication>
+#include "hwresources.h"
 #include "../StarProtocol/servercommands.h"
 
 bool cTcpIpServer::mDebugInfoEnable = false;
@@ -65,6 +67,13 @@ void cTcpIpServer::initialize()
     QThread *thread = new QThread(this);
     mExecutor->moveToThread(thread);
 
+#ifdef __linux__
+    QTimer* cpuReport = new QTimer();
+    cpuReport->setInterval(1000);
+    connect(cpuReport, &QTimer::timeout, this, &cTcpIpServer::consoleWriteHWStats);
+    cpuReport->start();
+#endif
+
     connect(thread, &QThread::started, mExecutor, &cCommandExecutor::doWork);
     connect(mExecutor, &cCommandExecutor::finished, thread, &QThread::quit);
     connect(mExecutor, &cCommandExecutor::finished, mExecutor, &cCommandExecutor::deleteLater);
@@ -99,8 +108,15 @@ void cTcpIpServer::consoleWriteError(QString string)
 {
     QString ts = QTime::currentTime().toString("hh:mm:ss:zzz ");
     if (mInfoEnable && mErrorInfoEnable)
-        std::cerr << ts.toLatin1().data() << "Error: "<<string.toLatin1().data()<<std::endl;
-}
+       std::cerr << ts.toLatin1().data() << "Error: "<<string.toLatin1().data()<<std::endl;
+   }
+
+void cTcpIpServer::consoleWriteHWStats()
+   {
+   QString ts = QTime::currentTime().toString("hh:mm:ss:zzz ");
+   if (mInfoEnable && mErrorInfoEnable)
+      std::cout << ts.toLatin1().data() << HWResources::systemLoad().toLatin1().data() << std::endl;
+   }
 
 void cTcpIpServer::incomingConnection(qintptr handle)
 {
