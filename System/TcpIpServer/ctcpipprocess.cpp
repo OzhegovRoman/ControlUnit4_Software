@@ -1,6 +1,7 @@
 #include "ctcpipprocess.h"
 #include <QThreadPool>
 #include <QTcpSocket>
+#include <QNetworkProxy>
 #include "ctcpipserver.h"
 
 cTcpIpProcess::cTcpIpProcess(QObject *parent)
@@ -12,6 +13,7 @@ cTcpIpProcess::cTcpIpProcess(QObject *parent)
 void cTcpIpProcess::initializeTcpIpSocket(qintptr handle)
 {
     mSocket = new QTcpSocket(this);
+    mSocket->setProxy(QNetworkProxy::NoProxy);
     cTcpIpServer::consoleWriteDebug("A new socket created!");
 
     connect(mSocket, &QTcpSocket::disconnected, this, &cTcpIpProcess::killProcess);

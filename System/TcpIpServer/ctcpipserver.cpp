@@ -22,6 +22,7 @@ cTcpIpServer::cTcpIpServer(QObject * parent)
     , mExecutor(nullptr)
     , udpSocket (new QUdpSocket(this))
 {
+    udpSocket->setProxy(QNetworkProxy::NoProxy);
 }
 
 cTcpIpServer::~cTcpIpServer()
