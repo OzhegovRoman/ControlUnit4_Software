@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QStringList>
+#include <QProcess>
 
 
 HWResources::HWResources()
@@ -14,60 +15,50 @@ HWResources::HWResources()
 QString HWResources::systemLoad()  // ignoring data
    {
 #ifdef __linux__
-   uint8_t cpuCount = 0;
-   static uint32_t prevCpuStats[4] = {0,0,0,0};
-   static uint32_t cpuDiff[4] = {0,0,0,0};
-   static bool firstRead = true;
-
-   qreal cpuLoad = 0;
+   qreal temperature = 0;
+   qreal cpuFreq = 0;
    qreal memoryLoad = 0;
    uint32_t memSpace[2] = {0,0};
 
-   QFile cpuInfo("/proc/cpuinfo");
-   if (cpuInfo.open(QIODevice::ReadOnly)){
-      QTextStream in(&cpuInfo);
-      while (!in.atEnd())
-         {
-         QString line = in.readLine();
-         QStringList strlist = line.split('\n');
-         if (strlist.contains("core id"))
-            cpuCount++;
-         }
-      cpuInfo.close();
+   QFile freqFile("/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq");
+   if (freqFile.open(QIODevice::ReadOnly)){
+      QTextStream in(&freqFile);
+      cpuFreq = in.readLine().toInt();
+      freqFile.close();
       }
 
-   QFile procFile("/proc/stat");
-   if (procFile.open(QIODevice::ReadOnly)){
-      QTextStream in(&procFile);
-      QStringList strList = in.readLine().split(' ');
-
-      for(int i = 0; i < 4; ++i) {
-         uint32_t val = strList.at(i+1).toInt();
-         cpuDiff[i] = val - prevCpuStats[i];
-         prevCpuStats[i] = val;
-         cpuLoad += cpuDiff[i];
-         }
-      procFile.close();
+   QFile tempFile("/sys/class/thermal/thermal_zone0/temp");
+   if (tempFile.open(QIODevice::ReadOnly)){
+      QTextStream in(&tempFile);
+      temperature = in.readLine().toInt();
+      tempFile.close();
       }
 
    QFile memFile("/proc/meminfo");
    if (memFile.open(QIODevice::ReadOnly)){
       QTextStream in(&memFile);
-      int i = 0;
-      while (!in.atEnd()){
-         QString str = in.readLine().split(':').last().remove(' ').chopped(3);
-         memSpace[i] = str.toInt();
-         if (i==1) break;
-         }
+      memSpace[0] = in.readLine().split(":").last().chopped(3).toInt();
+      memSpace[1] = in.readLine().split(":").last().chopped(3).toInt();
       memFile.close();
       }
-   memoryLoad = memSpace[0]/memSpace[1];
 
-   if (!firstRead)
-      cpuLoad = 100. * (cpuLoad-cpuDiff[3])/cpuLoad;
+   if (memSpace[0] != 0 && memSpace[1] != 0)
+      memoryLoad = (double)(memSpace[0] - memSpace[1]) / memSpace[0];
 
-   firstRead = false;
-   return QString("Mem: %1/%2 (%3)\t\tCpu: %4").arg(memSpace[0]).arg(memSpace[1]).arg(memoryLoad).arg(cpuLoad);
+   QProcess throttled;
+   throttled.start("vcgencmd get_throttled");
+   throttled.waitForFinished(5000);
+   QString throttledStr = throttled.readAllStandardOutput();
+   throttled.close();
+
+
+   return QString("Mem used: %1/%2 Mb (%3\%)\tCpu: %4\tT: %5\t%6")
+         .arg((memSpace[0]-memSpace[1])/1000)
+         .arg(memSpace[0]/1000)
+         .arg(memoryLoad*100)
+         .arg(cpuFreq)
+         .arg(temperature/1000)
+         .arg(throttledStr);
 #else
    return QString();
 #endif

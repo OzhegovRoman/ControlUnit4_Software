@@ -68,19 +68,19 @@ void cTcpIpServer::initialize()
     QThread *thread = new QThread(this);
     mExecutor->moveToThread(thread);
 
-#ifdef __linux__
-    QTimer* cpuReport = new QTimer();
-    cpuReport->setInterval(1000);
-    connect(cpuReport, &QTimer::timeout, this, &cTcpIpServer::consoleWriteHWStats);
-    cpuReport->start();
-#endif
-
     connect(thread, &QThread::started, mExecutor, &cCommandExecutor::doWork);
     connect(mExecutor, &cCommandExecutor::finished, thread, &QThread::quit);
     connect(mExecutor, &cCommandExecutor::finished, mExecutor, &cCommandExecutor::deleteLater);
     connect(thread, &QThread::finished, thread, &QThread::deleteLater);
     connect(mExecutor, &cCommandExecutor::inited, this, &cTcpIpServer::startServer);
     connect(mExecutor, &cCommandExecutor::sendAnswer, this, &cTcpIpServer::sendAnswer);
+
+#ifdef __linux__
+    QTimer* cpuReport = new QTimer();
+    cpuReport->setInterval(10000);
+    connect(cpuReport, &QTimer::timeout, this, &cTcpIpServer::consoleWriteHWStats);
+    cpuReport->start();
+#endif
 
     thread->start();
 }
@@ -116,7 +116,7 @@ void cTcpIpServer::consoleWriteHWStats()
    {
    QString ts = QTime::currentTime().toString("hh:mm:ss:zzz ");
    if (mInfoEnable && mErrorInfoEnable)
-      std::cout << ts.toLatin1().data() << HWResources::systemLoad().toLatin1().data() << std::endl;
+      std::cout << ts.toLatin1().data() << HWResources::systemLoad().toLatin1().data();
    }
 
 void cTcpIpServer::incomingConnection(qintptr handle)
