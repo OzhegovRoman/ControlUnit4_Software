@@ -44,9 +44,10 @@ void cTcpIpProcess::read()
     }
 
     cTcpIpServer::consoleWriteDebug(QString("Socket %1 is ready to read").arg(mSocket->socketDescriptor()));
-    QByteArray ba = mSocket->readAll();
-    cTcpIpServer::consoleWriteDebug(QString("Socket %1 readed %2").arg(mSocket->socketDescriptor()).arg(ba.data()));
-    emit socketReaded(this, ba);
+    buffer.clear();
+    buffer = mSocket->readAll();
+    cTcpIpServer::consoleWriteDebug(QString("Socket %1 readed %2").arg(mSocket->socketDescriptor()).arg(buffer.data()));
+    emit socketReaded(this, buffer);
 }
 
 void cTcpIpProcess::writeToSocket(QByteArray ba)

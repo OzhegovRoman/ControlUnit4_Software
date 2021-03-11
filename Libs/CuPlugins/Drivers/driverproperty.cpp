@@ -57,6 +57,11 @@ ServiceSignal *DriverProperty_p::gettedSignal()
     return mGettedSignal;
 }
 
+DriverProperty_p::~DriverProperty_p(){
+    delete mGettedSignal;
+    delete mSettedSignal;
+}
+
 quint8 DriverProperty_p::cmdGetter() const
 {
     return mCmdGetter;
