@@ -18,9 +18,7 @@ public:
     ~SaveDialog();
     void setJsonData(const QJsonObject &jsonData);
 
-
     int exec() override;
-
 
 private slots:
     void on_tbFilePath_clicked();

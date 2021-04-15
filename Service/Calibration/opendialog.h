@@ -23,7 +23,6 @@ public:
 
 private slots:
     void on_pbOpenFile_clicked();
-
     void on_pbReceiveFromFtp_clicked();
 
 private:

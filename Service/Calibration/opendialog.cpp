@@ -66,8 +66,19 @@ void OpenDialog::on_pbReceiveFromFtp_clicked()
 
     QNetworkAccessManager manager;
     manager.setProxy(QNetworkProxy::NoProxy);
-    QNetworkRequest request(QString("http://rplab.ru/~ozhegov/ControlUnit4/Calibration/%1/").arg(mDeviceType));
+    QNetworkRequest request(QString("http://software.scontel.ru/controlUnit4/Calibration/%1/").arg(mDeviceType));
+
     QNetworkReply *reply = manager.get(request);
+
+    connect(reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error), [=](QNetworkReply::NetworkError code){
+        qDebug()<<"Error"<<(int) code;
+    });
+    connect(reply, &QNetworkReply::sslErrors, this,[=](const QList<QSslError> &sslErrors){
+        for (int i = 0; i < sslErrors.size(); i++) {
+                qDebug() << "Error " << i << sslErrors.at(i).errorString();
+            }
+    });
+
     QElapsedTimer timer;
     timer.start();
     while ((!reply->isFinished()) && (timer.elapsed()<10000))
@@ -78,6 +89,7 @@ void OpenDialog::on_pbReceiveFromFtp_clicked()
         return;
     }
     QString str = QString(reply->readAll());
+    qDebug()<<str;
     QStringList list;
 
     QStringList tmpstr = str.split(".json\">");
@@ -87,7 +99,7 @@ void OpenDialog::on_pbReceiveFromFtp_clicked()
             list.append(substr.left(substr.indexOf("</a>")));
     }
 
-    qSort(list.begin(), list.end(), qGreater<QString>());
+    std::sort(list.begin(), list.end(), qGreater<QString>());
     if (list.isEmpty()){
         this->setEnabled(true);
         return;
@@ -107,7 +119,7 @@ void OpenDialog::on_pbReceiveFromFtp_clicked()
         return;
     }
 
-    QNetworkRequest request2(QString("http://rplab.ru/~ozhegov/ControlUnit4/Calibration/%1/%2")
+    QNetworkRequest request2(QString("http://software.scontel.ru/controlUnit4/Calibration/%1/%2")
                              .arg(mDeviceType)
                              .arg(fileName));
     reply = manager.get(request2);
