@@ -12,6 +12,10 @@ public:
     // CommonScpiCommands interface
 protected:
     bool executeCommand(QString command, QString params) override;
+
+private:
+    processingAnswer processingCommandSDM0(quint8 address, QString command, QString params);
+    processingAnswer processingCommandSDM1(quint8 address, QString command, QString params);
 };
 
 #endif // SSPDSCPICOMMANDS_H

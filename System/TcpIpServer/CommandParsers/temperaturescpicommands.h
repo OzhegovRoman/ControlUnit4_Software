@@ -13,6 +13,7 @@ public:
     // CommonScpiCommands interface
 protected:
     bool executeCommand(QString command, QString params) override;
+
 };
 
 #endif // TEMPERATURESCPICOMMANDS_H

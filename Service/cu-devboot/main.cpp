@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     QLoggingCategory::setFilterRules("qt.network.ssl.warning=false");
 
     QCommandLineParser parser;
-    parser.setApplicationDescription("Bootloader for device update via internet or with local binary for Scontel\'s control unit (CU4)");
+    parser.setApplicationDescription("Bootloader for device update via internet or with local binary for Scontel\'s control unit (CU4). Default url to all version of firmware is http://software.scontel.ru/controlUnit4/Bin/Firmware/");
     parser.addHelpOption();
     parser.addVersionOption();
 
@@ -52,10 +52,6 @@ int main(int argc, char *argv[])
                                                                      "Options -i, -t will be ignored."),
                                  QCoreApplication::translate("main","FileName"));
     parser.addOption(binOption);
-    QCommandLineOption urlOption(QStringList()<<"u"<<"url",
-                                 QCoreApplication::translate("main", "URL for repo. Default url: [http://rplab.ru/~ozhegov/ControlUnit4/Bin/Firmware/]"),
-                                 QCoreApplication::translate("main","http://url"));
-    parser.addOption(urlOption);
 
     QCommandLineOption hotPlugOption(QStringList()<<"H"<<"hot",
                                      QCoreApplication::translate("main", "Hot plug option. In this case device must be connected to ControlUnit when program will be processed. "
@@ -90,9 +86,6 @@ int main(int argc, char *argv[])
         devBoot.setFileName(parser.value(binOption));
 
 
-    if (parser.isSet(urlOption))
-        devBoot.setUrl(parser.value(urlOption));
-
     devBoot.setForce((parser.isSet(forceOption) || parser.isSet(hotPlugOption)) && !parser.isSet(updateAllOption));
     devBoot.setHotPlug(parser.isSet(hotPlugOption) && !parser.isSet(updateAllOption));
 
@@ -107,5 +100,4 @@ int main(int argc, char *argv[])
     devBoot.setUpdateAllEnable(parser.isSet(updateAllOption));
     devBoot.startProcess();
 
-    return a.exec();
 }

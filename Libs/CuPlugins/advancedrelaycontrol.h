@@ -30,6 +30,7 @@ enum TemperatureRecycleState{
    TRS_Thermalization,
    TRS_CoolingDown,
    TRS_RestoreSSPDParams,
+   TRS_Aborted,
    _TRS_Count
    };
 
@@ -42,8 +43,9 @@ class AdvancedRelayControl : public QObject
    RelayState rs = RS_Idle;
    RelayControlType rct = RCT_Idle;
    const bool mDefaultEnabledState;
-   bool mIsEnabled;
-   int remainingFails = 2;
+   bool mIsMustBeEnabled;
+   bool mReadedState;
+   int remainingFails;
    cRelaysStatus::RelayIndex mTargetRelay;
    QTimer* waitBeforeToggle;
    QTimer* waitAfterToggle;
@@ -60,7 +62,10 @@ public:
    uint32_t getElapsed();
    RelayState getRs() const;
    void setRs(const RelayState &value);
-   bool isEnabled() const;
+   bool isMustBeEnabled() const;
+
+   bool getReadedState() const;
+   void setReadedState(bool readedState);
 
 public slots:
    bool checkState();
@@ -120,6 +125,7 @@ public:
 
    TemperatureRecycleState getCurrentState() const;
    bool getRelayState(cRelaysStatus::RelayIndex ri);
+   bool getReadedRelayState(cRelaysStatus::RelayIndex ri);
    void setCurrentState(const TemperatureRecycleState &value);
    bool checkIntegrity();
 

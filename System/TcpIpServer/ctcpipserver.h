@@ -19,6 +19,7 @@ public:
     static void consoleWrite(QString string);
     static void consoleWriteDebug(QString string);
     static void consoleWriteError(QString string);
+//    static void consoleWriteHWStats();
 
     cCommandExecutor *executor() const;
     void setExecutor(cCommandExecutor *executor);

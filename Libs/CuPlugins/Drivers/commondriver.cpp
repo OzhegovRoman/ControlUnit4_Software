@@ -18,6 +18,22 @@ CommonDriver::CommonDriver(QObject *parent)
     mWriteEeprom->executedSignal()->connect([=](){emit eepromWrited();});
 }
 
+CommonDriver::~CommonDriver()
+{
+    delete mDeviceType;
+    delete mModificationVersion;
+    delete mHardwareVersion;
+    delete mFirmwareVersion;
+    delete mDeviceDescription;
+    delete mUDID;
+    delete mInit;
+    delete mShutDown;
+    delete mSilence;
+    delete mReboot;
+    delete mWriteEeprom;
+
+}
+
 DriverPropertyReadOnly<QString> *CommonDriver::deviceType() const
 {
     return mDeviceType;

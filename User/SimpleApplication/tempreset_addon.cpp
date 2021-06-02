@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QSettings>
 
 #include "tempreset_addon.h"
 #include "ui_tempreset_addon.h"
@@ -12,7 +13,6 @@ TemperatureResetAddon::TemperatureResetAddon(TemperatureRecycleInterface *tempRe
    {
    ui->setupUi(this);
 
-   settings = new TemperatureControlSettings();
    applySettings();
 
    setWindowTitle("Temperature recycle settings");
@@ -24,16 +24,15 @@ TemperatureResetAddon::TemperatureResetAddon(TemperatureRecycleInterface *tempRe
 TemperatureResetAddon::~TemperatureResetAddon()
    {
    saveSettings();
-   settings->saveSettings();
-   delete settings;
    delete ui;
    }
 
 void TemperatureResetAddon::saveSettings()
    {
-   settings->heatingMins         = ui->SB_HeatingTime->value();
-   settings->thermalizationMins  = ui->SB_ThermalizationTime->value();
-   settings->coolingDownMins     = ui->SB_CoolingDown->value();
+   QSettings settings("Scontel", "cu-simpleapp");
+   settings.setValue("heatingMins", ui->SB_HeatingTime->value());
+   settings.setValue("thermalizationMins", ui->SB_ThermalizationTime->value());
+   settings.setValue("coolingDownMins", ui->SB_CoolingDown->value());
    }
 
 void TemperatureResetAddon::resetAvg()
@@ -57,8 +56,8 @@ void TemperatureResetAddon::setTempRecycle(TemperatureRecycleInterface *value)
          changeAlgoritmState(false);
          QMessageBox::critical(this,"Recycle procedure aborted","The temperature module relays have been modified externally.");
          }
-      toggleIndicator(ui->L_25vIndicator,mTempRecycle->getRelayState(cRelaysStatus::ri25V));
-      toggleIndicator(ui->L_5vIndicator,mTempRecycle->getRelayState(cRelaysStatus::ri5V));
+      toggleIndicator(ui->L_25vIndicator,mTempRecycle->getReadedRelayState(cRelaysStatus::ri25V));
+      toggleIndicator(ui->L_5vIndicator,mTempRecycle->getReadedRelayState(cRelaysStatus::ri5V));
       });
 
    mTempRecycle = value;
@@ -68,6 +67,7 @@ void TemperatureResetAddon::setTempRecycle(TemperatureRecycleInterface *value)
          changeAlgoritmState(false);
       });
    connect(this->mTempRecycle,&TemperatureRecycleInterface::progress,this,[=](uint32_t progress){
+       Q_UNUSED(progress);
       //      ui->progressBar->setValue(progress);
       if (mIsRuning)
          ui->L_Time->setText(QTime::fromMSecsSinceStartOfDay(mTempRecycle->getElapsed()).toString("mm:ss"));
@@ -133,11 +133,17 @@ void TemperatureResetAddon::showPreStartMsg()
       }
    }
 
+TemperatureRecycleInterface *TemperatureResetAddon::getTempRecycle() const
+   {
+   return mTempRecycle;
+   }
+
 void TemperatureResetAddon::applySettings()
    {
-   ui->SB_HeatingTime->setValue(settings->heatingMins);
-   ui->SB_ThermalizationTime->setValue(settings->thermalizationMins);
-   ui->SB_CoolingDown->setValue(settings->coolingDownMins);
+   QSettings settings("Scontel", "cu-simpleapp");
+   ui->SB_HeatingTime->setValue(settings.value("heatingMins",12).toUInt());
+   ui->SB_ThermalizationTime->setValue(settings.value("thermalizationMins",10).toUInt());
+   ui->SB_CoolingDown->setValue(settings.value("coolingDownMins",25).toUInt());
    }
 
 void TemperatureResetAddon::mousePressEvent(QMouseEvent *event)
@@ -161,6 +167,7 @@ void TemperatureResetAddon::mousePressEvent(QMouseEvent *event)
 void TemperatureResetAddon::mouseReleaseEvent(QMouseEvent *event)
    {
 //   qDebug() << "released on Progress bar";
+    Q_UNUSED(event);
    progressTimer->stop();
    ui->progressBar->setValue(0);
    ui->progressBar->setStyleSheet("");

@@ -44,6 +44,7 @@ private:
     cuIOInterface *mInterface;
     QTimer *processTimer;
     QList<QPair <QObject*, QByteArray> > cmdList;
+    QObject* currentTcpIpProcess;
     SettingsProvider *mSettings;
     QList<cAbstractCommandParser*> parsers;
     bool mStopFlag;

@@ -9,6 +9,16 @@
 #include "Drivers/tempdriverm1.h"
 
 
+bool AdvancedRelayControl::getReadedState() const
+   {
+   return mReadedState;
+   }
+
+void AdvancedRelayControl::setReadedState(bool readedState)
+   {
+   mReadedState = readedState;
+   }
+
 AdvancedRelayControl::AdvancedRelayControl(TempDriverM1 *tDriver,
                                            cRelaysStatus::RelayIndex targetRelay,
                                            bool defaultEnabledState,
@@ -16,14 +26,15 @@ AdvancedRelayControl::AdvancedRelayControl(TempDriverM1 *tDriver,
    QObject(parent),
    mTDriver(tDriver),
    mTargetRelay(targetRelay),
-   mDefaultEnabledState(defaultEnabledState)
+   mDefaultEnabledState(defaultEnabledState),
+   remainingFails(5)
    {
    waitBeforeToggle = new QTimer(this);
    waitAfterToggle = new QTimer(this);
    waitAfterToggle->setInterval(10000);
    waitAfterToggle->setSingleShot(true);
 
-   mIsEnabled = !(mDefaultEnabledState ^ getRelayState());
+   mIsMustBeEnabled = !(mDefaultEnabledState ^ getRelayState());
 
    connect(waitAfterToggle, &QTimer::timeout, this, [=](){
       setRelay(true);
@@ -40,7 +51,7 @@ AdvancedRelayControl::~AdvancedRelayControl()
 void AdvancedRelayControl::setRelay(bool enable)
    {
    cRelaysStatus status;
-   mIsEnabled = enable;
+   mIsMustBeEnabled = enable;
    status.setStatus(mTargetRelay, (enable == mDefaultEnabledState) ? mTargetRelay : 0);
    mTDriver->relaysStatus()->setValueSync(status, nullptr, 5);
    }
@@ -49,6 +60,7 @@ bool AdvancedRelayControl::getRelayState()
    {
    bool rv = false;
    bool ok;
+//   qDebug() << mTargetRelay;
    cRelaysStatus status = mTDriver->relaysStatus()->getValueSync(&ok);
    if (ok){
       rv = status.status() & mTargetRelay;
@@ -87,6 +99,7 @@ void AdvancedRelayControl::beginRelaySchedule(uint32_t timeBeforeToggle,
 void AdvancedRelayControl::stop()
    {
    setRelay(true);
+   remainingFails = 2;
    waitBeforeToggle->stop();
    waitAfterToggle->stop();
    setRs(RS_Idle);
@@ -104,25 +117,25 @@ uint32_t AdvancedRelayControl::getElapsed()
    return rv;
    }
 
-bool AdvancedRelayControl::isEnabled() const
+bool AdvancedRelayControl::isMustBeEnabled() const
    {
-   return mIsEnabled;
+   return mIsMustBeEnabled;
    }
 
 bool AdvancedRelayControl::checkState()
    {
    bool rv = true;
-   bool relayState = getRelayState();
+   mReadedState = getRelayState();
 
-   if (relayState == !(mDefaultEnabledState ^ isEnabled()) ){
+   if (mReadedState == !(mDefaultEnabledState ^ isMustBeEnabled()) ){
       rv = true;
-      remainingFails = 2;
+      remainingFails = 5;
       }
    else
       if (remainingFails-- <= 0)
          rv = false;
-
-   //   qDebug() << remainingFails << relayState << mDefaultEnabledState << mIsEnabled << rv;
+   if (remainingFails < 5)
+      qDebug() << mTargetRelay << remainingFails << mReadedState << mDefaultEnabledState << mIsMustBeEnabled << rv;
    return rv;
    }
 
@@ -152,6 +165,14 @@ bool TemperatureRecycleInterface::getRelayState(cRelaysStatus::RelayIndex ri)
    switch (ri) {
       case cRelaysStatus::ri25V: return mRelay25v->getRelayState();
       case cRelaysStatus::ri5V:  return mRelay5v->getRelayState();
+      }
+   }
+
+bool TemperatureRecycleInterface::getReadedRelayState(cRelaysStatus::RelayIndex ri)
+   {
+   switch (ri) {
+      case cRelaysStatus::ri25V: return mRelay25v->getReadedState();
+      case cRelaysStatus::ri5V:  return mRelay5v->getReadedState();
       }
    }
 
@@ -188,13 +209,15 @@ QString TemperatureRecycleInterface::toString(TemperatureRecycleState trs)
       case TRS_Heating:           { return QString("Heating"); } break;
       case TRS_Thermalization:    { return QString("Thermalization"); } break;
       case TRS_CoolingDown:       { return QString("Cooling Down"); } break;
-      case TRS_RestoreSSPDParams: { return QString("Restore SSPD parameters"); } break;
+      case TRS_RestoreSSPDParams: { return QString("Finish Recycling"); } break;
+      case TRS_Aborted:           { return QString("Process Aborted"); } break;
       default: return QString("");
       }
    }
 
 void TemperatureRecycleInterface::startProcess(uint32_t HeatingTime, uint32_t ThermalizationTime, uint32_t CoolingDownTime)
    {
+   emit stateChanged(TRS_StartRecycle);
    currentProgress = 0;
    saveSSPDParams();
    prepareSSPD();
@@ -277,7 +300,8 @@ void TemperatureRecycleInterface::prepareSSPD()
 
 void TemperatureRecycleInterface::restoreSSPDParams()
    {
-   emit stateChanged(TRS_RestoreSSPDParams);
+   if (currentState != TRS_Aborted)
+      emit stateChanged(TRS_RestoreSSPDParams);
    for(auto a : *mDrivers) {
       auto driver = qobject_cast<SspdDriverM1*>(a);
       if (driver){
@@ -320,10 +344,12 @@ void TemperatureRecycleInterface::startWaitCoolingDown()
 
 void TemperatureRecycleInterface::abortProcess()
    {
+//   emit stateChanged(TRS_Aborted);
    waitCoolingDownTimer->stop();
    progressReportTimer->stop();
    mRelay5v->stop();
    mRelay25v->stop();
+
    restoreSSPDParams();
    }
 
@@ -359,9 +385,10 @@ void Averager::setMaxLen(const uint32_t &maxLen)
    mMaxLen = maxLen;
    }
 
-Averager::Averager(uint32_t maxLen):mMaxLen(maxLen)
+Averager::Averager(uint32_t maxLen):
+   mMaxLen(maxLen)
    {
-
+   reset();
    }
 
 double Averager::average(double val)
@@ -370,7 +397,7 @@ double Averager::average(double val)
    mSum+=val;
    buffer.append(val);
    if (buffer.count() > mMaxLen){
-      mSum -= buffer.takeLast();
+      mSum -= buffer.takeFirst();
       }
    rv = getAvg();
    if (buffer.count() > (mMaxLen/2))
@@ -388,9 +415,9 @@ void Averager::calcTrend(double val)
    {
    avgBuffer.append(val);
    if (avgBuffer.count() > mMaxLen){
-      buffer.removeLast();
+      avgBuffer.removeFirst();
       }
-   mTrend = avgBuffer.first() - avgBuffer.last();
+   mTrend = avgBuffer.last() - avgBuffer.first();
    }
 
 double Averager::getAvg() const {

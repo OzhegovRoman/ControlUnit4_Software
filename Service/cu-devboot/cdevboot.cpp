@@ -29,7 +29,7 @@ cDevBoot::cDevBoot(QObject *parent) :
     mUpdateAll(false),
     mBetaVersions(false),
     mFileName(QString("%1/fw.bin").arg("/home/pi")),
-    mUrl(QString("http://rplab.ru/~ozhegov/ControlUnit4/Bin/Firmware/")),
+    mUrl(QString("https://software.scontel.ru/controlUnit4/Bin/Firmware/")),
     mDevType(QString()),
     mFirmwareVersion(QString())
 {
@@ -249,8 +249,10 @@ bool cDevBoot::compareVersion(const QString &str1, const QString &str2)
         QList<int> res;
         QString tmpStr = str;
         bool beta = tmpStr.endsWith('b');
-        if (beta) tmpStr.chop(1);
-        auto strL = str.split(".");
+        if (beta) {
+            tmpStr.chop(1);
+        }
+        auto strL = tmpStr.split(".");
         for (auto st: strL)
             res<<st.toInt();
         if (beta) res<<-1;
@@ -372,6 +374,8 @@ void cDevBoot::prepareOptions()
 
     if (!isDeviceTypeCorrect()){
         qDebug()<<"WARNING! Wrong type of device";
+        qDebug()<<"Device type:"<<mDevType;
+        qDebug()<<"Available types:"<<mTypeVersion.keys();
         exit(3);
     }
     if (!isFirmwareVersionCorrect()){

@@ -18,7 +18,14 @@ TempDriverM1::TempDriverM1(QObject *parent)
 
 TempDriverM1::~TempDriverM1()
 {
-
+   delete mRelaysStatus;
+   delete mSwitcherMode;
+   delete mVoltageProperty;
+   delete mCurrentProperty;
+   delete mTemperatureProperty;
+   delete mDefaultParams;
+   delete mEepromCoeffs;
+   delete mTempTableProperty;
 }
 
 DriverProperty<cRelaysStatus> *TempDriverM1::relaysStatus() const

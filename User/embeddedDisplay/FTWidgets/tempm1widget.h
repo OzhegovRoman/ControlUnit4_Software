@@ -21,6 +21,7 @@ protected:
     void loop();
 private:
     enum {
+       BT_Dummy = 254,
         BT_Back = 1,
         BT_Relay5V = 2,
         BT_Relay25V = 3

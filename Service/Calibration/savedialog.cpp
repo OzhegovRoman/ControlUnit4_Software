@@ -196,20 +196,20 @@ bool SaveDialog::sendToFtp()
         script.open(QIODevice::WriteOnly | QIODevice::Text);
         QTextStream out(&script);
 
-        out<<QString("open sftp://ozhegov@rplab.ru/ "
-                     "-hostkey=\"ssh-ed25519 256 hBKCMocZux/5LUxnUYELguRg3goxhTNCVnpxGF7GRVU=\" "
+        out<<QString("open scp://root@software.scontel.ru/ "
                      "-privatekey=\"%1\" "
+                     "-hostkey=\"ssh-ed25519 255 OR/XRcDp0G+9TxJ5qw68+a8o4tQoJoJsWNOKOlL2f6I=\" "
                      "-rawsettings Cipher=\"aes,blowfish,3des,chacha20,WARN,arcfour,des\" KEX=\"ecdh,dh-gex-sha1,dh-group14-sha1,dh-group1-sha1,rsa,WARN\"\r\n")
              .arg(ui->lePrivateKey->text());
 
         out<<QString("option batch continue\r\n");
 
-        out<<QString("mkdir /home/ozhegov/public_html/ControlUnit4/Calibration/%1/\r\n")
+        out<<QString("mkdir /var/www/html/controlUnit4/Calibration/%1/\r\n")
              .arg(mJsonData["DeviceType"].toString());
 
         out<<QString("option batch abort\r\n");
 
-        out<<QString("put %1 /home/ozhegov/public_html/ControlUnit4/Calibration/%2/\r\n")
+        out<<QString("put %1 /var/www/html/controlUnit4/Calibration/%2/\r\n")
              .arg(tmpFileName)
              .arg(mJsonData["DeviceType"].toString());
         out<<QString("exit");
@@ -250,7 +250,7 @@ bool SaveDialog::sendToFtp()
         qApp->processEvents();
 
         qDebug()<<process.exitCode();
-        script.remove();
+        //script.remove();
     }
 
     // удаляем временный файл

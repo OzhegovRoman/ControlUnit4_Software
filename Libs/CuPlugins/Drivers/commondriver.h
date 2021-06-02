@@ -10,6 +10,7 @@ class CommonDriver: public AbstractDriver
     Q_OBJECT
 public:
     explicit CommonDriver(QObject * parent = nullptr);
+    ~CommonDriver();
 
     DriverPropertyReadOnly<QString> * deviceType() const;
     DriverPropertyReadOnly<QString> * modificationVersion() const;

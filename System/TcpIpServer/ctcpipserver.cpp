@@ -7,8 +7,10 @@
 #include <QString>
 #include "ctcpipprocess.h"
 #include "ccommandexecutor.h"
+#include <QTimer>
 #include <QThread>
 #include <QCoreApplication>
+#include "hwresources.h"
 #include "../StarProtocol/servercommands.h"
 
 bool cTcpIpServer::mDebugInfoEnable = false;
@@ -20,6 +22,7 @@ cTcpIpServer::cTcpIpServer(QObject * parent)
     , mExecutor(nullptr)
     , udpSocket (new QUdpSocket(this))
 {
+    udpSocket->setProxy(QNetworkProxy::NoProxy);
 }
 
 cTcpIpServer::~cTcpIpServer()
@@ -72,6 +75,13 @@ void cTcpIpServer::initialize()
     connect(mExecutor, &cCommandExecutor::inited, this, &cTcpIpServer::startServer);
     connect(mExecutor, &cCommandExecutor::sendAnswer, this, &cTcpIpServer::sendAnswer);
 
+//#ifdef __linux__
+//    QTimer* cpuReport = new QTimer();
+//    cpuReport->setInterval(10000);
+//    connect(cpuReport, &QTimer::timeout, this, &cTcpIpServer::consoleWriteHWStats);
+//    cpuReport->start();
+//#endif
+
     thread->start();
 }
 
@@ -83,21 +93,31 @@ void cTcpIpServer::stop()
 
 void cTcpIpServer::consoleWrite(QString string)
 {
+    QString ts = QTime::currentTime().toString("hh:mm:ss:zzz ");
     if (mInfoEnable)
-        std::cout<<string.toLatin1().data()<<std::endl;
+        std::cout<< ts.toLatin1().data()<<string.toLatin1().data()<<std::endl;
 }
 
 void cTcpIpServer::consoleWriteDebug(QString string)
 {
+    QString ts = QTime::currentTime().toString("hh:mm:ss:zzz ");
     if (mInfoEnable && mDebugInfoEnable)
-        std::cout<<"Debug: "<<string.toLatin1().data()<<std::endl;
+        std::cout<< ts.toLatin1().data()<<"Debug: "<<string.toLatin1().data()<<std::endl;
 }
 
 void cTcpIpServer::consoleWriteError(QString string)
 {
+    QString ts = QTime::currentTime().toString("hh:mm:ss:zzz ");
     if (mInfoEnable && mErrorInfoEnable)
-        std::cerr<<"Error: "<<string.toLatin1().data()<<std::endl;
+        std::cerr << ts.toLatin1().data() << "Error: "<<string.toLatin1().data()<<std::endl;
 }
+
+//void cTcpIpServer::consoleWriteHWStats()
+//{
+//    //   QString ts = QTime::currentTime().toString("hh:mm:ss:zzz ");
+//    //   if (mInfoEnable && mErrorInfoEnable)
+//    //      std::cout << ts.toLatin1().data() << HWResources::systemLoad().toLatin1().data();
+//}
 
 void cTcpIpServer::incomingConnection(qintptr handle)
 {
