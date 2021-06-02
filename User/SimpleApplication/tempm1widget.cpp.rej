@@ -1,0 +1,9 @@
+diff a/User/SimpleApplication/tempm1widget.cpp b/User/SimpleApplication/tempm1widget.cpp	(rejected hunks)
+@@ -79,7 +79,6 @@
+ 
+    QSettings settings("Scontel", "cu-simpleapp");
+    if (ui->CB_TemperatureControl->isChecked()
+-       && tempReset->avg[0].getAvg() < tempReset->settings->workTemperatureT1
+        && tempReset->avg[0].getAvg() < settings.value("workTemperatureT1",10).toReal()
+        && tempReset->getRecycleState() == TRS_Idle)
+       {

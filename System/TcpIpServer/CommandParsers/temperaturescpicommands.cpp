@@ -117,6 +117,7 @@ bool TemperatureScpiCommands::executeCommand(QString command, QString params)
                 QJsonDocument jsonDoc(jsonObj);
                 executor()->prepareAnswer(QString("%1\r\n").arg(QString(jsonDoc.toJson())));
                 return true;
+
             }
             answer = PA_TimeOut;
         }

@@ -4,6 +4,7 @@
 #include "ftwidget.h"
 #include "../DataHarvester/dataharvester.h"
 #include "riverdieve.h"
+#include "../compactdraw.h"
 
 class MainWidget: public FTWidget
 {
@@ -22,6 +23,7 @@ protected:
 
 private:
     enum {
+        BT_Dummy = 5,
         BT_Info = 2,
         BT_SCROLLER = 3,
         BT_DriverButton = 0x80
@@ -35,6 +37,7 @@ private:
         bool channelUpdated;
         bool channelError;
     };
+    CompactDraw* drawer;
 
     DataHarvester* mHarvester;
     quint16 dlOffset;

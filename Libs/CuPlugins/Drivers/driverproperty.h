@@ -19,6 +19,10 @@ public:
         Q_UNUSED(other)
     }
 
+    ~ServiceSignal(){
+        disconnect_all();
+    }
+
     // connects a std::function to the signal. The returned
     // value can be used to disconnect the function again
     int connect(std::function<void()> const& slot) const {
@@ -61,7 +65,7 @@ class TempDriverM1;
 class DriverProperty_p
 {
 public:
-    virtual ~DriverProperty_p(){}
+    virtual ~DriverProperty_p();
     quint8 cmdGetter() const;
     void setCmdGetter(const quint8 &cmdGetter);
 

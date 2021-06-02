@@ -32,6 +32,8 @@ public:
     void saveSettings();
 
 public slots:
+    void saveLogToFile();
+    void clearLog();
     void onTimerTicker();
 
 private slots:

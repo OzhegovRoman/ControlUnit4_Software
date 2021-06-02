@@ -25,6 +25,7 @@ protected:
 
 private:
     enum {
+       BT_Dummy = 254,
         BT_Back = 1,
         BT_Option = 2,
         BT_Plus = 3,

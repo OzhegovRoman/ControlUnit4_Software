@@ -1,12 +1,14 @@
 #include "welcomepagewidget.h"
 #include <QThread>
+#include "../compactdraw.h"
 
 const uint8_t welcome_screen[]={
-    #include "../Design/Images/LOGO.binh"
+    #include "../Design/welcomepage_alt/images/LOGO_2.binh"
 };
 
 WelcomePageWidget::WelcomePageWidget(Gpu_Hal_Context_t *host)
 {
+   CD::loadTheme();
     setHost(host);
 }
 
@@ -24,14 +26,16 @@ void WelcomePageWidget::setup()
 #endif
     while (pos < max){
         Gpu_CoCmd_Dlstart(host());
-        Gpu_CoCmd_Gradient(host(), 0, 0, 0xFEFFFF, 480, 272, 0xA5A5A5);
+        Gpu_CoCmd_Gradient(host(), 0, 0, 0xC4c8c8, 480, 272, 0xE2E6E6);
+
         App_WrCoCmd_Buffer(host(), BITMAP_HANDLE(0));
+
         App_WrCoCmd_Buffer(host(), BITMAP_SOURCE(0));
-        App_WrCoCmd_Buffer(host(), BITMAP_LAYOUT(ARGB1555, 960, 272));
-        App_WrCoCmd_Buffer(host(), BITMAP_SIZE(BILINEAR, BORDER, BORDER, 480, 272));
+        App_WrCoCmd_Buffer(host(), BITMAP_LAYOUT(ARGB4, 920, 272));
+        App_WrCoCmd_Buffer(host(), BITMAP_SIZE(BILINEAR, BORDER, BORDER, 460, 83));
 
         App_WrCoCmd_Buffer(host(), BEGIN(BITMAPS));
-        App_WrCoCmd_Buffer(host(), VERTEX2II(0, 0, 0, 0));
+        App_WrCoCmd_Buffer(host(), VERTEX2II(10, 86, 0, 0));
         App_WrCoCmd_Buffer(host(), END());
 
         App_WrCoCmd_Buffer(host(), COLOR_RGB(218, 131, 0));

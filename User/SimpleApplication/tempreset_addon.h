@@ -7,7 +7,6 @@
 #include <QLabel>
 
 #include "advancedrelaycontrol.h"
-#include "temperaturecontrolsettings.h"
 #include "Drivers/tempdriverm1.h"
 
 namespace Ui {
@@ -31,7 +30,6 @@ class TemperatureResetAddon : public QDialog
    void mouseReleaseEvent(QMouseEvent* event);
 
 public:   
-   TemperatureControlSettings* settings;
    Averager avg[4] = {60,60,60,60};
 
    explicit TemperatureResetAddon(TemperatureRecycleInterface *tempRecycle, QWidget *parent = nullptr);
@@ -47,6 +45,8 @@ public:
    void average(const uint8_t &value);
 
    TemperatureRecycleState getRecycleState();
+
+   TemperatureRecycleInterface *getTempRecycle() const;
 
 public slots:
    void showPreStartMsg();

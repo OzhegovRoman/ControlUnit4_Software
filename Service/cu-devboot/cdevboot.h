@@ -34,7 +34,7 @@ public:
     QString fwVersion() const;
     void setFwVersion(const QString &value);
 
-    void startProcess();
+    void startProcess()__attribute__((noreturn));
 
     bool isHotPlug() const;
     void setHotPlug(bool hotPlug);

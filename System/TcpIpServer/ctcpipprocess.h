@@ -25,6 +25,7 @@ public slots:
 
 private:
     QTcpSocket *mSocket;
+    QByteArray buffer;
 };
 
 #endif // CTCPIPPROCESS_H

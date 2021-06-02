@@ -1,5 +1,6 @@
 #include "turnoffwidget.h"
 #include "riverdieve.h"
+#include "../compactdraw.h"
 
 void TurnOffWidget::turnOff(Gpu_Hal_Context_t *host)
 {
@@ -8,8 +9,8 @@ void TurnOffWidget::turnOff(Gpu_Hal_Context_t *host)
 
     Gpu_CoCmd_Dlstart(host);
 
-    Gpu_CoCmd_Gradient(host, 464,73, 0x707070, 464,283, 0x000000);
-    App_WrCoCmd_Buffer(host, COLOR_RGB(255,255,255));
+    Gpu_CoCmd_Gradient(host, 464,73, CD::themeColor(Grad_LogoTop), 464,283, CD::themeColor(Grad_Bottom));
+    App_WrCoCmd_Buffer(host, COLOR(CD::themeColor(Colors::TextNormal)));
 
     Gpu_CoCmd_Text(host, 
                    240, 
