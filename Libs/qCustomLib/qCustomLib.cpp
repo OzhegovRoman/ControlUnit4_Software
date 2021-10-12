@@ -39,7 +39,8 @@ QStringList availableControlUnits()
         bool ok = socket->waitForReadyRead(100);
         if (ok){
             QByteArray ba = socket->readAll();
-            answer.append(QString(ba).split(";"));
+            QString ip = QHostAddress(socket->peerAddress().toIPv4Address()).toString();
+            answer.append(ip);
         }
         socket->deleteLater();
     });
@@ -48,13 +49,18 @@ QStringList availableControlUnits()
     QUdpSocket udpSocket;
     udpSocket.setProxy(QNetworkProxy::NoProxy);
     QString tcpipAddresses;
-    for (QHostAddress address: QNetworkInterface::allAddresses())
-        if (address.protocol() == QAbstractSocket::IPv4Protocol)
-            if (address != QHostAddress::LocalHost)
-                tcpipAddresses.append(address.toString()+";");
+    for (QNetworkInterface interface: QNetworkInterface::allInterfaces()){
+        QNetworkInterface::InterfaceFlags mask = QNetworkInterface::IsUp | QNetworkInterface::IsRunning | QNetworkInterface::CanBroadcast;
+        if ((interface.flags() & mask) == mask){
+            for (auto addressentry : interface.addressEntries()){
+                if (!addressentry.broadcast().isNull()){
+                    QByteArray datagram("cu-software");
+                    udpSocket.writeDatagram(datagram, addressentry.broadcast(), SERVER_TCPIP_PORT + 1);
+                }
+            }
+        }
+    }
 
-    QByteArray datagram = QByteArray(tcpipAddresses.toLocal8Bit());
-    udpSocket.writeDatagram(datagram, QHostAddress::Broadcast, SERVER_TCPIP_PORT + 1);
     QElapsedTimer timer;
     timer.start();
     while (timer.elapsed()<500)

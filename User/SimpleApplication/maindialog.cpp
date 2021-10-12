@@ -15,13 +15,9 @@ MainDialog::MainDialog(QWidget *parent)
 {
 
     ui->setupUi(this);
-
-    Qt::WindowFlags flags = Qt::Window | Qt::WindowSystemMenuHint
-            | Qt::WindowMinimizeButtonHint
-            | Qt::WindowMaximizeButtonHint
-            | Qt::WindowCloseButtonHint;
-    this->setWindowFlags(flags);
-
+#ifdef RASPBERRY_PI
+    this->setWindowState(Qt::WindowFullScreen);
+#endif
     mTimer->setSingleShot(true);
 
 }

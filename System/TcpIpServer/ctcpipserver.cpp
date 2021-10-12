@@ -7,10 +7,8 @@
 #include <QString>
 #include "ctcpipprocess.h"
 #include "ccommandexecutor.h"
-#include <QTimer>
 #include <QThread>
 #include <QCoreApplication>
-#include "hwresources.h"
 #include "../StarProtocol/servercommands.h"
 
 bool cTcpIpServer::mDebugInfoEnable = false;
@@ -22,7 +20,6 @@ cTcpIpServer::cTcpIpServer(QObject * parent)
     , mExecutor(nullptr)
     , udpSocket (new QUdpSocket(this))
 {
-    udpSocket->setProxy(QNetworkProxy::NoProxy);
 }
 
 cTcpIpServer::~cTcpIpServer()
@@ -38,23 +35,22 @@ void cTcpIpServer::initialize()
         QByteArray datagram;
         updateAvailableTcpIpAddresses();
         while (udpSocket->hasPendingDatagrams()){
+            QHostAddress address;
             datagram.resize(int(udpSocket->pendingDatagramSize()));
-            udpSocket->readDatagram(datagram.data(), datagram.size());
-            consoleWriteDebug(tr("Getted UDP diagram: %1").arg(datagram.constData()));
-            QStringList adList = QString(datagram).split(";");
-            for(QString addr: adList){
-                if (!addr.isEmpty()){
-                    QTcpSocket socket;
-                    socket.setProxy(QNetworkProxy::NoProxy);
-                    socket.connectToHost(QHostAddress(addr), SERVER_TCPIP_PORT + 2);
-                    qDebug()<<QHostAddress(addr);
-                    qApp->processEvents();
-                    socket.waitForConnected(100);
-                    if (socket.isOpen())
-                        consoleWriteDebug("Send TcpIpAddress to "+addr);
-                    socket.write(availableTcpIpAddresses.toLocal8Bit());
-                    socket.flush();
-                }
+            udpSocket->readDatagram(datagram.data(), datagram.size(), &address);
+            consoleWriteDebug(tr("Getted UDP diagram: %1 from address %2")
+                              .arg(datagram.constData())
+                              .arg(address.toString()));
+            if (QString(datagram).contains("cu-software")){
+                QTcpSocket socket;
+                socket.setProxy(QNetworkProxy::NoProxy);
+                socket.connectToHost(address, SERVER_TCPIP_PORT + 2);
+                qApp->processEvents();
+                socket.waitForConnected(100);
+                if (socket.isOpen())
+                    consoleWriteDebug(tr("Send answer to %1").arg(address.toString()));
+                socket.write("cu-software");
+                socket.flush();
             }
         }
     });
@@ -74,13 +70,6 @@ void cTcpIpServer::initialize()
     connect(thread, &QThread::finished, thread, &QThread::deleteLater);
     connect(mExecutor, &cCommandExecutor::inited, this, &cTcpIpServer::startServer);
     connect(mExecutor, &cCommandExecutor::sendAnswer, this, &cTcpIpServer::sendAnswer);
-
-//#ifdef __linux__
-//    QTimer* cpuReport = new QTimer();
-//    cpuReport->setInterval(10000);
-//    connect(cpuReport, &QTimer::timeout, this, &cTcpIpServer::consoleWriteHWStats);
-//    cpuReport->start();
-//#endif
 
     thread->start();
 }
@@ -111,13 +100,6 @@ void cTcpIpServer::consoleWriteError(QString string)
     if (mInfoEnable && mErrorInfoEnable)
         std::cerr << ts.toLatin1().data() << "Error: "<<string.toLatin1().data()<<std::endl;
 }
-
-//void cTcpIpServer::consoleWriteHWStats()
-//{
-//    //   QString ts = QTime::currentTime().toString("hh:mm:ss:zzz ");
-//    //   if (mInfoEnable && mErrorInfoEnable)
-//    //      std::cout << ts.toLatin1().data() << HWResources::systemLoad().toLatin1().data();
-//}
 
 void cTcpIpServer::incomingConnection(qintptr handle)
 {

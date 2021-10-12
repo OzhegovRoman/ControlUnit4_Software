@@ -45,25 +45,27 @@ int main(int argc, char *argv[])
     if (parser.isSet(welcomeOption)){
         QGraphicsScene scene;
         QGraphicsView view(&scene);
-        QGraphicsPixmapItem item(QPixmap(":/images/splash.png"));
+        QPixmap pixmap(":/images/splash.png");
+        pixmap = pixmap.scaledToWidth(view.width());
+        QGraphicsPixmapItem item(pixmap);
         scene.addItem(&item);
-        view.setWindowFlag(Qt::Window, true);
+//        view.setWindowFlag(Qt::Window, true);
         view.setWindowFlag(Qt::FramelessWindowHint, true);
-        view.setFrameShape(QFrame::NoFrame);
+//        view.setFrameShape(QFrame::NoFrame);
         view.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         view.setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         view.setGeometry(
                     QStyle::alignedRect(
                         Qt::LeftToRight,
                         Qt::AlignCenter,
-                        view.size(),
+                        pixmap.size(),
                         qApp->desktop()->availableGeometry()
                         )
                     );
         view.show();
         QElapsedTimer timer;
         timer.start();
-        while (timer.elapsed()<6000)
+        while (timer.elapsed()<2000)
             qApp->processEvents();
     }
 
