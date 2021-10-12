@@ -7,6 +7,11 @@
 #include "../qCustomLib/qCustomLib.h"
 #include "sspdwidgetm1.h"
 
+#ifdef RASPBERRY_PI
+#include <QApplication>
+#include <QDesktopWidget>
+#endif
+
 MainDialog::MainDialog(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::MainDialog)
@@ -16,8 +21,36 @@ MainDialog::MainDialog(QWidget *parent)
 
     ui->setupUi(this);
 #ifdef RASPBERRY_PI
+    QFrame *frame = new QFrame(this);
+    frame->setFrameShape(QFrame::HLine);
+    frame->setFrameShadow(QFrame::Plain);
+    QLabel *title = new QLabel(QString("Control Unit application").toUpper());
+    title->setAlignment(Qt::AlignHCenter);
+    QFont font = title->font();
+    font.setBold(true);
+    title->setFont(font);
+
+    QPushButton *pPB = new QPushButton ("x");
+    pPB->setFlat(true);
+    pPB->setFixedHeight(QApplication::style()->pixelMetric(QStyle::PM_TitleBarHeight));
+    pPB->setFixedWidth(QApplication::style()->pixelMetric(QStyle::PM_TitleBarHeight));
+
+    QVBoxLayout *vlayout = new QVBoxLayout(ui->wTitle);
+    QHBoxLayout *hlayout = new QHBoxLayout(ui->wTitle);
+    hlayout->addWidget(title);
+    hlayout->addWidget(pPB);
+
+    vlayout->addLayout(hlayout);
+    vlayout->addWidget(frame);
+    vlayout->setMargin(0);
+
+    connect(pPB,SIGNAL(clicked()), this, SLOT(close()));
+
     this->setWindowState(Qt::WindowFullScreen);
+#else
+    ui->wTitle->hide();
 #endif
+
     mTimer->setSingleShot(true);
 
 }

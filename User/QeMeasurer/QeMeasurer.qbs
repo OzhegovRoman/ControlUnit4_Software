@@ -76,6 +76,7 @@ CppApplication{
             "-rpath",
             "/home/roman/raspi/sysroot/opt/vc/lib/"
         ]
+        cpp.defines: outer.concat("RASPBERRY_PI")
     }
 
     // деплой проекта для raspberryPi

@@ -49,9 +49,7 @@ int main(int argc, char *argv[])
         pixmap = pixmap.scaledToWidth(view.width());
         QGraphicsPixmapItem item(pixmap);
         scene.addItem(&item);
-//        view.setWindowFlag(Qt::Window, true);
         view.setWindowFlag(Qt::FramelessWindowHint, true);
-//        view.setFrameShape(QFrame::NoFrame);
         view.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         view.setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         view.setGeometry(

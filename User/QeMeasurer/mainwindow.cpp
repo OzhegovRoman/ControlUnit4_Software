@@ -6,6 +6,11 @@
 #include "Drivers/sspddriverm0.h"
 #include "Drivers/sspddriverm1.h"
 
+#ifdef RASPBERRY_PI
+#include <QApplication>
+#include <QDesktopWidget>
+#endif
+
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::MainWindow),
@@ -20,6 +25,37 @@ MainWindow::MainWindow(QWidget *parent) :
     QSettings settings("Scontel","QeMeasurer");
     mLastTcpIpAddress = settings.value("TcpAddress",QString()).toString();
     ui->sbDeviceAddress->setValue(settings.value("DeviceAddress",0).toInt());
+
+#ifdef RASPBERRY_PI
+    QFrame *frame = new QFrame(this);
+    frame->setFrameShape(QFrame::HLine);
+    frame->setFrameShadow(QFrame::Plain);
+    QLabel *title = new QLabel(QString("Quantum efficiency measurer").toUpper());
+    title->setAlignment(Qt::AlignHCenter);
+    QFont font = title->font();
+    font.setBold(true);
+    title->setFont(font);
+
+    QPushButton *pPB = new QPushButton ("x");
+    pPB->setFlat(true);
+    pPB->setFixedHeight(QApplication::style()->pixelMetric(QStyle::PM_TitleBarHeight));
+    pPB->setFixedWidth(QApplication::style()->pixelMetric(QStyle::PM_TitleBarHeight));
+
+    QVBoxLayout *vlayout = new QVBoxLayout(ui->wTitle);
+    QHBoxLayout *hlayout = new QHBoxLayout(ui->wTitle);
+    hlayout->addWidget(title);
+    hlayout->addWidget(pPB);
+
+    vlayout->addLayout(hlayout);
+    vlayout->addWidget(frame);
+    vlayout->setMargin(0);
+    ui->wTitle->setFixedHeight(ui->wTitle->minimumSizeHint().height());
+
+    connect(pPB,SIGNAL(clicked()), this, SLOT(close()));
+    this->setWindowState(Qt::WindowFullScreen);
+#else
+    ui->wTitle->hide();
+#endif
 
 #if  defined(FAKE)
     FakeCuSdM0 *device = new FakeCuSdM0();
@@ -36,8 +72,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 #elif defined(RS485)
     mInterface->setPortName("COM3");
-#elif defined(RASPBERRY_PI)
-    mInterface->setPortName("ttyAMA0");
 #endif
 
     updateControlUnitList();

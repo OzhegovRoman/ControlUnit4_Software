@@ -10,10 +10,6 @@
 #include "Devices/FakeDevices/fcusdm0.h"
 #endif
 
-#ifdef RASPBERRY_PI
-#include "Interfaces/curasppirs485iointerface.h"
-#endif
-
 #ifdef RS485
 #include "Interfaces/curs485iointerface.h"
 #endif
