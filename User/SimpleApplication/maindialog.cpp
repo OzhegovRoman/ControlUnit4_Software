@@ -31,6 +31,7 @@ MainDialog::MainDialog(QWidget *parent)
     title->setFont(font);
 
     QPushButton *pPB = new QPushButton ("x");
+    pPB->setFocusPolicy(Qt::FocusPolicy::NoFocus);
     pPB->setFlat(true);
     pPB->setFixedHeight(QApplication::style()->pixelMetric(QStyle::PM_TitleBarHeight));
     pPB->setFixedWidth(QApplication::style()->pixelMetric(QStyle::PM_TitleBarHeight));

@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>cu-measurer</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_8">
+  <layout class="QVBoxLayout" name="verticalLayout_10">
    <item>
     <widget class="QWidget" name="wTitle" native="true"/>
    </item>
@@ -87,7 +87,7 @@
        <bool>true</bool>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="pInitialize">
        <layout class="QVBoxLayout" name="verticalLayout">
@@ -414,24 +414,9 @@
        </layout>
       </widget>
       <widget class="QWidget" name="pCounter">
-       <layout class="QVBoxLayout" name="verticalLayout_5">
-        <property name="spacing">
-         <number>0</number>
-        </property>
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
+       <layout class="QVBoxLayout" name="verticalLayout_8">
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
            <widget class="QLabel" name="label_5">
             <property name="font">
@@ -508,10 +493,37 @@
          </layout>
         </item>
         <item>
-         <widget class="QCustomPlot" name="wCounterPlot" native="true">
-          <property name="contextMenuPolicy">
-           <enum>Qt::CustomContextMenu</enum>
+         <widget class="QFrame" name="frame_2">
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
           </property>
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QCustomPlot" name="wCounterPlot" native="true">
+             <property name="contextMenuPolicy">
+              <enum>Qt::CustomContextMenu</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </item>
         <item>
@@ -802,7 +814,34 @@
          </layout>
         </item>
         <item>
-         <widget class="QCustomPlot" name="wMeasurerPlot" native="true"/>
+         <widget class="QFrame" name="frame">
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_9">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QCustomPlot" name="wMeasurerPlot" native="true"/>
+           </item>
+          </layout>
+         </widget>
         </item>
         <item>
          <widget class="QLabel" name="lbMeasurerStatus">
@@ -927,6 +966,37 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>lwActions</tabstop>
+  <tabstop>cbTcpIpAddress</tabstop>
+  <tabstop>sbDeviceAddress</tabstop>
+  <tabstop>pbInitialize</tabstop>
+  <tabstop>cbShort</tabstop>
+  <tabstop>cbAmplifier</tabstop>
+  <tabstop>cbComparator</tabstop>
+  <tabstop>cbHFMode</tabstop>
+  <tabstop>sbI</tabstop>
+  <tabstop>sbCmp</tabstop>
+  <tabstop>pbSetI</tabstop>
+  <tabstop>pbSetCmp</tabstop>
+  <tabstop>sbTimeConst</tabstop>
+  <tabstop>pbReadParams</tabstop>
+  <tabstop>pbSetParams</tabstop>
+  <tabstop>SB_YMin</tabstop>
+  <tabstop>SB_YMax</tabstop>
+  <tabstop>cbType</tabstop>
+  <tabstop>sbStart</tabstop>
+  <tabstop>sbStop</tabstop>
+  <tabstop>sbStep</tabstop>
+  <tabstop>sbTrigger</tabstop>
+  <tabstop>pbStart</tabstop>
+  <tabstop>pbStop</tabstop>
+  <tabstop>cbPID</tabstop>
+  <tabstop>pbGetSecretParams</tabstop>
+  <tabstop>pbSetSecretParams</tabstop>
+  <tabstop>pbReading</tabstop>
+  <tabstop>pbRecording</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

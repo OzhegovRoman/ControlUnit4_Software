@@ -37,6 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
     title->setFont(font);
 
     QPushButton *pPB = new QPushButton ("x");
+    pPB->setFocusPolicy(Qt::FocusPolicy::NoFocus);
     pPB->setFlat(true);
     pPB->setFixedHeight(QApplication::style()->pixelMetric(QStyle::PM_TitleBarHeight));
     pPB->setFixedWidth(QApplication::style()->pixelMetric(QStyle::PM_TitleBarHeight));
@@ -85,12 +86,38 @@ MainWindow::MainWindow(QWidget *parent) :
     mTimer->setSingleShot(true);
 
     ui->wCounterPlot->addGraph();
-    ui->wCounterPlot->graph(0)->setPen(QPen(Qt::blue));
+    ui->wCounterPlot->graph(0)->setPen(QPen(QApplication::palette().highlight(), 3));
+
     ui->wCounterPlot->xAxis->setTickLabelType(QCPAxis::ltDateTime);
     ui->wCounterPlot->xAxis->setDateTimeFormat("hh:mm:ss");
     ui->wCounterPlot->xAxis->setAutoTickStep(false);
     ui->wCounterPlot->xAxis->setTickStep(10);
-//    ui->wCounterPlot->xAxis->setRange(0,50,Qt::AlignLeading);
+    ui->wCounterPlot->setBackground(QApplication::palette().base().color());
+
+    ui->wCounterPlot->xAxis->setTickLabelColor(QApplication::palette().text().color());
+    ui->wCounterPlot->xAxis->setBasePen(QPen(QApplication::palette().text().color()));
+    ui->wCounterPlot->xAxis->setLabelColor(QApplication::palette().text().color());
+    ui->wCounterPlot->xAxis->setTickPen(QPen(QApplication::palette().text().color()));
+    ui->wCounterPlot->xAxis->setSubTickPen(QPen(QApplication::palette().text().color()));
+
+    ui->wCounterPlot->xAxis2->setTickLabelColor(QApplication::palette().text().color());
+    ui->wCounterPlot->xAxis2->setBasePen(QPen(QApplication::palette().text().color()));
+    ui->wCounterPlot->xAxis2->setLabelColor(QApplication::palette().text().color());
+    ui->wCounterPlot->xAxis2->setTickPen(QPen(QApplication::palette().text().color()));
+    ui->wCounterPlot->xAxis2->setSubTickPen(QPen(QApplication::palette().text().color()));
+
+    ui->wCounterPlot->yAxis->setTickLabelColor(QApplication::palette().text().color());
+    ui->wCounterPlot->yAxis->setBasePen(QPen(QApplication::palette().text().color()));
+    ui->wCounterPlot->yAxis->setLabelColor(QApplication::palette().text().color());
+    ui->wCounterPlot->yAxis->setTickPen(QPen(QApplication::palette().text().color()));
+    ui->wCounterPlot->yAxis->setSubTickPen(QPen(QApplication::palette().text().color()));
+
+    ui->wCounterPlot->yAxis2->setTickLabelColor(QApplication::palette().text().color());
+    ui->wCounterPlot->yAxis2->setBasePen(QPen(QApplication::palette().text().color()));
+    ui->wCounterPlot->yAxis2->setLabelColor(QApplication::palette().text().color());
+    ui->wCounterPlot->yAxis2->setTickPen(QPen(QApplication::palette().text().color()));
+    ui->wCounterPlot->yAxis2->setSubTickPen(QPen(QApplication::palette().text().color()));
+
     ui->wCounterPlot->axisRect()->setupFullAxesBox();
 
     ui->wCounterPlot->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -103,7 +130,21 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->wMeasurerPlot, SIGNAL(customContextMenuRequested(QPoint)),
             this, SLOT(measurerContextMenuRequest(QPoint)));
 
-   setAutoScaleCounterPlot(true);
+    setAutoScaleCounterPlot(true);
+
+
+    ui->wMeasurerPlot->setBackground(QApplication::palette().base().color());
+    ui->wMeasurerPlot->xAxis->setTickLabelColor(QApplication::palette().text().color());
+    ui->wMeasurerPlot->xAxis->setBasePen(QPen(QApplication::palette().text().color()));
+    ui->wMeasurerPlot->xAxis->setLabelColor(QApplication::palette().text().color());
+    ui->wMeasurerPlot->xAxis->setTickPen(QPen(QApplication::palette().text().color()));
+    ui->wMeasurerPlot->xAxis->setSubTickPen(QPen(QApplication::palette().text().color()));
+
+    ui->wMeasurerPlot->yAxis->setTickLabelColor(QApplication::palette().text().color());
+    ui->wMeasurerPlot->yAxis->setBasePen(QPen(QApplication::palette().text().color()));
+    ui->wMeasurerPlot->yAxis->setLabelColor(QApplication::palette().text().color());
+    ui->wMeasurerPlot->yAxis->setTickPen(QPen(QApplication::palette().text().color()));
+    ui->wMeasurerPlot->yAxis->setSubTickPen(QPen(QApplication::palette().text().color()));
 }
 
 MainWindow::~MainWindow()
@@ -125,74 +166,74 @@ void MainWindow::measurerContextMenuRequest(QPoint pos)
     menu->addAction("Save data", this, SLOT(saveData()));
 
     menu->popup(ui->wMeasurerPlot->mapToGlobal(pos));
-   }
+}
 
 void MainWindow::counterContextMenuRequest(QPoint pos)
-   {
-   qDebug()<<"MainWindow::counterContextMenuRequest";
+{
+    qDebug()<<"MainWindow::counterContextMenuRequest";
 
-//   if (ui->wCounterPlot->graphCount() == 0) return;
+    //   if (ui->wCounterPlot->graphCount() == 0) return;
 
-   auto *menu = new QMenu(this);
-   menu->setAttribute(Qt::WA_DeleteOnClose);
+    auto *menu = new QMenu(this);
+    menu->setAttribute(Qt::WA_DeleteOnClose);
 
-   QAction *autoScale = new QAction("Auto scale",menu);
-   autoScale->setCheckable(true);
-   autoScale->setChecked(isEnabledCounterAutoscale);
+    QAction *autoScale = new QAction("Auto scale",menu);
+    autoScale->setCheckable(true);
+    autoScale->setChecked(isEnabledCounterAutoscale);
 
-   QAction *rangesVisibility = new QAction("Show Y range",menu);
-   rangesVisibility->setCheckable(true);
-   rangesVisibility->setChecked(isRangesVisible);
+    QAction *rangesVisibility = new QAction("Show Y range",menu);
+    rangesVisibility->setCheckable(true);
+    rangesVisibility->setChecked(isRangesVisible);
 
-   connect(autoScale,&QAction::triggered,this,&MainWindow::setAutoScaleCounterPlot);
-   connect(rangesVisibility, &QAction::triggered, this, &MainWindow::setRangesVisible);
+    connect(autoScale,&QAction::triggered,this,&MainWindow::setAutoScaleCounterPlot);
+    connect(rangesVisibility, &QAction::triggered, this, &MainWindow::setRangesVisible);
 
-   menu->addAction(autoScale);
-   menu->addAction(rangesVisibility);
+    menu->addAction(autoScale);
+    menu->addAction(rangesVisibility);
 
-   menu->addAction("Clear", this, [=](){
-      ui->wCounterPlot->graph()->removeDataAfter(0);
-      ui->wCounterPlot->replot();
-      });
+    menu->addAction("Clear", this, [=](){
+        ui->wCounterPlot->graph()->removeDataAfter(0);
+        ui->wCounterPlot->replot();
+    });
 
-   menu->popup(ui->wCounterPlot->mapToGlobal(pos));
-   }
+    menu->popup(ui->wCounterPlot->mapToGlobal(pos));
+}
 
 void MainWindow::setAutoScaleCounterPlot(bool isAuto)
-   {
-   qDebug()<<"MainWindow::setAutoScaleCounterPlot";
+{
+    qDebug()<<"MainWindow::setAutoScaleCounterPlot";
 
-   isEnabledCounterAutoscale = isAuto;
-   setRangesVisible(!isAuto);
-   ui->SB_YMin->setDisabled(isAuto);
-   ui->SB_YMax->setDisabled(isAuto);
-   }
+    isEnabledCounterAutoscale = isAuto;
+    setRangesVisible(!isAuto);
+    ui->SB_YMin->setDisabled(isAuto);
+    ui->SB_YMax->setDisabled(isAuto);
+}
 
 void MainWindow::controlAutoScaleCounter()
-   {
-   if (isEnabledCounterAutoscale){
-      auto range = ui->wCounterPlot->yAxis->range();
-      ui->SB_YMin->setValue(range.lower);
-      ui->SB_YMax->setValue(range.upper);
-      }
-   else
-      {
-      if (ui->SB_YMin->value() >= ui->SB_YMax->value())
-         ui->SB_YMin->setValue(ui->SB_YMax->value() - 1);
-      if (ui->SB_YMax->value() <= ui->SB_YMin->value())
-         ui->SB_YMax->setValue(ui->SB_YMin->value() + 1);
-      ui->wCounterPlot->yAxis->setRange(ui->SB_YMin->value(),ui->SB_YMax->value());
-      }
-   }
+{
+    if (isEnabledCounterAutoscale){
+        auto range = ui->wCounterPlot->yAxis->range();
+        ui->SB_YMin->setValue(range.lower);
+        ui->SB_YMax->setValue(range.upper);
+    }
+    else
+    {
+        if (ui->SB_YMin->value() >= ui->SB_YMax->value())
+            ui->SB_YMin->setValue(ui->SB_YMax->value() - 1);
+        if (ui->SB_YMax->value() <= ui->SB_YMin->value())
+            ui->SB_YMax->setValue(ui->SB_YMin->value() + 1);
+        ui->wCounterPlot->yAxis->setRange(ui->SB_YMin->value(),ui->SB_YMax->value());
+    }
+}
 
 void MainWindow::setRangesVisible(bool isVisible)
-   {
-   isRangesVisible = isVisible;
-   ui->SB_YMin->setVisible(isRangesVisible);
-   ui->SB_YMax->setVisible(isRangesVisible);
-   ui->L_YMin-> setVisible(isRangesVisible);
-   ui->L_YMax-> setVisible(isRangesVisible);
-   }
+{
+    isRangesVisible = isVisible;
+    ui->SB_YMin->setVisible(isRangesVisible);
+    ui->SB_YMax->setVisible(isRangesVisible);
+    ui->L_YMin-> setVisible(isRangesVisible);
+    ui->L_YMax-> setVisible(isRangesVisible);
+}
 
 void MainWindow::on_pbInitialize_clicked()
 {
@@ -677,9 +718,9 @@ void MainWindow::on_pbStart_clicked()
     graph->setLineStyle(QCPGraph::lsNone);
     QCPScatterStyle myScatter;
     myScatter.setShape(QCPScatterStyle::ssDiamond);
-    myScatter.setPen(QPen(Qt::blue));
-    myScatter.setBrush(Qt::white);
-    myScatter.setSize(5);
+    myScatter.setPen(QPen(QApplication::palette().highlight(), 3));
+    myScatter.setBrush(QApplication::palette().base());
+    myScatter.setSize(9);
     graph->setScatterStyle(myScatter);
 
     enableControlsAtMeasure(false);
@@ -956,6 +997,6 @@ void MainWindow::on_cbHFMode_clicked(bool checked)
     if (tmpSspdM1)
         tmpSspdM1->highFrequencyModeEnable()->setValueSync(checked, &ok);
     if (!ok) qDebug()<<"can't set HF Mode";
-   }
+}
 
 

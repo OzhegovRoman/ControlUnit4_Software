@@ -35,7 +35,7 @@ signals:
 
 private slots:
    void on_pbSetUpdateTime_clicked();
-   void on_pushButton_clicked();
+   void on_pbLogPath_clicked();
 
 private:
     AllChannelsDataModel *model;

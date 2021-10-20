@@ -8,6 +8,7 @@
 #include <QSettings>
 #include <QDir>
 #include <QDateTime>
+#include <QFileDialog>
 
 AllChannels::AllChannels(QWidget *parent)
     : CommonWidget(parent)
@@ -114,7 +115,6 @@ void AllChannels::updateWidget()
                 driver->updateTemperature();
             }
         }
-
     }
     emit model->dataChanged(model->index(0), model->index(model->rowCount()));
 }
@@ -138,7 +138,8 @@ void AllChannels::setInterface(cuIOInterface *interface)
     delegate->setInterface(mInterface);
 }
 
-void AllChannels::on_pushButton_clicked()
+void AllChannels::on_pbLogPath_clicked()
 {
-
+    QString str = QFileDialog::getExistingDirectory(this, "Open Directory for Log file...");
+    if (!str.isEmpty()) ui->leLogPath->setText(str);
 }
