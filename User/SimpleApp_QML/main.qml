@@ -53,7 +53,6 @@ ApplicationWindow {
     Item {
         id: rootItem
         anchors.fill: parent
-        Component.onCompleted: startUp()
 
         state: "welcomeScreen"
 
@@ -61,6 +60,7 @@ ApplicationWindow {
             id: pageLoader
             anchors.fill: parent
             source: "WelcomeForm.qml"
+            Component.onCompleted: startUp()
         }
 
         states: [

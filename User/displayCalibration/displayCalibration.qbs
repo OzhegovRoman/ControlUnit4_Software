@@ -40,7 +40,7 @@ CppApplication{
         "-z",
         "relro",
         "-rpath",
-        "/home/roman/raspi/sysroot/opt/vc/lib/"
+        "/home/roman/Qt-CrossCompile/raspberrypi3/sysroot/usr/lib/arm-linux-gnueabihf/"
     ]
 
 

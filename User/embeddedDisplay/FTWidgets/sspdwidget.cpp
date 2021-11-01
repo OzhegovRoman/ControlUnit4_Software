@@ -37,9 +37,9 @@ void SspdWidget::setup()
 
     Gpu_CoCmd_Dlstart(host());
     App_WrCoCmd_Buffer(host(), TAG_MASK(1));
-   CD::dummyButton(BT_Dummy);
+    CD::dummyButton(BT_Dummy);
     App_WrCoCmd_Buffer(host(), TAG(BT_Back));
-     Gpu_CoCmd_Button(host(), 10, 10, 50, 50, 27, 0, "");
+    Gpu_CoCmd_Button(host(), 10, 10, 50, 50, 27, 0, "");
     App_WrCoCmd_Buffer(host(), TAG(BT_Option));
     Gpu_CoCmd_Button(host(), 420, 10, 50, 50, 27, 0, "");
     App_WrCoCmd_Buffer(host(), TAG(BT_SetCurrent));
@@ -84,8 +84,8 @@ void SspdWidget::setup()
 
 void SspdWidget::loop()
 {
-   static uint32_t lastButtonPressedTag = 0;
-   static QElapsedTimer buttonTimer;
+    static uint32_t lastButtonPressedTag = 0;
+    static QElapsedTimer buttonTimer;
     static int timeToValueChange = 0;
     static int timerCounts = 0;
     uint8_t buttonTag = Gpu_Hal_Rd8(host(), REG_TOUCH_TAG);
@@ -126,75 +126,75 @@ void SspdWidget::loop()
         }
     }
     else {
-            switch (lastButtonPressedTag) {
-            case BT_Back:{
-                terminate();
-                emit backClicked();
-                lastButtonPressedTag = 0;
-                return;
-            }
-            case BT_Short: {
-                lastButtonPressedTag = 0;
-                auto tmp = mDriver->status()->currentValue();
-                tmp.stShorted = !tmp.stShorted;
+        switch (lastButtonPressedTag) {
+        case BT_Back:{
+            terminate();
+            emit backClicked();
+            lastButtonPressedTag = 0;
+            return;
+        }
+        case BT_Short: {
+            lastButtonPressedTag = 0;
+            auto tmp = mDriver->status()->currentValue();
+            tmp.stShorted = !tmp.stShorted;
 
-                mDriver->shortEnable()->setValueSync(tmp.stShorted);
-                mDriver->status()->setCurrentValue(tmp);
-                update();
-                break;
-            }
-            case BT_Amp: {
-                lastButtonPressedTag = 0;
-                auto tmp = mDriver->status()->currentValue();
-                tmp.stAmplifierOn = !tmp.stAmplifierOn;
+            mDriver->shortEnable()->setValueSync(tmp.stShorted);
+            mDriver->status()->setCurrentValue(tmp);
+            update();
+            break;
+        }
+        case BT_Amp: {
+            lastButtonPressedTag = 0;
+            auto tmp = mDriver->status()->currentValue();
+            tmp.stAmplifierOn = !tmp.stAmplifierOn;
 
-                mDriver->amplifierEnable()->setValueSync(tmp.stAmplifierOn);
-                mDriver->status()->setCurrentValue(tmp);
-                update();
-                break;
-            }
-            case BT_Counter: {
-                lastButtonPressedTag = 0;
-                auto tmp = mDriver->status()->currentValue();
-                qDebug()<<tmp.Data;
-                bool tmpBool = !(tmp.stCounterOn | tmp.stRfKeyToCmp | tmp.stComparatorOn);
+            mDriver->amplifierEnable()->setValueSync(tmp.stAmplifierOn);
+            mDriver->status()->setCurrentValue(tmp);
+            update();
+            break;
+        }
+        case BT_Counter: {
+            lastButtonPressedTag = 0;
+            auto tmp = mDriver->status()->currentValue();
+            qDebug()<<tmp.Data;
+            bool tmpBool = !(tmp.stCounterOn | tmp.stRfKeyToCmp | tmp.stComparatorOn);
 
-                tmp.stCounterOn =    tmpBool;
-                tmp.stRfKeyToCmp =   tmpBool;
-                tmp.stComparatorOn = tmpBool;
+            tmp.stCounterOn =    tmpBool;
+            tmp.stRfKeyToCmp =   tmpBool;
+            tmp.stComparatorOn = tmpBool;
 
-                mDriver->status()->setValueSync(tmp);
-                update();
-                break;
-            }
-            case BT_Plus:
-            case BT_Minus: {
-                lastButtonPressedTag = 0;
-                mDriver->current()->setValueSync(mDriver->current()->currentValue(), nullptr, 2);
-                dataTimer->start(1000);
-                update();
-                break;
-            }
-            case  BT_SetCurrent: {
-                qDebug()<<"set current";
-                lastButtonPressedTag = 0;
-                terminate();
-                double newValue = InputWidget::getDouble(host(), "Current, uA");
-                if (!isnan(newValue))
-                    mDriver->current()->setValueSync(static_cast<float>(newValue*1e-6), nullptr, 2);
-                QThread::currentThread()->msleep(100);
-                emit restart();
-                return;
-            }
-            case BT_Option:{
-                qDebug()<<"option";
-                lastButtonPressedTag = 0;
-                terminate();
-                SspdDriverOption::getOptions(host(), mDriver);
-                emit restart();
-                //вводим новое значение тока
-                return;
-            }
+            mDriver->status()->setValueSync(tmp);
+            update();
+            break;
+        }
+        case BT_Plus:
+        case BT_Minus: {
+            lastButtonPressedTag = 0;
+            mDriver->current()->setValueSync(mDriver->current()->currentValue(), nullptr, 2);
+            dataTimer->start(1000);
+            update();
+            break;
+        }
+        case  BT_SetCurrent: {
+            qDebug()<<"set current";
+            lastButtonPressedTag = 0;
+            terminate();
+            double newValue = InputWidget::getDouble(host(), "Current, uA");
+            if (!isnan(newValue))
+                mDriver->current()->setValueSync(static_cast<float>(newValue*1e-6), nullptr, 2);
+            QThread::currentThread()->msleep(100);
+            emit restart();
+            return;
+        }
+        case BT_Option:{
+            qDebug()<<"option";
+            lastButtonPressedTag = 0;
+            terminate();
+            SspdDriverOption::getOptions(host(), mDriver);
+            emit restart();
+            //вводим новое значение тока
+            return;
+        }
         }
     }
 
@@ -208,19 +208,19 @@ void SspdWidget::loop()
         Gpu_CoCmd_Append(host(), 100000L, dlOffset);
 
         Gpu_CoCmd_Text(host(), 214, 106, 31, OPT_CENTERY | OPT_RIGHTX,
-                          QString("%1")
-                          .arg(static_cast<double>(mDriver->current()->currentValue()) * 1e6, 6,'f', 1)
-                          .toLocal8Bit());
+                       QString("%1")
+                       .arg(static_cast<double>(mDriver->current()->currentValue()) * 1e6, 6,'f', 1)
+                       .toLocal8Bit());
         Gpu_CoCmd_Text(host(), 214, 166, 31, OPT_CENTERY | OPT_RIGHTX,
-                          QString("%1")
-                          .arg(static_cast<double>(mDriver->voltage()->currentValue()) * 1e3, 6,'f', 1)
-                          .toLocal8Bit());
+                       QString("%1")
+                       .arg(static_cast<double>(mDriver->voltage()->currentValue()) * 1e3, 6,'f', 1)
+                       .toLocal8Bit());
         QString tmp = QString("%1")
                 .arg(static_cast<double>(mDriver->counts()->currentValue())/mDriver->params()->currentValue().Time_Const, 6, 'g', 4);
         tmp.replace("e+0","e");
 
         Gpu_CoCmd_Text(host(), 290, 226, 31, OPT_CENTERY | OPT_RIGHTX,
-                          tmp.toLocal8Bit());
+                       tmp.toLocal8Bit());
 
         // кнопки
 
@@ -254,20 +254,20 @@ void SspdWidget::loop()
 
         ColoredStatus cs;
         if (dataReady){
-           // зеленый
-           cs = CS_Normal;
-           dataReady = false;
-           update();
-           }
+            // зеленый
+            cs = CS_Normal;
+            dataReady = false;
+            update();
+        }
         else  if (errorFlag){
-           // красный
-           cs = CS_Fail;
-           errorFlag = false;
-           update();
-           }
+            // красный
+            cs = CS_Fail;
+            errorFlag = false;
+            update();
+        }
         else
-           //серый
-           cs = CS_Inactive;
+            //серый
+            cs = CS_Inactive;
 
         CD::updateIndicator(310,92,cs);
 
