@@ -171,6 +171,44 @@ enum enum_CU4TDM1_SwitcherMode {
     smAC = 2,
     smNone = 3
 };
+
+/*
+ * Команды для CU4HTM0
+ */
+enum enum_CU4HTM0 {
+    // основные команды
+    HT_ChangeMode                   = G_WriteEeprom + 1, // дополнтельная команда
+
+    // данные устройства
+    HT_GetData                      = 0x10, // Получение данных с устройства
+
+    HT_GetCurrent                   = 0x11, // получение тока печки в [А]
+    HT_SetCurrent                   = 0x12, // работает только в ручном режиме
+
+    HT_GetRelayStatus               = 0x13, // получение статуса выходного реле 0 - отключено, 1 - подключено
+    HT_SetRelayStatus               = 0x14,
+
+    // eeprom константы
+    HT_GetEepromConst               = 0x15,
+    HT_SetEepromConst               = 0x16,
+
+    HT_GetMaxCurrent                = 0x17, // максимальный ток печки [A]
+    HT_SetMaxCurrent                = 0x18,
+
+    HT_GetFrontEdgeTime             = 0x19, // получить время линейного нарастания тока печки [сек]
+    HT_SetFrontEdgeTime             = 0x1a,
+    HT_GetHoldTime                  = 0x1b, // получить время удержания максимального тока печки [сек]
+    HT_SetHoldTime                  = 0x1c,
+    HT_GetRearEdgeTime              = 0x1d, // получить время линейного спада тока печки [сек]
+    HT_SetRearEdgeTime              = 0x1e,
+
+    HT_GetCurrentAdcCoeff           = 0x1f,
+    HT_SetCurrentAdcCoeff           = 0x20,
+
+    HT_GetCurrentDacCoeff           = 0x21,
+    HT_SetCurrentDacCoeff           = 0x22,
+};
+
 }
 
 #endif /* STAR_PRC_COMMANDS_H_ */
