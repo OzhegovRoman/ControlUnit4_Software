@@ -144,5 +144,28 @@ struct CU4TDM0V1_Temp_Table_Item_t{
     }
 };
 
+//--------------------------------------------------------------------------------------------------------------
+// CU4HTM0V1 данные
+typedef struct {
+    char relayStatus;
+    char mode;
+    float current;
+} CU4HTM0V0_Data_t;
+
+#define  CU4HTM0V0_RELAY_OPEN   0
+#define  CU4HTM0V0_RELAY_CLOSE  1
+#define  CU4HTM0V0_MODE_MANUAL  0
+#define  CU4HTM0V0_MODE_AUTO    1
+
+typedef struct {
+    pair_t<float> currentAdc;
+    pair_t<float> currentDac;
+    float maximumCurrent;
+    float frontEdgeTime;
+    float holdTime;
+    float rearEdgeTime;
+} CU4HT0V0_EEPROM_Const_t;
+
+
 #endif // STAR_PRC_STRUCTS
 

@@ -177,7 +177,8 @@ enum enum_CU4TDM1_SwitcherMode {
  */
 enum enum_CU4HTM0 {
     // основные команды
-    HT_ChangeMode                   = G_WriteEeprom + 1, // дополнтельная команда
+    HT_GetMode                      = G_WriteEeprom + 1, // дополнтельная команда
+    HT_SetMode                      = G_WriteEeprom + 2,
 
     // данные устройства
     HT_GetData                      = 0x10, // Получение данных с устройства
