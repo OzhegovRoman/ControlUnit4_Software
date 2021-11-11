@@ -122,6 +122,8 @@ void MainDialog::setDeviceType(const QString &deviceType)
         mDriverType = CU4DriverType::dtTempDriverM0;
     if (deviceType.contains("CU4TDM1"))
         mDriverType = CU4DriverType::dtTempDriverM1;
+    if (deviceType.contains("CU4HTM"))
+        mDriverType = CU4DriverType::dtHeaterDriver;
 }
 
 void MainDialog::initializeUI()
@@ -146,6 +148,10 @@ void MainDialog::initializeUI()
     case CU4DriverType::dtTempDriverM1:
         mDriverWidget = new wTempM1Calibr(this);
         mDriver = new TempDriverM1(this);
+        break;
+    case CU4DriverType::dtHeaterDriver:
+        mDriverWidget = new wHeaterDriver(this);
+        mDriver = new HeaterDriverM0(this);
         break;
     default:
         QMessageBox::warning(nullptr,"Warning","Unknown type of Device");

@@ -7,6 +7,7 @@
 #include "Drivers/sspddriverm1.h"
 #include "Drivers/tempdriverm0.h"
 #include "Drivers/tempdriverm1.h"
+#include "Drivers/heaterdriverm0.h"
 #include "savedialog.h"
 #include "opendialog.h"
 #include "calibratedialog.h"
@@ -15,6 +16,7 @@
 #include "wsspddriver.h"
 #include "wtempcalibr.h"
 #include "wtempm1calibr.h"
+#include "wheaterdriver.h"
 
 namespace Ui {
 class MainDialog;

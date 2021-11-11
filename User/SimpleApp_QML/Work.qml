@@ -157,6 +157,10 @@ Item {
                             workPageLoader.setSource("./WorkForms/Data.qml");
                             titleText = qsTr("SSPD Driver") + " (" + address + ")";
                         }
+                        else if (type.includes("Heater")){
+                            workPageLoader.setSource("./WorkForms/Heater.qml");
+                            titleText = qsTr("Heater") + " (" + address + ")";
+                        }
                         else {
                             workPageLoader.setSource("./WorkForms/HomePage.qml");
                             titleText = "";

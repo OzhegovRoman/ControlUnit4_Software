@@ -29,6 +29,9 @@ public:
     DriverProperty<float> *holdTime() const;
     DriverProperty<float> *rearEdgeTime() const;
 
+    DriverCommand *startHeating() const;
+    DriverCommand *emergencyStop() const;
+
 signals:
     void dataUpdated(CU4HTM0V0_Data_t);
     void eepromConstUpdated(CU4HT0V0_EEPROM_Const_t);
@@ -52,6 +55,12 @@ private:
     DriverProperty          <float>                     *mFrontEdgeTime;
     DriverProperty          <float>                     *mHoldTime;
     DriverProperty          <float>                     *mRearEdgeTime;
+
+    //команды
+    DriverCommand                                       *mStartHeating;
+    DriverCommand                                       *mEmergencyStop;
+
+
 };
 
 #endif // HEATERDRIVERM0_H

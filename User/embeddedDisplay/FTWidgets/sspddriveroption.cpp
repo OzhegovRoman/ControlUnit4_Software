@@ -88,7 +88,7 @@ void SspdDriverOption::getOptions(Gpu_Hal_Context_t *host,  CommonDriver *driver
                }
             case BT_ComparatorLevel: {
                double temp = InputWidget::getDouble(host, "Counter level, mV");
-               if (!isnan(temp)){
+               if (!qIsNaN(temp)){
                   if (tmpDriverM0){
                      tmpDriverM0->cmpReferenceLevel()->setValueSync(static_cast<float>(temp * 1e-3), nullptr, 10);
                      QThread::msleep(100);
@@ -106,7 +106,7 @@ void SspdDriverOption::getOptions(Gpu_Hal_Context_t *host,  CommonDriver *driver
                }
             case BT_CounterTimeOut: {
                double temp = InputWidget::getDouble(host, "Timeout, sec");
-               if (!isnan(temp)){
+               if (!qIsNaN(temp)){
                   if (tmpDriverM0){
                      tmpDriverM0->timeConst()->setValueSync(static_cast<float>(temp), nullptr, 10);
                      QThread::msleep(100);
@@ -124,7 +124,7 @@ void SspdDriverOption::getOptions(Gpu_Hal_Context_t *host,  CommonDriver *driver
                }
             case BT_AutoresetThreshold: {
                double temp = InputWidget::getDouble(host, "AR trigger level, mV");
-               if (!isnan(temp)){
+               if (!qIsNaN(temp)){
                   if (tmpDriverM0){
                      tmpDriverM0->autoResetThreshold()->setValueSync(static_cast<float>(temp * 1e-3), nullptr, 10);
                      QThread::msleep(100);
@@ -142,7 +142,7 @@ void SspdDriverOption::getOptions(Gpu_Hal_Context_t *host,  CommonDriver *driver
                }
             case BT_AutoresetTimeOut: {
                double temp = InputWidget::getDouble(host, "AR timeout, sec");
-               if (!isnan(temp)){
+               if (!qIsNaN(temp)){
                   if (tmpDriverM0){
                      tmpDriverM0->autoResetTimeOut()->setValueSync(static_cast<float>(temp), nullptr, 10);
                      QThread::msleep(100);

@@ -45,7 +45,13 @@ int main(int argc, char *argv[])
     if (parser.isSet(welcomeOption)){
         QGraphicsScene scene;
         QGraphicsView view(&scene);
-        QPixmap pixmap(":/images/splash.png");
+        QPixmap pixmap;
+#ifdef RASPBERRY_PI
+        if (QFile::exists("/home/pi/.tirphotonics"))
+            pixmap = QPixmap(":/images/splash_tirphotonics.png");
+        else
+#endif
+            pixmap = QPixmap(":/images/splash.png");
         pixmap = pixmap.scaledToWidth(view.width());
         QGraphicsPixmapItem item(pixmap);
         scene.addItem(&item);

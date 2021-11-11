@@ -1,14 +1,18 @@
 #include "welcomepagewidget.h"
 #include <QThread>
 #include "../compactdraw.h"
+#include <QFile>
 
 const uint8_t welcome_screen[]={
     #include "../Design/welcomepage_alt/images/LOGO_2.binh"
 };
+const uint8_t welcome_screen_tirphotonics[]={
+    #include "../Design/welcomepage_tirphot/images/Tirphotonics_2.binh"
+};
 
 WelcomePageWidget::WelcomePageWidget(Gpu_Hal_Context_t *host)
 {
-   CD::loadTheme();
+    CD::loadTheme();
     setHost(host);
 }
 
@@ -16,7 +20,14 @@ void WelcomePageWidget::setup()
 {
     Gpu_Hal_WrCmd32(host(), CMD_INFLATE);
     Gpu_Hal_WrCmd32(host(), 0);
-    Gpu_Hal_WrCmdBuf(host(), const_cast<uint8_t*>(welcome_screen), sizeof(welcome_screen));
+    uint32_t image_width = 460;
+    uint32_t image_height = 83;
+    if (QFile::exists("/home/pi/.tirphotonics")){
+        Gpu_Hal_WrCmdBuf(host(), const_cast<uint8_t*>(welcome_screen_tirphotonics), sizeof(welcome_screen_tirphotonics));
+        image_height = 101;
+    }
+    else
+        Gpu_Hal_WrCmdBuf(host(), const_cast<uint8_t*>(welcome_screen), sizeof(welcome_screen));
 
     uint16_t pos = 0;
 #ifdef DEBUG
@@ -32,7 +43,7 @@ void WelcomePageWidget::setup()
 
         App_WrCoCmd_Buffer(host(), BITMAP_SOURCE(0));
         App_WrCoCmd_Buffer(host(), BITMAP_LAYOUT(ARGB4, 920, 272));
-        App_WrCoCmd_Buffer(host(), BITMAP_SIZE(BILINEAR, BORDER, BORDER, 460, 83));
+        App_WrCoCmd_Buffer(host(), BITMAP_SIZE(BILINEAR, BORDER, BORDER, image_width, image_height));
 
         App_WrCoCmd_Buffer(host(), BEGIN(BITMAPS));
         App_WrCoCmd_Buffer(host(), VERTEX2II(10, 86, 0, 0));

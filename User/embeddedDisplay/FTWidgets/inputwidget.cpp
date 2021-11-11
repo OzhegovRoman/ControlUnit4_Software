@@ -46,7 +46,7 @@ double InputWidget::getDouble(Gpu_Hal_Context_t *host, QString title)
         }
         else {
             if (lastButtonPressedTag == BT_Back){
-                return nan("1");
+                return qQNaN();
             }
             if ((lastButtonPressedTag >= '0' && lastButtonPressedTag <= '9') ||
                     lastButtonPressedTag == '.'){
@@ -69,7 +69,7 @@ double InputWidget::getDouble(Gpu_Hal_Context_t *host, QString title)
                 lastButtonPressedTag = 0;
             }
             if (lastButtonPressedTag == BT_Ok){
-                if (str.isEmpty()) return nan("1");
+                if (str.isEmpty()) return qQNaN();
                 return(str.toDouble());
             }
 

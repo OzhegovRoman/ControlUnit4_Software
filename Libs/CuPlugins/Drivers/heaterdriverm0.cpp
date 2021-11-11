@@ -18,6 +18,10 @@ HeaterDriverM0::HeaterDriverM0(QObject *parent)
     , mHoldTime         (new DriverProperty<float>                      (this, cmd::HT_GetHoldTime,         cmd::HT_SetHoldTime))
     , mRearEdgeTime     (new DriverProperty<float>                      (this, cmd::HT_GetRearEdgeTime,     cmd::HT_SetRearEdgeTime))
 
+    //Команды
+    , mStartHeating     (new DriverCommand                              (this, cmd::HT_StartHeating))
+    , mEmergencyStop    (new DriverCommand                              (this, cmd::HT_StopHeating))
+
 {
     // Обработка Сигналов при посылке-приеме информации от устройства
 
@@ -34,6 +38,7 @@ HeaterDriverM0::HeaterDriverM0(QObject *parent)
         data.current = mCurrent->currentValue();
         updateData(data);
     });
+
     mRelayStatus->gettedSignal()->connect([=](){
         auto data = mDeviceData->currentValue();
         data.relayStatus = mRelayStatus->currentValue();
@@ -168,4 +173,14 @@ void HeaterDriverM0::updateEEPROM(const CU4HT0V0_EEPROM_Const_t &eeprom)
 {
     mEepromConst->setCurrentValue(eeprom);
     emit eepromConstUpdated(eeprom);
+}
+
+DriverCommand *HeaterDriverM0::emergencyStop() const
+{
+    return mEmergencyStop;
+}
+
+DriverCommand *HeaterDriverM0::startHeating() const
+{
+    return mStartHeating;
 }

@@ -11,6 +11,7 @@ typedef enum {
     dtSspdDriverM1,
     dtTempDriverM0,
     dtTempDriverM1,
+    dtHeaterDriver,
     dtUnknown
 } CU4DriverType;
 

@@ -188,7 +188,7 @@ void SspdWidgetM1::loop()
             lastButtonPressedTag = 0;
             terminate();
             double newValue = InputWidget::getDouble(host(), "Current, uA");
-            if (!isnan(newValue))
+            if (!qIsNaN(newValue))
                mDriver->current()->setValueSync(static_cast<float>(newValue*1e-6), nullptr, 2);
             QThread::currentThread()->msleep(100);
             emit restart();

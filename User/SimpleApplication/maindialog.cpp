@@ -6,6 +6,7 @@
 #include "Interfaces/curs485iointerface.h"
 #include "../qCustomLib/qCustomLib.h"
 #include "sspdwidgetm1.h"
+#include "heaterwidget.h"
 
 #ifdef RASPBERRY_PI
 #include <QApplication>
@@ -236,6 +237,15 @@ bool MainDialog::createUI(const QString& deviceList)
                 auto* widget = new TempM1Widget(this);
                 widget->setDriver(qobject_cast<TempDriverM1*>(tmpDriver));
                 widget->setTempReset(new TemperatureRecycleInterface(qobject_cast<TempDriverM1*>(tmpDriver),&mDrivers,widget));
+                ui->stackedWidget->addWidget(widget);
+            }
+            else if (type.contains("CU4HTM")){
+                //данное устройство - HeaterDriver
+                tmpDriver = new HeaterDriverM0(this);
+                ui->listWidget->addItem(QString("Heater\nAddress: %1").arg(address));
+
+                auto* widget = new HeaterWidget(this);
+                widget->setDriver(qobject_cast<HeaterDriverM0*>(tmpDriver));
                 ui->stackedWidget->addWidget(widget);
             }
 

@@ -7,6 +7,7 @@
 #include "Drivers/sspddriverm1.h"
 #include "Drivers/tempdriverm0.h"
 #include "Drivers/tempdriverm1.h"
+#include "Drivers/heaterdriverm0.h"
 
 #include "Interfaces/cutcpsocketiointerface.h"
 #include "servercommands.h"

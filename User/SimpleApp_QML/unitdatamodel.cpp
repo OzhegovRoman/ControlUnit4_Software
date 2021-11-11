@@ -90,6 +90,6 @@ void UnitDataModel::setData(UnitData *data)
         connect(mData, &UnitData::dataChanged, this, [=](int index) {
             emit dataChanged(this->index(index), this->index(index), QVector<int>() << ValueRole);
         });
-        connect(this, SIGNAL(newDataSetted(int, double)), mData, SIGNAL(newDataSetted(int, double)));
+        connect(this, SIGNAL(newDataSetted(int,double)), mData, SIGNAL(newDataSetted(int,double)));
     }
 }

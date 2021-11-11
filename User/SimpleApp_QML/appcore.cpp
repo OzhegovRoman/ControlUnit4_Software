@@ -82,6 +82,7 @@ void AppCore::coreConnectToIpAddress(const QString& ipAddress)
                 if (tmpStr.contains("CU4SDM1")) driverType = "SSPD Driver M1";
                 if (tmpStr.contains("CU4TDM0")) driverType = "Temperature M0";
                 if (tmpStr.contains("CU4TDM1")) driverType = "Temperature M1";
+                if (tmpStr.contains("CU4HTM"))  driverType = "Heater";
                 int driverAddress = -1;
                 QRegExp reg("address=[0-9]{1,2}:");
 

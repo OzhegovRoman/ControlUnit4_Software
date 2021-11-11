@@ -176,10 +176,9 @@ enum enum_CU4TDM1_SwitcherMode {
  * Команды для CU4HTM0
  */
 enum enum_CU4HTM0 {
-    // основные команды
-    HT_GetMode                      = G_WriteEeprom + 1, // дополнтельная команда
-    HT_SetMode                      = G_WriteEeprom + 2,
-
+    // команды
+    HT_StartHeating                 = G_WriteEeprom + 1,
+    HT_StopHeating                  = G_WriteEeprom + 2,
     // данные устройства
     HT_GetData                      = 0x10, // Получение данных с устройства
 
@@ -189,25 +188,28 @@ enum enum_CU4HTM0 {
     HT_GetRelayStatus               = 0x13, // получение статуса выходного реле 0 - отключено, 1 - подключено
     HT_SetRelayStatus               = 0x14,
 
+    HT_GetMode                      = 0x15,
+    HT_SetMode                      = 0x16,
+
     // eeprom константы
-    HT_GetEepromConst               = 0x15,
-    HT_SetEepromConst               = 0x16,
+    HT_GetEepromConst               = 0x17,
+    HT_SetEepromConst               = 0x18,
 
-    HT_GetMaxCurrent                = 0x17, // максимальный ток печки [A]
-    HT_SetMaxCurrent                = 0x18,
+    HT_GetMaxCurrent                = 0x19, // максимальный ток печки [A]
+    HT_SetMaxCurrent                = 0x1a,
 
-    HT_GetFrontEdgeTime             = 0x19, // получить время линейного нарастания тока печки [сек]
-    HT_SetFrontEdgeTime             = 0x1a,
-    HT_GetHoldTime                  = 0x1b, // получить время удержания максимального тока печки [сек]
-    HT_SetHoldTime                  = 0x1c,
-    HT_GetRearEdgeTime              = 0x1d, // получить время линейного спада тока печки [сек]
-    HT_SetRearEdgeTime              = 0x1e,
+    HT_GetFrontEdgeTime             = 0x1b, // получить время линейного нарастания тока печки [сек]
+    HT_SetFrontEdgeTime             = 0x1c,
+    HT_GetHoldTime                  = 0x1d, // получить время удержания максимального тока печки [сек]
+    HT_SetHoldTime                  = 0x1e,
+    HT_GetRearEdgeTime              = 0x1f, // получить время линейного спада тока печки [сек]
+    HT_SetRearEdgeTime              = 0x20,
 
-    HT_GetCurrentAdcCoeff           = 0x1f,
-    HT_SetCurrentAdcCoeff           = 0x20,
+    HT_GetCurrentAdcCoeff           = 0x21,
+    HT_SetCurrentAdcCoeff           = 0x22,
 
-    HT_GetCurrentDacCoeff           = 0x21,
-    HT_SetCurrentDacCoeff           = 0x22,
+    HT_GetCurrentDacCoeff           = 0x23,
+    HT_SetCurrentDacCoeff           = 0x24,
 };
 
 }
