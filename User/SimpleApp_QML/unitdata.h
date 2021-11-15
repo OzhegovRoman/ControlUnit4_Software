@@ -39,6 +39,7 @@ public slots:
     void setData(int index, bool value);
     void setData(QString name, double value);
     void setData(QString name, bool value);
+    double value(QString name);
 
 protected:
     virtual void initialize();

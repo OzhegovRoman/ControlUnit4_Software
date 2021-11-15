@@ -15,6 +15,7 @@
 #include "Drivers/sspddriverm1.h"
 #include "Drivers/tempdriverm0.h"
 #include "Drivers/tempdriverm1.h"
+#include "Drivers/heaterdriverm0.h"
 
 AppCore::AppCore(QObject *parent)
     : QObject(parent)
@@ -207,6 +208,31 @@ void AppCore::updateDriverData(quint8 address, QString type)
         mUnitData->setData("relay_5",   static_cast<bool>(relays.status() & cRelaysStatus::ri5V));
         mUnitData->setData("relay_25",  static_cast<bool>(relays.status() & cRelaysStatus::ri25V));
     }
+    else if (type == "Heater"){
+        HeaterDriverM0 * driver;
+        if (mDriver != nullptr){
+            driver = qobject_cast<HeaterDriverM0 *>(mDriver);
+            if (!driver){
+                mDriver->deleteLater();
+                driver = new HeaterDriverM0(this);
+            }
+        }
+        else driver = new HeaterDriverM0(this);
+        mDriver = driver;
+
+        driver->setDevAddress(address);
+        mUnitData->setCurrentAddress(address);
+        driver->setIOInterface(mInterface);
+        bool ok = false;
+        auto data = driver->eepromConst()->getValueSync(&ok, 5);
+        qDebug()<<ok;
+        if (!ok) return;
+
+        mUnitData->setData("maxcurrent",   static_cast<double>(data.maximumCurrent));
+        mUnitData->setData("frontedge",    static_cast<double>(data.frontEdgeTime));
+        mUnitData->setData("holdtime",     static_cast<double>(data.holdTime));
+        mUnitData->setData("rearedge",     static_cast<double>(data.rearEdgeTime));
+    }
 }
 
 void AppCore::updateDriverParameters(quint8 address, QString type)
@@ -338,6 +364,82 @@ void AppCore::prepareUnitData(quint8 address, QString type)
                                             0, "unchangable", 1, "Temperature", 0});
             }
     }
+
+    else if (type == "Heater"){
+        mUnitData->items()->append({"maxcurrent",   "Max Current (mA)", 0, "changable", 1, "Current",   0.1});
+        mUnitData->items()->append({"frontedge",    "Front Edge (sec)", 0, "changable", 1, "Time",      0.1});
+        mUnitData->items()->append({"holdtime",     "Hold Time (sec)" , 0, "changable", 1, "Time",      0.1});
+        mUnitData->items()->append({"rearedge",     "Rear Edge (sec)" , 0, "changable", 1, "Time",      0.1});
+        qDebug()<<"prepared";
+    }
+
+}
+
+void AppCore::startHeating(quint8 address, QString type)
+{
+    assert(mUnitData);
+
+    if (type != "Heater") return;
+
+    auto * driver = qobject_cast<HeaterDriverM0 *>(mDriver);
+    if (!driver) return;
+
+    // получаем данные
+    bool ok = false;
+    auto data = driver->eepromConst()->getValueSync(&ok, 5);
+    if (!ok) return;
+
+    int index = mUnitData->getIndexByName("maxcurrent");
+    data.maximumCurrent = mUnitData->items()->at(index).value;
+    if (data.maximumCurrent < 0){
+        data.maximumCurrent = 0;
+        mUnitData->setData(index, 0.0);
+    }
+    qDebug()<<"current"<<data.maximumCurrent;
+
+    index = mUnitData->getIndexByName("frontedge");
+    data.frontEdgeTime = mUnitData->items()->at(index).value;
+    if (data.frontEdgeTime < 0){
+        data.frontEdgeTime = 0;
+        mUnitData->setData(index, 0.0);
+    }
+    qDebug()<<"frontedge"<<data.frontEdgeTime;
+
+    index = mUnitData->getIndexByName("holdtime");
+    data.holdTime = mUnitData->items()->at(index).value;
+    if (data.holdTime < 0){
+        data.holdTime = 0;
+        mUnitData->setData(index, 0.0);
+    }
+    qDebug()<<"holdtime"<<data.holdTime;
+
+    index = mUnitData->getIndexByName("rearedge");
+    data.rearEdgeTime = mUnitData->items()->at(index).value;
+    if (data.rearEdgeTime < 0){
+        data.rearEdgeTime = 0;
+        mUnitData->setData(index, 0.0);
+    }
+    qDebug()<<"rearedge"<<data.rearEdgeTime;
+
+    // отправляем Новые данные
+    driver->eepromConst()->setValueSync(data, &ok, 5);
+    if (!ok) return;
+
+    driver->startHeating()->executeSync(&ok, 5);
+}
+
+void AppCore::emergencyStop(quint8 address, QString type)
+{
+    qDebug()<<"emergency stop";
+    if (type != "Heater") return;
+
+    auto * driver = qobject_cast<HeaterDriverM0 *>(mDriver);
+    if (!driver) return;
+
+    // получаем данные
+    bool ok = false;
+    driver->emergencyStop()->executeSync(&ok, 5);
+
 }
 
 void AppCore::setNewData(int dataListIndex, double value)

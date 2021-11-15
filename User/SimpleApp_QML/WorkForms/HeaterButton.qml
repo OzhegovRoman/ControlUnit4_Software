@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import QtQml 2.13
 
 Item{
     id: heaterButton
@@ -9,6 +10,24 @@ Item{
     signal startHeating();
     signal emergencyStop();
     signal stopHeated();
+
+    property double startHeatingTime: 0.0
+
+    Timer {
+        id: heaterTimer
+        interval: 10
+        running: false
+        repeat: true
+        onTriggered: {
+            progress.heatingValue = (new Date().getTime() - startHeatingTime) / waitingTime * 100.0
+            if (progress.heatingValue >= 100){
+                stop();
+                progressText.text = "Hold button to Heating...";
+                progress.heatingValue = 0
+                stopHeated()
+            }
+        }
+    }
 
     Rectangle{
         id: progress
@@ -21,19 +40,6 @@ Item{
         clip: true
         radius: 5
 
-        NumberAnimation on heatingValue{
-            id: heatingAnimation
-            running: false
-            from: 0; to: 100
-            duration: waitingTime
-            onStopped: {
-                progress.value = 0
-                progress.heatingValue = 0
-                progressText.text = "Hold button to Heating..."
-                stopHeated();
-            }
-        }
-
         NumberAnimation on value {
             id: pressAnimation
             running: false
@@ -42,11 +48,8 @@ Item{
 
             onStopped: {
                 if (progress.value === 100){
-                    if (heatingAnimation.running){
-                        heatingAnimation.pause();
-                        heatingAnimation.from = Math.max(progress.heatingValue, 100 * (waitingTime-rearEdgeTime) /waitingTime);
-                        heatingAnimation.duration = (1 - heatingAnimation.from / 100) * waitingTime;
-                        heatingAnimation.restart();
+                    if (heaterTimer.running){
+                        startHeatingTime = new Date().getTime() - waitingTime + rearEdgeTime
                         progressText.text = "Wait for stoping..."
 
                         emergencyStop();
@@ -54,11 +57,13 @@ Item{
                     else
                     {
                         progressText.text = "Heating. Hold to stop..."
-                        heatingAnimation.from = 0;
-                        heatingAnimation.duration = waitingTime;
-                        heatingAnimation.start();
 
                         startHeating();
+                        startHeatingTime = new Date().getTime()
+                        heaterTimer.start();
+
+                        console.log("waitingTime", waitingTime)
+                        console.log("start", new Date().toISOString());
                     }
 
                 }

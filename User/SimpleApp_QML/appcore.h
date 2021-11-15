@@ -52,6 +52,8 @@ public slots:
     Q_INVOKABLE void updateDriverParameters(quint8 address, QString type);
     Q_INVOKABLE void updateControlUnitsList();
     Q_INVOKABLE void prepareUnitData(quint8 address, QString type);
+    Q_INVOKABLE void startHeating(quint8 address, QString type);
+    Q_INVOKABLE void emergencyStop(quint8 address, QString type);
 
     void setNewData(int dataListIndex, double value);
 

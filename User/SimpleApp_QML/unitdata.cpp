@@ -40,19 +40,13 @@ void UnitData::setData(QString name, bool value)
     setData(getIndexByName(name), value);
 }
 
+double UnitData::value(QString name)
+{
+    return mItems->at(getIndexByName(name)).value;
+}
+
 void UnitData::initialize()
 {
-    //    mItems.append({"current", "Current (uA)", 0, "changable", 1, "Bias", 0.1});
-    //    mItems.append({"voltage", "Voltage (mV)", 0, "unchangable", 2, "Bias", 0});
-    //    mItems.append({"short", "Shorted", 0, "switch", 0, "Bias", 0});
-    //    mItems.append({"amplifier", "Amplifier", 1, "switch", 0, "Signal", 0});
-    //    mItems.append({"cmp", "Trigger (mV)", 0, "changable", 0, "Signal", 10});
-    //    mItems.append({"cmp_on", "Comparator", 0, "switch", 0, "Signal", 0});
-    //    mItems.append({"counter", "Counts", 0, "unchangable", 0, "Counter", 0});
-    //    mItems.append({"counter_timeOut", "TimeOut (sec)", 0, "changable", 2, "Counter", 0.1});
-    //    mItems.append({"autoreset_on", "Autoreset", 0, "switch", 0, "Autoreset", 0});
-    //    mItems.append({"threshold", "Threshold (V)", 0, "changable", 2, "Autoreset", 0.1});
-    //    mItems.append({"timeOut", "TimeOut (sec)", 0, "changable", 2, "Autoreset", 0.1});
 }
 
 int UnitData::currentAddress() const
