@@ -21,6 +21,7 @@ cCommandExecutor::cCommandExecutor(QObject *parent)
     parsers << new GeneralScpiCommands(this);
     parsers << new SspdScpiCommands(this);
     parsers << new TemperatureScpiCommands(this);
+    parsers << new HeaterScpiCommands(this);
 }
 
 void cCommandExecutor::doWork()

@@ -8,5 +8,6 @@
 #include "generalscpicommands.h"
 #include "sspdscpicommands.h"
 #include "temperaturescpicommands.h"
+#include "heaterscpicommands.h"
 
 #endif // COMMANDPARSER_H
