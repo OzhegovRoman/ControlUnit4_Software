@@ -5,6 +5,7 @@
 #include "Drivers/sspddriverm1.h"
 #include "Drivers/tempdriverm0.h"
 #include "Drivers/tempdriverm1.h"
+#include "Drivers/heaterdriverm0.h"
 #include "../qCustomLib/qCustomLib.h"
 #include "servercommands.h"
 #include <QSettings>
@@ -112,6 +113,10 @@ void DataHarvester::initializeDriverList()
                 //данное устройство - TempDriver
                 tmpDriver = new TempDriverM1(this);
             }
+            else if (type.contains("CU4HTM")){
+                //данное устройство - HeaterDriverM0
+                tmpDriver = new HeaterDriverM0(this);
+            }
 
             if (tmpDriver == nullptr)
                 continue;
@@ -126,7 +131,6 @@ void DataHarvester::initializeDriverList()
                 //данное устройство - TempDriverM1
                 qobject_cast<TempDriverM1*>(tmpDriver)->readDefaultParams();
             }
-
         }
     }
 }

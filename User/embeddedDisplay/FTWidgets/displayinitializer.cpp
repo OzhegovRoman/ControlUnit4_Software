@@ -23,7 +23,7 @@ void DisplayInitializer::setup()
 
     App_Common_Init(host());    
     QSettings settings("Scontel", "embeddedDisplay");
-    
+
     Gpu_Hal_Wr32(host(), REG_TOUCH_TRANSFORM_A, settings.value("TransformA", 4294942916).toUInt());
     Gpu_Hal_Wr32(host(), REG_TOUCH_TRANSFORM_B, settings.value("TransformB", 4294965629).toUInt());
     Gpu_Hal_Wr32(host(), REG_TOUCH_TRANSFORM_C, settings.value("TransformC", 32018140).toUInt());

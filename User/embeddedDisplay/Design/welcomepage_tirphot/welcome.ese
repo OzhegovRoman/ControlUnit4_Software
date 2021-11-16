@@ -4,30 +4,26 @@
             "converter": "Image",
             "dataCompressed": true,
             "dataStorage": "Embedded",
-            "destName": "images/Logo_2",
+            "destName": "images/Tirphotonics_2",
             "imageFormat": 6,
             "memoryAddress": 0,
             "memoryLoaded": true,
-            "sourcePath": "resources/Logo_2.png"
+            "sourcePath": "resources/Tirphotonics_2.png"
         }
     ],
     "coprocessor": [
+        "BITMAP_HANDLE(0)",
+        "CMD_SETBITMAP(0, ARGB4, 460, 101)",
         "CLEAR(1, 1, 1)",
         "CMD_GRADIENT(0, 0, 0xFEFFFF, 480, 272, 0xA5A5A5)",
-        "",
-        "BITMAP_HANDLE(0)",
-        "BITMAP_SOURCE(0)",
-        "BITMAP_LAYOUT(ARGB4, 920, 83)",
-        "BITMAP_SIZE(BILINEAR, BORDER, BORDER, 460, 83)",
-        "",
-        "BEGIN(BITMAPS)",
-        "VERTEX2II(10, 86, 0, 0)",
-        "END()",
         "",
         "COLOR_RGB(218, 131, 0)",
         "Cmd_FGColor(0xC8510B)",
         "Cmd_BGColor(0x783508);",
         "CMD_PROGRESS(30, 240, 420, 18, 0, 26, 100)",
+        "BEGIN(BITMAPS)",
+        "VERTEX2II(17, 87, 0, 0)",
+        "END()",
         ""
     ],
     "displayList": [

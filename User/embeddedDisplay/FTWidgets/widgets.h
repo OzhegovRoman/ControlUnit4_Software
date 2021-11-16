@@ -12,5 +12,6 @@
 #include "sspddriveroption.h"
 #include "welcomepagewidget.h"
 #include "turnoffwidget.h"
+#include "heaterwidget.h"
 
 #endif //WIDGETS_H

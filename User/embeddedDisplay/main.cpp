@@ -119,13 +119,14 @@ int main(int argc, char *argv[])
 
     DisplayInitializer _DisplayInitializer(&host);
 
-    MainWidget _MainWidget(&host, _DataHarvester);
-    SystemInfo _SystemInfo(&host);
-    TempWidget _TempWidget(&host);
-    TempM1Widget _TempM1Widget(&host);
-    SspdWidget _SspdWidget(&host);
-    SspdWidgetM1 _SspdWidgetM1(&host);
-    WelcomePageWidget _WelcomePage(&host);
+    MainWidget          _MainWidget(&host, _DataHarvester);
+    SystemInfo          _SystemInfo(&host);
+    TempWidget          _TempWidget(&host);
+    TempM1Widget        _TempM1Widget(&host);
+    SspdWidget          _SspdWidget(&host);
+    SspdWidgetM1        _SspdWidgetM1(&host);
+    WelcomePageWidget   _WelcomePage(&host);
+    HeaterWidget        _HeaterWidget(&host);
     CD::mHost = &host;
 
     QObject::connect(&_DisplayInitializer, &DisplayInitializer::initialized, &_WelcomePage, &WelcomePageWidget::exec);
@@ -137,7 +138,7 @@ int main(int argc, char *argv[])
     });
 
     QObject::connect(&_MainWidget, &MainWidget::systemInfoClicked, &_SystemInfo, &SystemInfo::exec);
-    QObject::connect(&_MainWidget, &MainWidget::channelChoosen, [&_DataHarvester, &_TempWidget, &_TempM1Widget, &_SspdWidget, &_SspdWidgetM1](const int index){
+    QObject::connect(&_MainWidget, &MainWidget::channelChoosen, [&_DataHarvester, &_TempWidget, &_TempM1Widget, &_SspdWidget, &_SspdWidgetM1, &_HeaterWidget](const int index){
         qDebug()<<"index"<<index;
         {
             auto tempDriver = qobject_cast<TempDriverM0*>(_DataHarvester->drivers()[index]);
@@ -167,13 +168,21 @@ int main(int argc, char *argv[])
                 _SspdWidgetM1.exec();
             }
         }
+        {
+            auto heaterDriver = qobject_cast<HeaterDriverM0*>(_DataHarvester->drivers()[index]);
+            if (heaterDriver){
+                _HeaterWidget.setDriver(heaterDriver);
+                _HeaterWidget.exec();
+            }
+        }
     });
 
-    QObject::connect(&_SystemInfo, &SystemInfo::backClicked, &_MainWidget, &MainWidget::exec);
-    QObject::connect(&_TempWidget, &TempWidget::backClicked, &_MainWidget, &MainWidget::exec);
-    QObject::connect(&_TempM1Widget, &TempM1Widget::backClicked, &_MainWidget, &MainWidget::exec);
-    QObject::connect(&_SspdWidget, &SspdWidget::backClicked, &_MainWidget, &MainWidget::exec);
-    QObject::connect(&_SspdWidgetM1, &SspdWidgetM1::backClicked, &_MainWidget, &MainWidget::exec);
+    QObject::connect(&_SystemInfo,      &SystemInfo::backClicked, &_MainWidget, &MainWidget::exec);
+    QObject::connect(&_TempWidget,      &TempWidget::backClicked, &_MainWidget, &MainWidget::exec);
+    QObject::connect(&_TempM1Widget,    &TempM1Widget::backClicked, &_MainWidget, &MainWidget::exec);
+    QObject::connect(&_SspdWidget,      &SspdWidget::backClicked, &_MainWidget, &MainWidget::exec);
+    QObject::connect(&_SspdWidgetM1,    &SspdWidgetM1::backClicked, &_MainWidget, &MainWidget::exec);
+    QObject::connect(&_HeaterWidget,    &HeaterWidget::backClicked, &_MainWidget, &MainWidget::exec);
 
     _DisplayInitializer.exec();
 
