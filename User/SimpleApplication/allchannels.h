@@ -20,9 +20,9 @@ public:
     explicit AllChannels(QWidget *parent = nullptr);
     ~AllChannels() override;
 
-    void openWidget();
-    void closeWidget() override;
-    void updateWidget();
+    void openWidget()   override;
+    void closeWidget()  override;
+    void updateWidget() override;
 
     void initialize(const QVector<CommonDriver *> &mDrivers);
 

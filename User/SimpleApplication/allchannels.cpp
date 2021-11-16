@@ -1,10 +1,11 @@
 #include "allchannels.h"
 #include "ui_allchannels.h"
 #include <QDebug>
-#include <Drivers/sspddriverm0.h>
-#include <Drivers/sspddriverm1.h>
-#include <Drivers/tempdriverm0.h>
-#include <Drivers/tempdriverm1.h>
+#include "Drivers/sspddriverm0.h"
+#include "Drivers/sspddriverm1.h"
+#include "Drivers/tempdriverm0.h"
+#include "Drivers/tempdriverm1.h"
+#include "Drivers/heaterdriverm0.h"
 #include <QSettings>
 #include <QDir>
 #include <QDateTime>
@@ -113,6 +114,12 @@ void AllChannels::updateWidget()
             if (driver){
                 QString tmpString = QString();
                 driver->updateTemperature();
+            }
+        }
+        {
+            auto driver = qobject_cast<HeaterDriverM0*>(model->drivers[idx]);
+            if (driver){
+                QString tmpString = QString();
             }
         }
     }

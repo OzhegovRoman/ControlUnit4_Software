@@ -679,6 +679,8 @@ bool TemperatureScpiCommands::executeCommand(QString command, QString params)
     }
 
     switch (answer) {
+    case CommonScpiCommands::PA_WithoutAnswer:
+        break;
     case CommonScpiCommands::PA_Ok:
         executor()->prepareAnswer("OK\r\n");
         break;

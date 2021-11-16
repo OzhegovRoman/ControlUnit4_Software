@@ -6,6 +6,7 @@
 #include "Drivers/sspddriverm1.h"
 #include "Drivers/tempdriverm0.h"
 #include "Drivers/tempdriverm1.h"
+#include "Drivers/heaterdriverm0.h"
 
 AllChannelsDataModel::AllChannelsDataModel(QObject *parent):
     QAbstractListModel (parent)
@@ -97,6 +98,15 @@ QVariant AllChannelsDataModel::data(const QModelIndex &index, int role) const
             }
         }
     }
+
+    {
+        auto driver = qobject_cast<HeaterDriverM0*>(drivers[idx]);
+        if (driver){
+            if (role == Qt::DisplayRole){
+                return QString("No Data");
+            }
+        }
+    }
     return QVariant();
 }
 
@@ -113,6 +123,8 @@ QVariant AllChannelsDataModel::headerData(int section, Qt::Orientation orientati
             return ("Temperature");
         if (qobject_cast<TempDriverM1*>(drivers[section]))
             return ("Temperature");
+        if (qobject_cast<HeaterDriverM0*>(drivers[section]))
+            return ("Heater");
     }
     return QAbstractListModel::headerData(section, orientation, role);
 }

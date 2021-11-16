@@ -13,6 +13,7 @@ HeaterScpiCommands::HeaterScpiCommands(QObject * parent)
 
 }
 
+//HEAT:DEV1:
 /** формат команд для  Heater
  * HEATer:DEVice<N>:HEAT                            - включение нагрева
  * HEATer:DEVice<N>:STOP                            - остановка
@@ -126,7 +127,7 @@ bool HeaterScpiCommands::executeCommand(QString command, QString params)
     if (command == "RELS?"){
         auto data = driver.relayStatus()->getValueSync(&ok);
         if (ok){
-            executor()->prepareAnswer(QString("%1\r\n").arg(data));
+            executor()->prepareAnswer(QString("%1\r\n").arg(data ? "1" : "0"));
             return true;
         }
         answer = PA_TimeOut;
@@ -142,7 +143,7 @@ bool HeaterScpiCommands::executeCommand(QString command, QString params)
     if (command == "MODE?"){
         auto data = driver.mode()->getValueSync(&ok);
         if (ok){
-            executor()->prepareAnswer(QString("%1\r\n").arg(data));
+            executor()->prepareAnswer(QString("%1\r\n").arg(data ? "1" : "0"));
             return true;
         }
         answer = PA_TimeOut;
