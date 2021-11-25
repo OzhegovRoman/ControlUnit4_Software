@@ -212,6 +212,40 @@ enum enum_CU4HTM0 {
     HT_SetCurrentDacCoeff           = 0x24,
 };
 
+/*
+ * Команды для CU4HTM0
+ */
+enum enum_CU4CLM0 {
+    // данные устройства
+    CL_GetData                      = 0x10, // Получение данных с устройства
+
+    CL_GetCurrent                   = 0x11, // получение тока печки в [А]
+    CL_SetCurrent                   = 0x12, // работает только в ручном режиме
+
+    CL_GetShortEnable               = 0x13,      // Закоротка
+    CL_SetShortEnable               = 0x14,      // Закоротка
+
+    CL_GetPIDStatus                 = 0x15,      // PID регулятор стабилизации тока смещения
+    CL_SetPIDStatus                 = 0x16,
+
+    // eeprom константы
+    CL_GetEepromConst               = 0x17,
+    CL_SetEepromConst               = 0x18,
+
+    CL_GetCurrentAdcCoeff           = 0x19,
+    CL_SetCurrentAdcCoeff           = 0x1a,
+
+    CL_GetCurrentDacCoeff           = 0x1b,
+    CL_SetCurrentDacCoeff           = 0x1c,
+
+    CL_GetCurrentLimits             = 0x1d,
+    CL_SetCurrentLimits             = 0x1e,
+
+    CL_GetCurrentStep               = 0x1f,
+    CL_SetCurrentStep               = 0x20,
+
+};
+
 }
 
 #endif /* STAR_PRC_COMMANDS_H_ */

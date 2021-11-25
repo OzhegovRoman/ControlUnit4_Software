@@ -170,7 +170,7 @@ void HeaterWidget::loop()
             double temp = InputWidget::getDouble(host(), "Max current, mA");
             if (!qIsNaN(temp) && (temp >=0)){
                 auto data = mDriver->eepromConst()->currentValue();
-                data.maximumCurrent = static_cast<float>(temp);
+                data.maximumCurrent = static_cast<float>(temp)/1000.0;
                 mDriver->eepromConst()->setCurrentValue(data);
             }
             lastButtonPressedTag = 0;
@@ -262,7 +262,7 @@ void HeaterWidget::loop()
         auto data = mDriver->eepromConst()->currentValue();
 
         Gpu_CoCmd_Text(host(), 450, 99, 29, OPT_CENTERY | OPT_RIGHTX,
-                       QString("%1").arg(static_cast<double>(data.maximumCurrent), 6, 'f', 1).toLocal8Bit());
+                       QString("%1").arg(static_cast<double>(data.maximumCurrent) * 1000.0, 6, 'f', 1).toLocal8Bit());
         Gpu_CoCmd_Text(host(), 450, 133, 29, OPT_CENTERY | OPT_RIGHTX,
                        QString("%1").arg(static_cast<double>(data.frontEdgeTime), 6, 'f', 1).toLocal8Bit());
         Gpu_CoCmd_Text(host(), 450, 167, 29, OPT_CENTERY | OPT_RIGHTX,

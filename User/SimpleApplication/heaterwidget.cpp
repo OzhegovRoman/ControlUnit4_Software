@@ -62,7 +62,7 @@ void HeaterWidget::startHeating()
     heatingProgress = 0;
 
     auto eepromConst = mDriver->eepromConst()->currentValue();
-    eepromConst.maximumCurrent = ui->leMaxCurrent   -> text().toDouble();
+    eepromConst.maximumCurrent = ui->leMaxCurrent   -> text().toDouble() / 1000.0;
     eepromConst.frontEdgeTime  = ui->leFrontEdge    -> text().toDouble();
     eepromConst.holdTime       = ui->leHoldTime     -> text().toDouble();
     eepromConst.rearEdgeTime   = ui->leRearEdge     -> text().toDouble();
@@ -137,7 +137,7 @@ void HeaterWidget::openWidget()
     bool ok = false;
     mDriver->eepromConst()->getValueSync(&ok, 5);
     if (ok){
-        ui->leMaxCurrent    -> setText(QString::number(mDriver->eepromConst()->currentValue().maximumCurrent));
+        ui->leMaxCurrent    -> setText(QString::number(mDriver->eepromConst()->currentValue().maximumCurrent*1000.0));
         ui->leFrontEdge     -> setText(QString::number(mDriver->eepromConst()->currentValue().frontEdgeTime ));
         ui->leHoldTime      -> setText(QString::number(mDriver->eepromConst()->currentValue().holdTime      ));
         ui->leRearEdge      -> setText(QString::number(mDriver->eepromConst()->currentValue().rearEdgeTime  ));

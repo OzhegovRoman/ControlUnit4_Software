@@ -8,6 +8,7 @@
 #include "Calibrator/cu4sdm1calibrator.h"
 #include "Calibrator/cu4tdm0calibrator.h"
 #include "Calibrator/cu4tdm1calibrator.h"
+#include "Calibrator/cu4htm0calibrator.h"
 
 CalibrateDialog::CalibrateDialog(QWidget *parent)
     : QDialog(parent)
@@ -153,6 +154,9 @@ int CalibrateDialog::exec()
     case dtTempDriverM1:
         mCalibrator = new CU4TDM1Calibrator(this);
         qobject_cast<CU4TDM1Calibrator * >(mCalibrator)->setChannel(mChannel);
+        break;
+    case dtHeaterDriver:
+        mCalibrator = new CU4HTM0Calibrator(this);
         break;
     default:
         mCalibrator = new CommonCalibrator(this);

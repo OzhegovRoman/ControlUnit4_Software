@@ -166,6 +166,20 @@ typedef struct {
     float rearEdgeTime;
 } CU4HT0V0_EEPROM_Const_t;
 
+//--------------------------------------------------------------------------------------------------------------
+// CU4CLM0V1 данные
+typedef struct {
+    float current;
+    bool  shortCircuit;
+} CU4CLM0V0_Data_t;
+
+typedef struct {
+    pair_t<float> currentAdc;
+    pair_t<float> currentDac;
+    pair_t<float> currentLimits;
+    float currentStep;
+} CU4CLM0V0_EEPROM_Const_t;
+
 
 #endif // STAR_PRC_STRUCTS
 

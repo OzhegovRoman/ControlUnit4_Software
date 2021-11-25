@@ -228,7 +228,7 @@ void AppCore::updateDriverData(quint8 address, QString type)
         qDebug()<<ok;
         if (!ok) return;
 
-        mUnitData->setData("maxcurrent",   static_cast<double>(data.maximumCurrent));
+        mUnitData->setData("maxcurrent",   static_cast<double>(data.maximumCurrent) * 1000.0);
         mUnitData->setData("frontedge",    static_cast<double>(data.frontEdgeTime));
         mUnitData->setData("holdtime",     static_cast<double>(data.holdTime));
         mUnitData->setData("rearedge",     static_cast<double>(data.rearEdgeTime));
@@ -390,7 +390,7 @@ void AppCore::startHeating(quint8 address, QString type)
     if (!ok) return;
 
     int index = mUnitData->getIndexByName("maxcurrent");
-    data.maximumCurrent = mUnitData->items()->at(index).value;
+    data.maximumCurrent = mUnitData->items()->at(index).value/1000.0;
     if (data.maximumCurrent < 0){
         data.maximumCurrent = 0;
         mUnitData->setData(index, 0.0);
