@@ -117,6 +117,10 @@ void DataHarvester::initializeDriverList()
                 //данное устройство - HeaterDriverM0
                 tmpDriver = new SisControlLineDriverM0(this);
             }
+            else if (type.contains("CU4BSM")){
+                //данное устройство - HeaterDriverM0
+                tmpDriver = new SisBiasSourceDriverM0(this);
+            }
 
             if (tmpDriver == nullptr)
                 continue;

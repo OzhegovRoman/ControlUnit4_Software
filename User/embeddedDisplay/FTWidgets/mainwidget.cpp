@@ -261,6 +261,27 @@ void MainWidget::loop()
             }
         }
 
+        {
+            auto sisBiasSourceDriver =qobject_cast<SisBiasSourceDriverM0*>(mHarvester->drivers()[i+mTopIndex]);
+            if (sisBiasSourceDriver){
+                ColoredStatus cs = ColoredStatus::CS_Normal;
+                if (!dataInfo[i+mTopIndex].channelInited || sisBiasSourceDriver->shortEnable()->currentValue())
+                    // серый
+                    cs = ColoredStatus::CS_Inactive;
+                int16_t center = wideList ? 309 : 291;
+                CD::listButtonText(cs,
+                                   top,
+                                   QString("#%1 Control Line").arg(sisBiasSourceDriver->devAddress()),
+                                   QString());
+                                   QString tempStr = QString("U: %1 mV; I: %2 uA")
+                                   .arg(sisBiasSourceDriver->voltage()->currentValue()*1e3,6,'f', 2)
+                                   .arg(sisBiasSourceDriver->current()->currentValue()*1e6,6,'f', 1);
+
+                CD::animatedButtonText(CS_Normal, top, center, animationProcess, animationPeriod, tempStr);
+
+            }
+        }
+
         // общая для всех точка моргания сетодиодом
         ColoredStatus cs;
         if (dataInfo[i + mTopIndex].channelUpdated){
@@ -278,7 +299,7 @@ void MainWidget::loop()
         else
             //серый
             cs = CS_Inactive;
-        CD::updateIndicator(wideList ? 456: 420, top+16,cs);
+        CD::updateIndicator(wideList ? 456: 420, top + 16,cs);
     }
 
     App_WrCoCmd_Buffer(host(), DISPLAY());
@@ -360,6 +381,13 @@ void MainWidget::dataHarvest()
             if (sisControlLIneDriver){
                 // в случае успеха
                 sisControlLIneDriver->data()->getValueSync(&ok);
+            }
+        }
+        {
+            auto * sisBiasSourceDriver = qobject_cast<SisBiasSourceDriverM0*>(mHarvester->drivers()[currentIndex]);
+            if (sisBiasSourceDriver){
+                // в случае успеха
+                sisBiasSourceDriver->data()->getValueSync(&ok);
             }
         }
 

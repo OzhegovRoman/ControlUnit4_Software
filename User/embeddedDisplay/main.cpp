@@ -129,6 +129,7 @@ int main(int argc, char *argv[])
     WelcomePageWidget       _WelcomePage(&host);
     HeaterWidget            _HeaterWidget(&host);
     SisControlLineWidget    _SisControlLineWidget(&host);
+    SisBiasSourceWidget     _SisBiasSourceWidget(&host);
     CD::mHost = &host;
 
     QObject::connect(&_DisplayInitializer, &DisplayInitializer::initialized, &_WelcomePage, &WelcomePageWidget::exec);
@@ -148,6 +149,7 @@ int main(int argc, char *argv[])
                      , &_SspdWidgetM1
                      , &_HeaterWidget
                      , &_SisControlLineWidget
+                     , &_SisBiasSourceWidget
                      ](const int index){
         qDebug()<<"index"<<index;
         {
@@ -192,6 +194,13 @@ int main(int argc, char *argv[])
                 _SisControlLineWidget.exec();
             }
         }
+        {
+            auto sisBiasSourceDriver = qobject_cast<SisBiasSourceDriverM0*>(_DataHarvester->drivers()[index]);
+            if (sisBiasSourceDriver){
+                _SisBiasSourceWidget.setDriver(sisBiasSourceDriver);
+                _SisBiasSourceWidget.exec();
+            }
+        }
     });
 
     QObject::connect(&_SystemInfo,              &SystemInfo::backClicked,               &_MainWidget, &MainWidget::exec);
@@ -200,7 +209,8 @@ int main(int argc, char *argv[])
     QObject::connect(&_SspdWidget,              &SspdWidget::backClicked,               &_MainWidget, &MainWidget::exec);
     QObject::connect(&_SspdWidgetM1,            &SspdWidgetM1::backClicked,             &_MainWidget, &MainWidget::exec);
     QObject::connect(&_HeaterWidget,            &HeaterWidget::backClicked,             &_MainWidget, &MainWidget::exec);
-    QObject::connect(&_SisControlLineWidget,    &SisControlLineWidget::backClicked,    &_MainWidget, &MainWidget::exec);
+    QObject::connect(&_SisControlLineWidget,    &SisControlLineWidget::backClicked,     &_MainWidget, &MainWidget::exec);
+    QObject::connect(&_SisBiasSourceWidget,     &SisBiasSourceWidget::backClicked,     &_MainWidget, &MainWidget::exec);
 
     _DisplayInitializer.exec();
 

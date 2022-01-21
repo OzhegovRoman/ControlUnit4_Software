@@ -14,5 +14,6 @@
 #include "turnoffwidget.h"
 #include "heaterwidget.h"
 #include "siscontrollinewidget.h"
+#include "sisbiassourcewidget.h"
 
 #endif //WIDGETS_H
