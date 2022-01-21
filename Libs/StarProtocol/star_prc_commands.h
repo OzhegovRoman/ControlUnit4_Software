@@ -213,19 +213,19 @@ enum enum_CU4HTM0 {
 };
 
 /*
- * Команды для CU4HTM0
+ * Команды для CU4CLM0
  */
 enum enum_CU4CLM0 {
     // данные устройства
     CL_GetData                      = 0x10, // Получение данных с устройства
 
-    CL_GetCurrent                   = 0x11, // получение тока печки в [А]
-    CL_SetCurrent                   = 0x12, // работает только в ручном режиме
+    CL_GetCurrent                   = 0x11, // получение тока смещения [А]
+    CL_SetCurrent                   = 0x12,
 
-    CL_GetShortEnable               = 0x13,      // Закоротка
-    CL_SetShortEnable               = 0x14,      // Закоротка
+    CL_GetShortEnable               = 0x13, // Закоротка
+    CL_SetShortEnable               = 0x14, // Закоротка
 
-    CL_GetPIDStatus                 = 0x15,      // PID регулятор стабилизации тока смещения
+    CL_GetPIDStatus                 = 0x15, // PID регулятор стабилизации тока смещения
     CL_SetPIDStatus                 = 0x16,
 
     // eeprom константы
@@ -244,6 +244,60 @@ enum enum_CU4CLM0 {
     CL_GetCurrentStep               = 0x1f,
     CL_SetCurrentStep               = 0x20,
 
+};
+
+/*
+ * Команды для CU4BSM0
+ */
+enum enum_CU4BSM0 {
+    // данные устройства
+    BS_GetData                      = 0x10, // Получение данных с устройства
+
+    BS_GetCurrent                   = 0x11, // получение тока смещения [А]
+    BS_SetCurrent                   = 0x12,
+
+    BS_GetVoltage                   = 0x13, // получение напряжения смещения [В]
+    BS_SetVoltage                   = 0x14,
+
+    BS_GetShortEnable               = 0x15, // Закоротка
+    BS_SetShortEnable               = 0x16, // Закоротка
+
+    BS_GetMode                      = 0x17, // режим смещения
+    BS_SetMode                      = 0x18, //
+
+    BS_GetPIDStatus                 = 0x19, // PID регулятор стабилизации тока смещения
+    BS_SetPIDStatus                 = 0x1A,
+
+    // eeprom константы
+    BS_GetEepromConst               = 0x1B, // EEPROM_Coeff Коэффициенты для записи в память
+    BS_SetEepromConst               = 0x1C,
+
+    BS_GetCurrentAdcCoeff           = 0x1D, // Current_ADC
+    BS_SetCurrentAdcCoeff           = 0x1E,
+
+    BS_GetVoltageAdcCoeff           = 0x1F, // Voltage_ADC
+    BS_SetVoltageAdcCoeff           = 0x20,
+
+    BS_GetCurrentDacCoeff           = 0x21, // Current_DAC
+    BS_SetCurrentDacCoeff           = 0x22,
+
+    BS_GetVoltageDacCoeff           = 0x23, // Voltage_DAC
+    BS_SetVoltageDacCoeff           = 0x24,
+
+    BS_GetCurrentLimits             = 0x25,
+    BS_SetCurrentLimits             = 0x26,
+
+    BS_GetCurrentStep               = 0x27,
+    BS_SetCurrentStep               = 0x28,
+
+    BS_GetVoltageLimits             = 0x29,
+    BS_SetVoltageLimits             = 0x2A,
+
+    BS_GetVoltageStep               = 0x2B,
+    BS_SetVoltageStep               = 0x2C,
+
+    BS_GetCurrentMonitoResistance   = 0x2D,
+    BS_SetCurrentMonitoResistance   = 0x2E,
 };
 
 }

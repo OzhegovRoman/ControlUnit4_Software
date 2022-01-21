@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>wSisBiasSourceDriver</class>
+ <widget class="QWidget" name="wSisBiasSourceDriver">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>290</width>
+    <height>417</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>SIS BiasSource Driver EEPROM Const </string>
+     </property>
+     <layout class="QFormLayout" name="formLayout">
+      <property name="horizontalSpacing">
+       <number>6</number>
+      </property>
+      <property name="verticalSpacing">
+       <number>6</number>
+      </property>
+      <property name="leftMargin">
+       <number>9</number>
+      </property>
+      <property name="topMargin">
+       <number>9</number>
+      </property>
+      <property name="rightMargin">
+       <number>9</number>
+      </property>
+      <property name="bottomMargin">
+       <number>9</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QLabel" name="lCurrentAdcSlope">
+        <property name="text">
+         <string>Current ADC slope</string>
+        </property>
+        <property name="buddy">
+         <cstring>leCurrentAdcSlope</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="leCurrentAdcSlope">
+        <property name="frame">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="lCurrentAdcIntercept">
+        <property name="text">
+         <string>Current ADC intercept</string>
+        </property>
+        <property name="buddy">
+         <cstring>leCurrentAdcIntercept</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="leCurrentAdcIntercept"/>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLineEdit" name="leCurrentMaxLimit"/>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="lCurrentMinLimit">
+        <property name="text">
+         <string>Current Min Limit</string>
+        </property>
+        <property name="buddy">
+         <cstring>leCurrentMinLimit</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QLineEdit" name="leCurrentMinLimit"/>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="lCurrentStep">
+        <property name="text">
+         <string>Current Step</string>
+        </property>
+        <property name="buddy">
+         <cstring>leCurrentStep</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QLineEdit" name="leCurrentStep"/>
+      </item>
+      <item row="7" column="0">
+       <widget class="QLabel" name="lVoltageAdcSlope">
+        <property name="text">
+         <string>Voltage ADC slope</string>
+        </property>
+        <property name="buddy">
+         <cstring>leVoltageAdcSlope</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="1">
+       <widget class="QLineEdit" name="leVoltageAdcSlope"/>
+      </item>
+      <item row="8" column="0">
+       <widget class="QLabel" name="lVoltageAdcIntercept">
+        <property name="text">
+         <string>Voltage ADC intercept</string>
+        </property>
+        <property name="buddy">
+         <cstring>leVoltageAdcIntercept</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="1">
+       <widget class="QLineEdit" name="leVoltageAdcIntercept"/>
+      </item>
+      <item row="9" column="0">
+       <widget class="QLabel" name="lVoltageDacSlope">
+        <property name="text">
+         <string>Voltage DAC slope</string>
+        </property>
+        <property name="buddy">
+         <cstring>leVoltageDacSlope</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="1">
+       <widget class="QLineEdit" name="leVoltageDacSlope"/>
+      </item>
+      <item row="10" column="0">
+       <widget class="QLabel" name="lVoltageDacIntercept">
+        <property name="text">
+         <string>Voltage DAC intercept</string>
+        </property>
+        <property name="buddy">
+         <cstring>leVoltageDacIntercept</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="1">
+       <widget class="QLineEdit" name="leVoltageDacIntercept"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="lCurrentDacSlope">
+        <property name="text">
+         <string>Current DAC slope</string>
+        </property>
+        <property name="buddy">
+         <cstring>leCurrentDacSlope</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="leCurrentDacSlope"/>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLineEdit" name="leCurrentDacIntercept"/>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="lCurrentDacIntercept">
+        <property name="text">
+         <string>Current DAC intercept</string>
+        </property>
+        <property name="buddy">
+         <cstring>leCurrentDacIntercept</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="11" column="0">
+       <widget class="QLabel" name="lVoltageMaxLimit">
+        <property name="text">
+         <string>Voltage Max Limit</string>
+        </property>
+        <property name="buddy">
+         <cstring>leVoltageMaxLimit</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="11" column="1">
+       <widget class="QLineEdit" name="leVoltageMaxLimit"/>
+      </item>
+      <item row="12" column="0">
+       <widget class="QLabel" name="lVoltageMinLimit">
+        <property name="text">
+         <string>Voltage Min Limit</string>
+        </property>
+        <property name="buddy">
+         <cstring>leVoltageMinLimit</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="12" column="1">
+       <widget class="QLineEdit" name="leVoltageMinLimit"/>
+      </item>
+      <item row="13" column="0">
+       <widget class="QLabel" name="lVoltageStep">
+        <property name="text">
+         <string>Voltage Step</string>
+        </property>
+        <property name="buddy">
+         <cstring>leVoltageStep</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="13" column="1">
+       <widget class="QLineEdit" name="leVoltageStep"/>
+      </item>
+      <item row="14" column="0">
+       <widget class="QLabel" name="lCurrentMonitorResistance">
+        <property name="text">
+         <string>Current Monitor Resistance</string>
+        </property>
+        <property name="buddy">
+         <cstring>leCurrentMonitorResistance</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="14" column="1">
+       <widget class="QLineEdit" name="leCurrentMonitorResistance"/>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="lCurrentMaxLimit">
+        <property name="text">
+         <string>Current Max Limit</string>
+        </property>
+        <property name="buddy">
+         <cstring>leCurrentMaxLimit</cstring>
+        </property>
+       </widget>
+      </item>
+     </layout>
+     <zorder>leCurrentAdcSlope</zorder>
+     <zorder>lCurrentAdcIntercept</zorder>
+     <zorder>leCurrentAdcIntercept</zorder>
+     <zorder>leCurrentMaxLimit</zorder>
+     <zorder>lCurrentMinLimit</zorder>
+     <zorder>leCurrentMinLimit</zorder>
+     <zorder>lCurrentAdcSlope</zorder>
+     <zorder>lCurrentStep</zorder>
+     <zorder>leCurrentStep</zorder>
+     <zorder>lVoltageAdcSlope</zorder>
+     <zorder>leVoltageAdcSlope</zorder>
+     <zorder>lVoltageAdcIntercept</zorder>
+     <zorder>leVoltageAdcIntercept</zorder>
+     <zorder>lVoltageDacSlope</zorder>
+     <zorder>leVoltageDacSlope</zorder>
+     <zorder>lVoltageDacIntercept</zorder>
+     <zorder>leVoltageDacIntercept</zorder>
+     <zorder>lCurrentDacSlope</zorder>
+     <zorder>leCurrentDacSlope</zorder>
+     <zorder>leCurrentDacIntercept</zorder>
+     <zorder>lCurrentDacIntercept</zorder>
+     <zorder>lVoltageMaxLimit</zorder>
+     <zorder>leVoltageMaxLimit</zorder>
+     <zorder>lVoltageMinLimit</zorder>
+     <zorder>leVoltageMinLimit</zorder>
+     <zorder>lVoltageStep</zorder>
+     <zorder>leVoltageStep</zorder>
+     <zorder>lCurrentMonitorResistance</zorder>
+     <zorder>leCurrentMonitorResistance</zorder>
+     <zorder>lCurrentMaxLimit</zorder>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>leCurrentAdcSlope</tabstop>
+  <tabstop>leCurrentAdcIntercept</tabstop>
+  <tabstop>leCurrentDacSlope</tabstop>
+  <tabstop>leCurrentDacIntercept</tabstop>
+  <tabstop>leCurrentMaxLimit</tabstop>
+  <tabstop>leCurrentMinLimit</tabstop>
+  <tabstop>leCurrentStep</tabstop>
+  <tabstop>leVoltageAdcSlope</tabstop>
+  <tabstop>leVoltageAdcIntercept</tabstop>
+  <tabstop>leVoltageDacSlope</tabstop>
+  <tabstop>leVoltageDacIntercept</tabstop>
+  <tabstop>leVoltageMaxLimit</tabstop>
+  <tabstop>leVoltageMinLimit</tabstop>
+  <tabstop>leVoltageStep</tabstop>
+  <tabstop>leCurrentMonitorResistance</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

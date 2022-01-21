@@ -8,6 +8,9 @@
 #include "Drivers/tempdriverm0.h"
 #include "Drivers/tempdriverm1.h"
 #include "Drivers/heaterdriverm0.h"
+#include "Drivers/siscontrollinedriverm0.h"
+#include "Drivers/sisbiassourcedriverm0.h"
+
 #include "savedialog.h"
 #include "opendialog.h"
 #include "calibratedialog.h"
@@ -17,6 +20,8 @@
 #include "wtempcalibr.h"
 #include "wtempm1calibr.h"
 #include "wheaterdriver.h"
+#include "wsiscontrollinedriver.h"
+#include "wsisbiassourcedriver.h"
 
 namespace Ui {
 class MainDialog;

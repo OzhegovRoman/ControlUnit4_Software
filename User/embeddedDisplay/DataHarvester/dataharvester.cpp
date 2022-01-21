@@ -1,11 +1,7 @@
 #include "dataharvester.h"
 #include "Interfaces/cutcpsocketiointerface.h"
 #include "Interfaces/curs485iointerface.h"
-#include "Drivers/sspddriverm0.h"
-#include "Drivers/sspddriverm1.h"
-#include "Drivers/tempdriverm0.h"
-#include "Drivers/tempdriverm1.h"
-#include "Drivers/heaterdriverm0.h"
+#include "Drivers/drivers.h"
 #include "../qCustomLib/qCustomLib.h"
 #include "servercommands.h"
 #include <QSettings>
@@ -116,6 +112,10 @@ void DataHarvester::initializeDriverList()
             else if (type.contains("CU4HTM")){
                 //данное устройство - HeaterDriverM0
                 tmpDriver = new HeaterDriverM0(this);
+            }
+            else if (type.contains("CU4CLM")){
+                //данное устройство - HeaterDriverM0
+                tmpDriver = new SisControlLineDriverM0(this);
             }
 
             if (tmpDriver == nullptr)

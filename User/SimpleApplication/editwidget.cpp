@@ -1,12 +1,13 @@
 #include "editwidget.h"
 #include "ui_editwidget.h"
 #include "QDoubleValidator"
-#include "Drivers/sspddriverm0.h"
 #include <QDebug>
+#include <QObject>
 
-EditWidget::EditWidget(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::EditWidget)
+EditWidget::EditWidget(QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::EditWidget)
+    , mDriver(nullptr)
 {
     ui->setupUi(this);
     connect(ui->pushButton, SIGNAL(clicked(bool)), this, SIGNAL(clickShorted(bool)));
@@ -37,30 +38,51 @@ bool EditWidget::getChecked()
     return ui->pushButton->isChecked();
 }
 
-void EditWidget::setInterface(cuIOInterface *value)
+void EditWidget::setDriver(CommonDriver *newDriver)
 {
-    qDebug()<<"setInterface"<<value;
-    interface = value;
+    mDriver = newDriver;
 }
 
 void EditWidget::on_pushButton_clicked(bool checked)
 {
-    qDebug()<<checked<<index;
-    SspdDriverM0 driver;
-    driver.setIOInterface(interface);
-    driver.setDevAddress(static_cast<quint8>(index));
-    driver.shortEnable()->setValueSync(checked);
-}
-
-void EditWidget::setIndex(int value)
-{
-    index = value;
+    {
+        auto* tmpDriver = qobject_cast<SspdDriverM0*>(mDriver);
+        if (tmpDriver){
+            tmpDriver->shortEnable()->setValueSync(checked);
+        }
+    }
+    {
+        auto* tmpDriver = qobject_cast<SspdDriverM1*>(mDriver);
+        if (tmpDriver){
+            tmpDriver->shortEnable()->setValueSync(checked);
+        }
+    }
+    {
+        auto* tmpDriver = qobject_cast<SisControlLineDriverM0*>(mDriver);
+        if (tmpDriver){
+            tmpDriver->shortEnable()->setValueSync(checked);
+        }
+    }
 }
 
 void EditWidget::on_doubleSpinBox_editingFinished()
 {
-    SspdDriverM0 driver;
-    driver.setIOInterface(interface);
-    driver.setDevAddress(static_cast<quint8>(index));
-    driver.current()->setValueSync(static_cast<float>(ui->doubleSpinBox->value() * 1E-6), nullptr, 5);
+    {
+        auto* tmpDriver = qobject_cast<SspdDriverM0*>(mDriver);
+        if (tmpDriver){
+            tmpDriver->current()->setValueSync(static_cast<float>(ui->doubleSpinBox->value() * 1E-6), nullptr, 5);
+        }
+    }
+    {
+        auto* tmpDriver = qobject_cast<SspdDriverM1*>(mDriver);
+        if (tmpDriver){
+            tmpDriver->current()->setValueSync(static_cast<float>(ui->doubleSpinBox->value() * 1E-6), nullptr, 5);
+        }
+    }
+    {
+        auto* tmpDriver = qobject_cast<SisControlLineDriverM0*>(mDriver);
+        if (tmpDriver){
+            tmpDriver->current()->setValueSync(static_cast<float>(ui->doubleSpinBox->value() * 1E-3), nullptr, 5);
+        }
+    }
 }

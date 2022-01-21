@@ -5,7 +5,6 @@
 #include "commonwidget.h"
 
 #include "Drivers/heaterdriverm0.h"
-#include <QTimer>
 
 namespace Ui {
 class HeaterWidget;
@@ -25,7 +24,6 @@ public:
 private:
     Ui::HeaterWidget *ui;
     HeaterDriverM0 * mDriver{nullptr};
-//    QTimer *progressTimer;
     int currentProgress{0};
     int heatingProgress{0};
     int waitingTime{0};

@@ -2,11 +2,7 @@
 #include <QBrush>
 #include <QDebug>
 #include <cmath>
-#include "Drivers/sspddriverm0.h"
-#include "Drivers/sspddriverm1.h"
-#include "Drivers/tempdriverm0.h"
-#include "Drivers/tempdriverm1.h"
-#include "Drivers/heaterdriverm0.h"
+#include "Drivers/drivers.h"
 
 AllChannelsDataModel::AllChannelsDataModel(QObject *parent):
     QAbstractListModel (parent)
@@ -107,6 +103,27 @@ QVariant AllChannelsDataModel::data(const QModelIndex &index, int role) const
             }
         }
     }
+
+    {
+        auto driver = qobject_cast<SisControlLineDriverM0*>(drivers[idx]);
+        if (driver){
+            if (role == Qt::DisplayRole){
+                return QString("I: %1 mA").arg(driver->current()->currentValue() * 1e3, 4,'f', 2);
+            }
+        }
+    }
+
+    {
+        auto driver = qobject_cast<SisBiasSourceDriverM0*>(drivers[idx]);
+        if (driver){
+            if (role == Qt::DisplayRole){
+                return QString("U: %1 mV; I: %2 uA")
+                        .arg(driver->voltage()->currentValue() * 1e3, 4,'f', 2)
+                        .arg(driver->current()->currentValue() * 1e6, 4,'f', 1)
+                        ;
+            }
+        }
+    }
     return QVariant();
 }
 
@@ -125,6 +142,10 @@ QVariant AllChannelsDataModel::headerData(int section, Qt::Orientation orientati
             return ("Temperature");
         if (qobject_cast<HeaterDriverM0*>(drivers[section]))
             return ("Heater");
+        if (qobject_cast<SisControlLineDriverM0*>(drivers[section]))
+            return ("SIS Control Line");
+        if (qobject_cast<SisBiasSourceDriverM0*>(drivers[section]))
+            return ("SIS Bias Source");
     }
     return QAbstractListModel::headerData(section, orientation, role);
 }
@@ -142,6 +163,8 @@ Qt::ItemFlags AllChannelsDataModel::flags(const QModelIndex &index) const
     if (qobject_cast<SspdDriverM0*>(drivers[index.row()]))
         return Qt::ItemIsSelectable |  Qt::ItemIsEditable | Qt::ItemIsEnabled ;
     if (qobject_cast<SspdDriverM1*>(drivers[index.row()]))
+        return Qt::ItemIsSelectable |  Qt::ItemIsEditable | Qt::ItemIsEnabled ;
+    if (qobject_cast<SisControlLineDriverM0*>(drivers[index.row()]))
         return Qt::ItemIsSelectable |  Qt::ItemIsEditable | Qt::ItemIsEnabled ;
     return Qt::NoItemFlags;
 }

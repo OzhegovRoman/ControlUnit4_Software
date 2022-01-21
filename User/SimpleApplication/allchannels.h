@@ -26,8 +26,6 @@ public:
 
     void initialize(const QVector<CommonDriver *> &mDrivers);
 
-    void setInterface(cuIOInterface *interface);
-
 private:
     Ui::AllChannels *ui;
 signals:
@@ -40,7 +38,6 @@ private slots:
 private:
     AllChannelsDataModel *model;
     AllChannelsDataDelegate *delegate;
-    cuIOInterface *mInterface{nullptr};
 };
 
 #endif // ALLCHANNELS_H

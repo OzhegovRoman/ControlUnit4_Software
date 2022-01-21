@@ -248,6 +248,22 @@ bool MainDialog::createUI(const QString& deviceList)
                 widget->setDriver(qobject_cast<HeaterDriverM0*>(tmpDriver));
                 ui->stackedWidget->addWidget(widget);
             }
+            else if (type.contains("CU4CLM")){
+                //данное устройство - SisControlLine
+                ui->listWidget->addItem(QString("SIS Control Line\nAddress: %1").arg(address));
+                auto* widget = new SisControlLineWidget(this);
+                widget->setDriver(new SisControlLineDriverM0(this));
+                tmpDriver = widget->driver();
+                ui->stackedWidget->addWidget(widget);
+            }
+            else if (type.contains("CU4BSM")){
+                //данное устройство - SisBiasSource
+                ui->listWidget->addItem(QString("SIS Bias Source\nAddress: %1").arg(address));
+                auto* widget = new SisBiasSourceWidget(this);
+                widget->setDriver(new SisBiasSourceDriverM0(this));
+                tmpDriver = widget->driver();
+                ui->stackedWidget->addWidget(widget);
+            }
 
             if (tmpDriver != nullptr){
                 tmpDriver->setDevAddress(address);
@@ -261,7 +277,6 @@ bool MainDialog::createUI(const QString& deviceList)
     aWidget = new AllChannels(this);
     ui->stackedWidget->addWidget(aWidget);
     aWidget->initialize(mDrivers);
-    aWidget->setInterface(mInterface);
 
     connect(aWidget, SIGNAL(setTimeOut(int)), SLOT(changeTimeOut(int)));
     return true;

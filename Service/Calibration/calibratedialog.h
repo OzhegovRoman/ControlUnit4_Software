@@ -12,6 +12,8 @@ typedef enum {
     dtTempDriverM0,
     dtTempDriverM1,
     dtHeaterDriver,
+    dtSisControlLine,
+    dtSisBiasSource,
     dtUnknown
 } CU4DriverType;
 

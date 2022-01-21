@@ -6,6 +6,8 @@
 #include "Drivers/tempdriverm0.h"
 #include "Drivers/tempdriverm1.h"
 #include "Drivers/heaterdriverm0.h"
+#include "Drivers/siscontrollinedriverm0.h"
+#include "Drivers/sisbiassourcedriverm0.h"
 #include <QSettings>
 #include <QDir>
 #include <QDateTime>
@@ -112,14 +114,21 @@ void AllChannels::updateWidget()
         {
             auto driver = qobject_cast<TempDriverM1*>(model->drivers[idx]);
             if (driver){
-                QString tmpString = QString();
                 driver->updateTemperature();
             }
         }
+
         {
-            auto driver = qobject_cast<HeaterDriverM0*>(model->drivers[idx]);
+            auto driver = qobject_cast<SisControlLineDriverM0*>(model->drivers[idx]);
             if (driver){
-                QString tmpString = QString();
+                driver->data()->getValueSync(nullptr, 5);
+            }
+        }
+
+        {
+            auto driver = qobject_cast<SisBiasSourceDriverM0*>(model->drivers[idx]);
+            if (driver){
+                driver->data()->getValueSync(nullptr, 5);
             }
         }
     }
@@ -137,12 +146,6 @@ void AllChannels::initialize(const QVector<CommonDriver*>& mDrivers)
 void AllChannels::on_pbSetUpdateTime_clicked()
 {
     openWidget();
-}
-
-void AllChannels::setInterface(cuIOInterface *interface)
-{
-    mInterface = interface;
-    delegate->setInterface(mInterface);
 }
 
 void AllChannels::on_pbLogPath_clicked()

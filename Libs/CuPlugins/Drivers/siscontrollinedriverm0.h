@@ -24,6 +24,8 @@ public:
     DriverProperty<pair_t<float> >              *currentLimits()    const;
     DriverProperty<float>                       *currentStep()      const;
 
+    DriverProperty<bool> *pidEnable() const;
+
 signals:
     void dataUpdated(CU4CLM0V0_Data_t);
     void eepromConstUpdated(CU4CLM0V0_EEPROM_Const_t);
@@ -44,6 +46,9 @@ private:
     DriverProperty          <pair_t<float> >            *mCurrentDacCoeff   ;
     DriverProperty          <pair_t<float> >            *mCurrentLimits     ;
     DriverProperty          <float>                     *mCurrentStep       ;
+
+    //Params
+    DriverProperty           <bool>                     *mPidEnable;
 
 };
 

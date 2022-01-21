@@ -8,6 +8,8 @@
 #include "Drivers/tempdriverm0.h"
 #include "Drivers/tempdriverm1.h"
 #include "Drivers/heaterdriverm0.h"
+#include "Drivers/siscontrollinedriverm0.h"
+#include "Drivers/sisbiassourcedriverm0.h"
 
 #include "Interfaces/cutcpsocketiointerface.h"
 #include "servercommands.h"
@@ -19,6 +21,8 @@ using cInterface = cuTcpSocketIOInterface;
 #include "sspdwidget.h"
 #include "sspdwidgetm1.h"
 #include "allchannels.h"
+#include "siscontrollinewidget.h"
+#include "sisbiassourcewidget.h"
 
 #include <QElapsedTimer>
 

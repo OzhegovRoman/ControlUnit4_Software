@@ -1,10 +1,6 @@
 #include "mainwidget.h"
 #include <QDebug>
-#include "Drivers/sspddriverm0.h"
-#include "Drivers/sspddriverm1.h"
-#include "Drivers/tempdriverm0.h"
-#include "Drivers/tempdriverm1.h"
-#include "Drivers/heaterdriverm0.h"
+#include "Drivers/drivers.h"
 #include <QThread>
 
 MainWidget::MainWidget(Gpu_Hal_Context_t *host, DataHarvester *harvester)
@@ -115,8 +111,6 @@ void MainWidget::loop()
     }
     //увеличил количество отрисовок, но добавил анимацию
 
-    //    if (mUpdateFlag){
-    //        mUpdateFlag = false;
     Gpu_CoCmd_Dlstart(host());
 
     Gpu_CoCmd_Append(host(), 100000L, dlOffset);
@@ -249,10 +243,21 @@ void MainWidget::loop()
         {
             auto heaterdriver =qobject_cast<HeaterDriverM0*>(mHarvester->drivers()[i+mTopIndex]);
             if (heaterdriver){
-                //удачно
-                QString tempStr;
-
                 CD::listButtonText(CS_Inactive,top,QString("#%1 Heater").arg(heaterdriver->devAddress()), QString("No Data"));
+            }
+        }
+
+        {
+            auto sisControlLineDriver =qobject_cast<SisControlLineDriverM0*>(mHarvester->drivers()[i+mTopIndex]);
+            if (sisControlLineDriver){
+                ColoredStatus cs = ColoredStatus::CS_Normal;
+                if (!dataInfo[i+mTopIndex].channelInited || sisControlLineDriver->shortEnable()->currentValue())
+                    // серый
+                    cs = ColoredStatus::CS_Inactive;
+                CD::listButtonText(cs,
+                                   top,
+                                   QString("#%1 Control Line").arg(sisControlLineDriver->devAddress()),
+                                   QString("%1 mA").arg(sisControlLineDriver->current()->currentValue()*1e3,6,'f', 2));
             }
         }
 
@@ -348,6 +353,13 @@ void MainWidget::dataHarvest()
             if (heaterdriver){
                 // в случае успеха
                 ok = true;
+            }
+        }
+        {
+            auto * sisControlLIneDriver = qobject_cast<SisControlLineDriverM0*>(mHarvester->drivers()[currentIndex]);
+            if (sisControlLIneDriver){
+                // в случае успеха
+                sisControlLIneDriver->data()->getValueSync(&ok);
             }
         }
 

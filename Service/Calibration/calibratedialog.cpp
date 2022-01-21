@@ -9,6 +9,8 @@
 #include "Calibrator/cu4tdm0calibrator.h"
 #include "Calibrator/cu4tdm1calibrator.h"
 #include "Calibrator/cu4htm0calibrator.h"
+#include "Calibrator/cu4clm0calibrator.h"
+#include "Calibrator/cu4bsm0calibrator.h"
 
 CalibrateDialog::CalibrateDialog(QWidget *parent)
     : QDialog(parent)
@@ -157,6 +159,12 @@ int CalibrateDialog::exec()
         break;
     case dtHeaterDriver:
         mCalibrator = new CU4HTM0Calibrator(this);
+        break;
+    case dtSisControlLine:
+        mCalibrator = new CU4CLM0Calibrator(this);
+        break;
+    case dtSisBiasSource:
+        mCalibrator = new CU4BSM0Calibrator(this);
         break;
     default:
         mCalibrator = new CommonCalibrator(this);

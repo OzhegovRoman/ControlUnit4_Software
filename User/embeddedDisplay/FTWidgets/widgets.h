@@ -13,5 +13,6 @@
 #include "welcomepagewidget.h"
 #include "turnoffwidget.h"
 #include "heaterwidget.h"
+#include "siscontrollinewidget.h"
 
 #endif //WIDGETS_H

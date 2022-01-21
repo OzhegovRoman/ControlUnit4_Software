@@ -180,6 +180,29 @@ typedef struct {
     float currentStep;
 } CU4CLM0V0_EEPROM_Const_t;
 
+// CU4BSM0V1 данные
+typedef struct {
+    float current;
+    float voltage;
+    bool  shortCircuit;
+    char  mode;
+} CU4BSM0_Data_t;
+
+#define CU4BSM0_IMODE 0
+#define CU4BSM0_UMODE 1
+
+// CU4BSM0V1 константы
+typedef struct {
+    pair_t<float> currentAdc;
+    pair_t<float> voltageAdc;
+    pair_t<float> currentDac;
+    pair_t<float> voltageDac;
+    pair_t<float> currentLimits;
+    pair_t<float> voltageLimits;
+    float currentStep;
+    float voltageStep;
+    float currentMonitorResistance;
+} CU4BSM0V0_EEPROM_Const_t;
 
 #endif // STAR_PRC_STRUCTS
 

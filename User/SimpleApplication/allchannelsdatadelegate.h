@@ -24,13 +24,9 @@ public:
     void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     void setModel(AllChannelsDataModel *value);
 
-    void setInterface(cuIOInterface *value);
-
 private:
     AllChannelsDataModel *model{};
     void finishEditing(QWidget *editor, QAbstractItemDelegate::EndEditHint hint = NoHint);
-    cuIOInterface *interface{};
-
 };
 
 #endif // ALLCHANNELSDATADELEGATE_H

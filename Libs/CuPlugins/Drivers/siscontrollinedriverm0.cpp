@@ -11,7 +11,59 @@ SisControlLineDriverM0::SisControlLineDriverM0(QObject *parent)
     , mCurrentDacCoeff   (new DriverProperty<pair_t<float> >            (this, cmd::CL_GetCurrentDacCoeff,  cmd::CL_SetCurrentDacCoeff))
     , mCurrentLimits     (new DriverProperty<pair_t<float> >            (this, cmd::CL_GetCurrentLimits,    cmd::CL_SetCurrentLimits))
     , mCurrentStep       (new DriverProperty<float>                     (this, cmd::CL_GetCurrentStep,      cmd::CL_SetCurrentStep))
+
+    , mPidEnable         (new DriverProperty<bool>                      (this, cmd::CL_GetPIDStatus,        cmd::CL_SetPIDStatus))
 {
+
+    //All data
+    mDeviceData->gettedSignal()->connect([=](){
+        auto data = mDeviceData->currentValue();
+        mCurrent        ->  setCurrentValue(data.current);
+        mShortEnable    ->  setCurrentValue(data.shortCircuit);
+        updateData(data);
+    });
+    mCurrent->gettedSignal()->connect([=](){
+        auto data = mDeviceData->currentValue();
+        data.current = mCurrent->currentValue();
+        updateData(data);
+    });
+    mShortEnable->gettedSignal()->connect([=](){
+        auto data = mDeviceData->currentValue();
+        data.shortCircuit = mShortEnable->currentValue();
+        updateData(data);
+    });
+
+    //EEPROM
+    mEepromConst->gettedSignal()->connect([=](){
+        auto data = mEepromConst->currentValue();
+        mCurrentAdcCoeff    -> setCurrentValue(data.currentAdc);
+        mCurrentDacCoeff    -> setCurrentValue(data.currentDac);
+        mCurrentLimits      -> setCurrentValue(data.currentLimits);
+        mCurrentStep        -> setCurrentValue(data.currentStep);
+        updateEEPROM(data);
+    });
+    mCurrentAdcCoeff->gettedSignal()->connect([=](){
+       auto data = mEepromConst->currentValue();
+       data.currentAdc = mCurrentAdcCoeff->currentValue();
+       updateEEPROM(data);
+    });
+    mCurrentDacCoeff->gettedSignal()->connect([=](){
+       auto data = mEepromConst->currentValue();
+       data.currentDac = mCurrentDacCoeff->currentValue();
+       updateEEPROM(data);
+    });
+    mCurrentLimits->gettedSignal()->connect([=](){
+       auto data = mEepromConst->currentValue();
+       data.currentLimits = mCurrentLimits->currentValue();
+       updateEEPROM(data);
+    });
+    mCurrentStep->gettedSignal()->connect([=](){
+       auto data = mEepromConst->currentValue();
+       data.currentStep = mCurrentStep->currentValue();
+       updateEEPROM(data);
+    });
+
+
 
 }
 
@@ -25,6 +77,7 @@ SisControlLineDriverM0::~SisControlLineDriverM0()
     delete mCurrentDacCoeff   ;
     delete mCurrentLimits     ;
     delete mCurrentStep       ;
+    delete mPidEnable         ;
 }
 
 void SisControlLineDriverM0::updateData(const CU4CLM0V0_Data_t &data)
@@ -37,6 +90,11 @@ void SisControlLineDriverM0::updateEEPROM(const CU4CLM0V0_EEPROM_Const_t &eeprom
 {
     mEepromConst->setCurrentValue(eeprom);
     emit eepromConstUpdated(eeprom);
+}
+
+DriverProperty<bool> *SisControlLineDriverM0::pidEnable() const
+{
+    return mPidEnable;
 }
 
 DriverProperty<float> *SisControlLineDriverM0::currentStep() const

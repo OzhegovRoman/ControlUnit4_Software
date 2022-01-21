@@ -17,6 +17,7 @@
 #include "../qCustomLib/qCustomLib.h"
 
 #include "riverdieve.h"
+#include "Drivers/drivers.h"
 
 static Gpu_Hal_Context_t host;
 
@@ -117,16 +118,17 @@ int main(int argc, char *argv[])
 
     // TODO: Установить все параметры программы
 
-    DisplayInitializer _DisplayInitializer(&host);
+    DisplayInitializer      _DisplayInitializer(&host);
 
-    MainWidget          _MainWidget(&host, _DataHarvester);
-    SystemInfo          _SystemInfo(&host);
-    TempWidget          _TempWidget(&host);
-    TempM1Widget        _TempM1Widget(&host);
-    SspdWidget          _SspdWidget(&host);
-    SspdWidgetM1        _SspdWidgetM1(&host);
-    WelcomePageWidget   _WelcomePage(&host);
-    HeaterWidget        _HeaterWidget(&host);
+    MainWidget              _MainWidget(&host, _DataHarvester);
+    SystemInfo              _SystemInfo(&host);
+    TempWidget              _TempWidget(&host);
+    TempM1Widget            _TempM1Widget(&host);
+    SspdWidget              _SspdWidget(&host);
+    SspdWidgetM1            _SspdWidgetM1(&host);
+    WelcomePageWidget       _WelcomePage(&host);
+    HeaterWidget            _HeaterWidget(&host);
+    SisControlLineWidget    _SisControlLineWidget(&host);
     CD::mHost = &host;
 
     QObject::connect(&_DisplayInitializer, &DisplayInitializer::initialized, &_WelcomePage, &WelcomePageWidget::exec);
@@ -138,7 +140,15 @@ int main(int argc, char *argv[])
     });
 
     QObject::connect(&_MainWidget, &MainWidget::systemInfoClicked, &_SystemInfo, &SystemInfo::exec);
-    QObject::connect(&_MainWidget, &MainWidget::channelChoosen, [&_DataHarvester, &_TempWidget, &_TempM1Widget, &_SspdWidget, &_SspdWidgetM1, &_HeaterWidget](const int index){
+    QObject::connect(&_MainWidget, &MainWidget::channelChoosen, [
+                     &_DataHarvester
+                     , &_TempWidget
+                     , &_TempM1Widget
+                     , &_SspdWidget
+                     , &_SspdWidgetM1
+                     , &_HeaterWidget
+                     , &_SisControlLineWidget
+                     ](const int index){
         qDebug()<<"index"<<index;
         {
             auto tempDriver = qobject_cast<TempDriverM0*>(_DataHarvester->drivers()[index]);
@@ -175,14 +185,22 @@ int main(int argc, char *argv[])
                 _HeaterWidget.exec();
             }
         }
+        {
+            auto sisControlLineDriver = qobject_cast<SisControlLineDriverM0*>(_DataHarvester->drivers()[index]);
+            if (sisControlLineDriver){
+                _SisControlLineWidget.setDriver(sisControlLineDriver);
+                _SisControlLineWidget.exec();
+            }
+        }
     });
 
-    QObject::connect(&_SystemInfo,      &SystemInfo::backClicked, &_MainWidget, &MainWidget::exec);
-    QObject::connect(&_TempWidget,      &TempWidget::backClicked, &_MainWidget, &MainWidget::exec);
-    QObject::connect(&_TempM1Widget,    &TempM1Widget::backClicked, &_MainWidget, &MainWidget::exec);
-    QObject::connect(&_SspdWidget,      &SspdWidget::backClicked, &_MainWidget, &MainWidget::exec);
-    QObject::connect(&_SspdWidgetM1,    &SspdWidgetM1::backClicked, &_MainWidget, &MainWidget::exec);
-    QObject::connect(&_HeaterWidget,    &HeaterWidget::backClicked, &_MainWidget, &MainWidget::exec);
+    QObject::connect(&_SystemInfo,              &SystemInfo::backClicked,               &_MainWidget, &MainWidget::exec);
+    QObject::connect(&_TempWidget,              &TempWidget::backClicked,               &_MainWidget, &MainWidget::exec);
+    QObject::connect(&_TempM1Widget,            &TempM1Widget::backClicked,             &_MainWidget, &MainWidget::exec);
+    QObject::connect(&_SspdWidget,              &SspdWidget::backClicked,               &_MainWidget, &MainWidget::exec);
+    QObject::connect(&_SspdWidgetM1,            &SspdWidgetM1::backClicked,             &_MainWidget, &MainWidget::exec);
+    QObject::connect(&_HeaterWidget,            &HeaterWidget::backClicked,             &_MainWidget, &MainWidget::exec);
+    QObject::connect(&_SisControlLineWidget,    &SisControlLineWidget::backClicked,    &_MainWidget, &MainWidget::exec);
 
     _DisplayInitializer.exec();
 
