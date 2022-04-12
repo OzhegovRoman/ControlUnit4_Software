@@ -55,7 +55,6 @@ QString cuTcpSocketIOInterface::tcpIpQuery(QString query, int TimeOut, bool *ok)
         *ok = true;
 
     if (!initialize()) {
-        qDebug()<<"Something wrong";
         if (ok)
             *ok = false;
         return QString();
@@ -109,12 +108,14 @@ bool cuTcpSocketIOInterface::pInitialize()
 void cuTcpSocketIOInterface::dataReady()
 {
     buffer.append(mSocket->readAll());
-    if (buffer.size() < 3) return;
-    if (buffer.size() == buffer[2] + 3) {
+    //int index = 0;
+    while ((buffer.size() >= 3) && (buffer.size() >= buffer[2] + 3)){
         emit msgReceived(buffer[0],
                 buffer[1],
                 buffer[2],
                 ((quint8*) buffer.data()) + 3);
+        //index += buffer[index + 2] + 3;
+        buffer.remove(0, buffer[2] + 3);
     }
 }
 

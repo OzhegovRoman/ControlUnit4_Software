@@ -60,5 +60,7 @@ void cTcpIpProcess::writeToSocket(QByteArray ba)
     if (mSocket->isValid()){
         cTcpIpServer::consoleWriteDebug(QString("Socket %1 write: %2").arg(mSocket->socketDescriptor()).arg(ba.data()));
         mSocket->write(ba);
+        mSocket->waitForBytesWritten(10);
+        mSocket->flush();
     }
 }

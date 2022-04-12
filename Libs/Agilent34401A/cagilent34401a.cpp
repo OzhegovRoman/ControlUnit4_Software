@@ -1,5 +1,4 @@
 #include "cagilent34401a.h"
-#include <QDebug>
 
 cAgilent34401A::cAgilent34401A() :
     mMode{Mode_U_DC},

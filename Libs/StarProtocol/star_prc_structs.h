@@ -193,16 +193,31 @@ typedef struct {
 
 // CU4BSM0V1 константы
 typedef struct {
-    pair_t<float> currentAdc;
-    pair_t<float> voltageAdc;
-    pair_t<float> currentDac;
-    pair_t<float> voltageDac;
-    pair_t<float> currentLimits;
-    pair_t<float> voltageLimits;
-    float currentStep;
-    float voltageStep;
-    float currentMonitorResistance;
+    pair_t<float>   currentAdc;
+    pair_t<float>   voltageAdc;
+    pair_t<float>   currentDac;
+    pair_t<float>   voltageDac;
+    pair_t<float>   currentLimits;
+    pair_t<float>   voltageLimits;
+    float           currentStep;
+    float           voltageStep;
+    float           currentMonitorResistance;
 } CU4BSM0V0_EEPROM_Const_t;
+
+// Sweep Parameters
+typedef struct {
+    float           start;
+    float           stop;
+    float           step;
+    unsigned int    timeStep_ms;
+    char            mode;
+} CU4BSM0_SWEEP_PARAMS_t;
+
+typedef struct {
+    float           current;
+    float           voltage;
+    unsigned int    time;
+} CU4BSM0_SWEEP_DATA_t;
 
 #endif // STAR_PRC_STRUCTS
 

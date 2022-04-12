@@ -271,7 +271,7 @@ void MainWidget::loop()
                 int16_t center = wideList ? 309 : 291;
                 CD::listButtonText(cs,
                                    top,
-                                   QString("#%1 Control Line").arg(sisBiasSourceDriver->devAddress()),
+                                   QString("#%1 Bias Source").arg(sisBiasSourceDriver->devAddress()),
                                    QString());
                                    QString tempStr = QString("U: %1 mV; I: %2 uA")
                                    .arg(sisBiasSourceDriver->voltage()->currentValue()*1e3,6,'f', 2)

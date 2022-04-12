@@ -4,7 +4,6 @@
  */
 
 #include "platform.h"
-//#include <QDebug>
 
 /*
  * platform_init()
@@ -78,11 +77,5 @@ void platform_gpio_value (gpio_name ngpio, gpio_val vgpio)
 {
     digitalWrite(ngpio, vgpio);
 }
-
-//QVariant getJSONSettings(QString args...)
-//{
-//    for ( auto a: args)
-//        qDebug()<<a;
-//}
 
 

@@ -36,6 +36,9 @@ public:
 
     DriverProperty<bool>                        *pidEnable()                const;
 
+    DriverProperty<CU4BSM0_SWEEP_PARAMS_t>      *sweepParams()              const;
+    DriverCommand                               *sweepStart()               const;
+    DriverCommand                               *sweepStop()                const;
 signals:
     void dataUpdated(CU4BSM0_Data_t);
     void eepromConstUpdated(CU4BSM0V0_EEPROM_Const_t);
@@ -66,6 +69,11 @@ private:
 
     //Params
     DriverProperty           <bool>                     *mPidEnable                 ;
+
+    //Sweep Params
+    DriverProperty          <CU4BSM0_SWEEP_PARAMS_t>    *mSweepParams               ;
+    DriverCommand                                       *mSweepStart                ;
+    DriverCommand                                       *mSweepStop                 ;
 };
 
 #endif // SISBIASSOURCEDRIVERM0_H

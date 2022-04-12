@@ -1,6 +1,5 @@
 #include "tempdriverm1.h"
 #include "star_prc_commands.h"
-#include <QDebug>
 
 TempDriverM1::TempDriverM1(QObject *parent)
     : CommonDriver(parent)

@@ -1,6 +1,7 @@
 #include "serverrawdatacommandparser.h"
 #include "../ctcpipserver.h"
 #include "../StarProtocol/servercommands.h"
+#include "../StarProtocol/star_prc_commands.h"
 #include "cuiodevice.h"
 
 ServerRawDataCommandParser::ServerRawDataCommandParser(QObject *parent)
@@ -63,8 +64,53 @@ bool ServerRawDataCommandParser::doIt(const QByteArray &ba)
         executor()->prepareAnswer(SERVER_ADDRESS, command, 1, &tmpUint8);
         break;
     }
+
+    case CMD_SERVER_PIPE_MODE_ON:
+    {
+        executor()->setPipeMode(true);
+        executor()->prepareAnswer(SERVER_ADDRESS, command, 0 , nullptr);
+        break;
+    }
+    case CMD_SERVER_PIPE_MODE_OFF:{
+        executor()->setPipeMode(false);
+        executor()->prepareAnswer(SERVER_ADDRESS, command, 0 , nullptr);
+        break;
+    }
+
     default:
         return false;
     }
     return true;
+}
+
+void ServerRawDataCommandParser::msgReceived(quint8 address, quint8 command, quint8 dataLength, quint8 *data)
+{
+    if (!executor()){
+        cTcpIpServer::consoleWriteError("executor is empty");
+        return;
+    }
+
+    if (!executor()->isPipeMode())
+        //это вобще не к нам команда пришла. Откуда то еще
+        return;
+
+    static int i =0;
+
+    if (command == cmd::BS_SweepData){
+        QByteArray ba(reinterpret_cast<char*>(data), dataLength);
+        cTcpIpServer::consoleWriteDebug(QString("Message received from Device. Address: %1. Command: %2. Data Length: %3. Data: %4")
+                                        .arg(address)
+                                        .arg(command)
+                                        .arg(dataLength)
+                                        .arg(ba.toHex().data()));
+
+        executor()->prepareAnswer(address, command, dataLength, reinterpret_cast<char*>(data));
+    }
+}
+
+void ServerRawDataCommandParser::initializeParser()
+{
+    if (executor())
+        connect(executor()->interface(), &cuIOInterface::msgReceived,
+                this, &ServerRawDataCommandParser::msgReceived);
 }

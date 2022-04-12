@@ -27,6 +27,9 @@ public:
 
     void moveToThread(QThread *thread);
 
+    bool isPipeMode() const;
+    void setPipeMode(bool isPipeMode);
+
 signals:
     void finished();
     void inited();
@@ -48,6 +51,7 @@ private:
     SettingsProvider *mSettings;
     QList<cAbstractCommandParser*> parsers;
     bool mStopFlag;
+    bool mPipeMode;
 
     void initialize();
     bool checkDevice(const cDeviceInfo &info);

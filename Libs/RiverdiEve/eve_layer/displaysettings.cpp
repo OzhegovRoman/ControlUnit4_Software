@@ -1,6 +1,5 @@
 #include "displaysettings.h"
 
-#include <QDebug>
 #include <cassert>
 #include "platform.h"
 #include "Gpu.h"
@@ -1098,7 +1097,6 @@ bool DisplaySettings::autoDetectDisplayGeneration()
     int trycount = 10;
     while (trycount --){
         unsigned int tmp = Gpu_Hal_Rd32(&tmp_host, FT_ROM_CHIPID);
-        qDebug()<<tmp;
         if (tmp == 0x11508){
             setDisplayGeneration(dgEve3);
             return true;
@@ -1117,7 +1115,7 @@ uint32_t DisplaySettings::operator[](const QString property)
         return mapDisplaySizeSettings[property];
     if (mapDisplayOptions.contains(property))
         return mapDisplayOptions[property];
-    qCritical()<<"Property:"<<property<<"Not founded";
+//    qCritical()<<"Property:"<<property<<"Not founded";
     assert(false);
 }
 

@@ -707,7 +707,6 @@ CommonScpiCommands::processingAnswer SspdScpiCommands::processingCommandSDM1(qui
         QJsonDocument jsonDoc(QJsonDocument::fromJson(params.toUtf8()));
         QJsonObject jsonObj = jsonDoc.object();
         auto status = driver.status()->currentValue();
-        qDebug()<<"status before"<<status.Data;
         status.stShorted        = (jsonObj["Shorted"].toInt(status.stShorted)               != 0) ? 1 : 0;
         status.stAmplifierOn    = (jsonObj["AmplifierEnable"].toInt(status.stAmplifierOn)   != 0) ? 1 : 0;
         status.stHFModeOn       = (jsonObj["HFModeEnable"].toInt(status.stHFModeOn)         != 0) ? 1 : 0;

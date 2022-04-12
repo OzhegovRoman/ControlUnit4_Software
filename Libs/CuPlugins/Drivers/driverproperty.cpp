@@ -1,5 +1,4 @@
 #include "driverproperty.h"
-#include <QDebug>
 
 DriverProperty_p::DriverProperty_p(AbstractDriver *parent, quint8 cmdGetter, quint8 cmdSetter)
     : mDriver(parent)

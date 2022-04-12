@@ -13,6 +13,14 @@ public:
     // cAbstractCommandParser interface
 protected:
     bool doIt(const QByteArray &ba) override;
+
+private slots:
+    void msgReceived(quint8 address, quint8 command, quint8 dataLength, quint8 *data);
+
+
+    // cAbstractCommandParser interface
+public:
+    void initializeParser();
 };
 
 #endif // SERVERRAWDATACOMMANDPARSER_H

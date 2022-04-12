@@ -89,8 +89,6 @@ bool cuRs485IOInterface::pInitialize()
 
     if (!mSerialPort->isOpen())
         if (!mSerialPort->open(QIODevice::ReadWrite)) {
-            qDebug()<<"Error at opening serialPort";
-            qDebug()<<mSerialPort->error();
             deleteLater();
             return false;
         }

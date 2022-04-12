@@ -1,5 +1,4 @@
 #include "sspddriverm1.h"
-#include <QDebug>
 
 SspdDriverM1::SspdDriverM1(QObject *parent)
     : CommonDriver(parent)
@@ -101,10 +100,8 @@ SspdDriverM1::SspdDriverM1(QObject *parent)
 
     // atomic function of status
     mShortEnable->settedSignal()->connect([=](){
-        qDebug()<<"mShortEnable setted";
         auto data = mDeviceStatus->currentValue();
         data.stShorted = mShortEnable->lastSettedValue();
-        qDebug()<<"status"<<data.Data;
         updateStatus(data);
     });
 

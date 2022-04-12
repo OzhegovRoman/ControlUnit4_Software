@@ -296,8 +296,16 @@ enum enum_CU4BSM0 {
     BS_GetVoltageStep               = 0x2B,
     BS_SetVoltageStep               = 0x2C,
 
-    BS_GetCurrentMonitoResistance   = 0x2D,
-    BS_SetCurrentMonitoResistance   = 0x2E,
+    BS_GetCurrentMonitorResistance  = 0x2D,
+    BS_SetCurrentMonitorResistance  = 0x2E,
+
+    // sweep params
+    BS_GetSweepParams               = 0x2F,
+    BS_SetSweepParams               = 0x30,
+
+    BS_StartSweep                   = 0x31,
+    BS_StopSweep                    = 0x32,
+    BS_SweepData                    = 0x33,
 };
 
 }

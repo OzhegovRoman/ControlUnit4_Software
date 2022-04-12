@@ -1,8 +1,6 @@
 #include "cagilent34401agpibinterface.h"
 #include "decl-32.h"
 
-#include <QDebug>
-
 cAgilent34401aGpibInterface::cAgilent34401aGpibInterface()
     : mGpibAddress{0}
     , dvm {0}

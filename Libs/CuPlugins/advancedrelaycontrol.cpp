@@ -1,5 +1,4 @@
 #include <QTime>
-#include <QDebug>
 
 #include "advancedrelaycontrol.h"
 
@@ -60,7 +59,6 @@ bool AdvancedRelayControl::getRelayState()
    {
    bool rv = false;
    bool ok;
-//   qDebug() << mTargetRelay;
    cRelaysStatus status = mTDriver->relaysStatus()->getValueSync(&ok);
    if (ok){
       rv = status.status() & mTargetRelay;
@@ -134,8 +132,8 @@ bool AdvancedRelayControl::checkState()
    else
       if (remainingFails-- <= 0)
          rv = false;
-   if (remainingFails < 5)
-      qDebug() << mTargetRelay << remainingFails << mReadedState << mDefaultEnabledState << mIsMustBeEnabled << rv;
+//   if (remainingFails < 5)
+//      qDebug() << mTargetRelay << remainingFails << mReadedState << mDefaultEnabledState << mIsMustBeEnabled << rv;
    return rv;
    }
 
@@ -147,7 +145,6 @@ RelayState AdvancedRelayControl::getRs() const
 void AdvancedRelayControl::setRs(const RelayState &value)
    {
    rs = value;
-   //   qDebug() << "Rs: " << rs;
    }
 
 void TemperatureRecycleInterface::setDrivers(QVector<CommonDriver *> *drivers)
@@ -183,9 +180,7 @@ void TemperatureRecycleInterface::setCurrentState(const TemperatureRecycleState 
 
 bool TemperatureRecycleInterface::checkIntegrity()
    {
-   //   qDebug() << "Check 5V";
    bool rv = mRelay5v->checkState();
-   //   qDebug() << "Check 25V";
    rv &= mRelay25v->checkState();
    return rv;
    }

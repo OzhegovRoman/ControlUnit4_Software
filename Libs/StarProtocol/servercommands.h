@@ -11,6 +11,9 @@
 #define CMD_SERVER_ADD_DEVICE       2
 #define CMD_SERVER_SAVE_DEVICE_LIST 3
 
+#define CMD_SERVER_PIPE_MODE_ON     4
+#define CMD_SERVER_PIPE_MODE_OFF    5
+
 #include <QObject>
 #include "../CuPlugins/cudid.h"
 

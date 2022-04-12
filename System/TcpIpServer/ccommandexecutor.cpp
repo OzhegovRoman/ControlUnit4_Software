@@ -13,6 +13,7 @@ cCommandExecutor::cCommandExecutor(QObject *parent)
     , processTimer(nullptr)
     , mSettings(new SettingsProvider(this))
     , mStopFlag(false)
+    , mPipeMode(false)
 {
     parsers << new ServerRawDataCommandParser(this);
     parsers << new DeviceRawDataCommandParser(this);
@@ -67,18 +68,32 @@ void cCommandExecutor::process()
 
         if (!sameProcessFounded){
             bool done = false;
-            currentTcpIpProcess = cmdList.begin()->first;
-            for (auto iter = parsers.begin(); iter<parsers.end() && !done; iter++)
-                done = (*iter)->parse(cmdList.begin()->second);
+            if (!mPipeMode)
+                currentTcpIpProcess = cmdList.begin()->first;
+            if ((mPipeMode && (currentTcpIpProcess == cmdList.begin()->first)) ||
+                    !mPipeMode) {
+                for (auto iter = parsers.begin(); iter<parsers.end() && !done; iter++)
+                    done = (*iter)->parse(cmdList.begin()->second);
 
-            if (!done)
-                prepareAnswer("UNKNOWN COMMAND\r\n");
+                if (!done)
+                    prepareAnswer("UNKNOWN COMMAND\r\n");
+            }
         }
 
         // в конце удаляем команду из начала списка команд
         cmdList.removeAt(0);
     }
     processTimer->start();
+}
+
+bool cCommandExecutor::isPipeMode() const
+{
+    return mPipeMode;
+}
+
+void cCommandExecutor::setPipeMode(bool pipeMode)
+{
+    mPipeMode = pipeMode;
 }
 
 SettingsProvider *cCommandExecutor::settings() const
@@ -171,10 +186,12 @@ void cCommandExecutor::prepareAnswer(quint8 address, quint8 command, quint8 data
     ba.append(*reinterpret_cast<char*>(&dataLength));
     ba.append(data, dataLength);
 
+    if (command == cmd::BS_SweepData){
+    }
+
     cTcpIpServer::consoleWriteDebug(QString("Answer: %1").arg(ba.toHex().data()));
 
     emit sendAnswer(currentTcpIpProcess, ba);
-//    emit sendAnswer(cmdList.begin()->first, ba);
 }
 
 void cCommandExecutor::prepareAnswer(QString answer)
@@ -182,7 +199,6 @@ void cCommandExecutor::prepareAnswer(QString answer)
     cTcpIpServer::consoleWriteDebug("Preparing answer as string");
     cTcpIpServer::consoleWriteDebug(QString("Answer: %1").arg(answer));
 
-//    emit sendAnswer(cmdList.begin()->first, QByteArray(answer.toLocal8Bit()));
     emit sendAnswer(currentTcpIpProcess, QByteArray(answer.toLocal8Bit()));
 }
 

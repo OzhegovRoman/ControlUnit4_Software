@@ -22,7 +22,7 @@
      <item>
       <widget class="QLabel" name="lbTemperature">
        <property name="styleSheet">
-        <string notr="true">font: 24pt &quot;MS Shell Dlg 2&quot;; color: black;</string>
+        <string notr="true">font: 24pt &quot;MS Shell Dlg 2&quot;; </string>
        </property>
        <property name="text">
         <string>T1: 4.3K
@@ -35,7 +35,7 @@ T4:</string>
      <item>
       <widget class="QLabel" name="lbVoltage">
        <property name="styleSheet">
-        <string notr="true">font: 24pt &quot;MS Shell Dlg 2&quot;; color: black;</string>
+        <string notr="true">font: 24pt &quot;MS Shell Dlg 2&quot;;</string>
        </property>
        <property name="text">
         <string>U1: 1.28V
@@ -52,7 +52,7 @@ U4</string>
      <item>
       <widget class="QCheckBox" name="cb5V">
        <property name="styleSheet">
-        <string notr="true">font: 12pt &quot;MS Shell Dlg 2&quot;; color: black;</string>
+        <string notr="true">font: 12pt &quot;MS Shell Dlg 2&quot;; </string>
        </property>
        <property name="text">
         <string>Relay5V</string>
@@ -62,7 +62,7 @@ U4</string>
      <item>
       <widget class="QCheckBox" name="cb25V">
        <property name="styleSheet">
-        <string notr="true">font: 12pt &quot;MS Shell Dlg 2&quot;; color: black;</string>
+        <string notr="true">font: 12pt &quot;MS Shell Dlg 2&quot;; </string>
        </property>
        <property name="text">
         <string>Relay25V</string>
@@ -138,7 +138,7 @@ U4</string>
           <item>
            <widget class="QLabel" name="label_3">
             <property name="styleSheet">
-             <string notr="true">font: 12pt &quot;MS Shell Dlg 2&quot;; color: black</string>
+             <string notr="true">font: 12pt &quot;MS Shell Dlg 2&quot;;</string>
             </property>
             <property name="text">
              <string>T0 &lt; 10K :</string>
@@ -212,7 +212,7 @@ U4</string>
              <enum>Qt::LeftToRight</enum>
             </property>
             <property name="styleSheet">
-             <string notr="true">font: 12pt &quot;MS Shell Dlg 2&quot;; color: black</string>
+             <string notr="true">font: 12pt &quot;MS Shell Dlg 2&quot;;</string>
             </property>
             <property name="text">
              <string>Auto start recycle if</string>
@@ -268,7 +268,7 @@ U4</string>
              <string/>
             </property>
             <property name="styleSheet">
-             <string notr="true">font: 12pt &quot;MS Shell Dlg 2&quot;; color: black</string>
+             <string notr="true">font: 12pt &quot;MS Shell Dlg 2&quot;; </string>
             </property>
             <property name="text">
              <string>&gt;</string>

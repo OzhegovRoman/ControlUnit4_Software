@@ -17,9 +17,13 @@ SisBiasSourceDriverM0::SisBiasSourceDriverM0(QObject *parent)
     , mVoltageDacCoeff          (new DriverProperty<pair_t<float> >            (this, cmd::BS_GetVoltageDacCoeff,           cmd::BS_SetVoltageDacCoeff))
     , mVoltageLimits            (new DriverProperty<pair_t<float> >            (this, cmd::BS_GetVoltageLimits,             cmd::BS_SetVoltageLimits))
     , mVoltageStep              (new DriverProperty<float>                     (this, cmd::BS_GetVoltageStep,               cmd::BS_SetVoltageStep))
-    , mCurrentMonitorResistance (new DriverProperty<float>                     (this, cmd::BS_GetCurrentMonitoResistance,   cmd::BS_SetCurrentMonitoResistance))
+    , mCurrentMonitorResistance (new DriverProperty<float>                     (this, cmd::BS_GetCurrentMonitorResistance,  cmd::BS_SetCurrentMonitorResistance))
 
     , mPidEnable                (new DriverProperty<bool>                      (this, cmd::BS_GetPIDStatus,                 cmd::BS_SetPIDStatus))
+
+    , mSweepParams              (new DriverProperty<CU4BSM0_SWEEP_PARAMS_t>    (this, cmd::BS_GetSweepParams,               cmd::BS_SetSweepParams))
+    , mSweepStart               (new DriverCommand                             (this, cmd::BS_StartSweep))
+    , mSweepStop                (new DriverCommand                             (this, cmd::BS_StopSweep))
 {
     //All data
     mDeviceData->gettedSignal()->connect([=](){
@@ -145,6 +149,21 @@ void SisBiasSourceDriverM0::updateEEPROM(const CU4BSM0V0_EEPROM_Const_t &eeprom)
 {
     mEepromConst->setCurrentValue(eeprom);
     emit eepromConstUpdated(eeprom);
+}
+
+DriverCommand *SisBiasSourceDriverM0::sweepStop() const
+{
+    return mSweepStop;
+}
+
+DriverCommand *SisBiasSourceDriverM0::sweepStart() const
+{
+    return mSweepStart;
+}
+
+DriverProperty<CU4BSM0_SWEEP_PARAMS_t> *SisBiasSourceDriverM0::sweepParams() const
+{
+    return mSweepParams;
 }
 
 DriverProperty<float> *SisBiasSourceDriverM0::currentMonitorResistance() const

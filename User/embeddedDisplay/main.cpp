@@ -32,8 +32,10 @@ void catchUnixSignals(std::initializer_list<int> quitSignals) {
         printf("\nquit the application by signal(%d).\n", sig);
 
         TurnOffWidget::turnOff(&host);
-        QCoreApplication::quit();
 
+        printf("Done!!! Buy!!!\n");
+        exit(0);
+        //QCoreApplication::quit();
     };
 
     sigset_t blocking_mask;
@@ -109,7 +111,7 @@ int main(int argc, char *argv[])
 
     parser.process(a);
 
-    catchUnixSignals({SIGQUIT, SIGINT, SIGTERM, SIGHUP});
+    catchUnixSignals({SIGSYS, SIGQUIT, SIGINT, SIGTERM, SIGHUP});
 
     qDebug()<< "init interface";
 
