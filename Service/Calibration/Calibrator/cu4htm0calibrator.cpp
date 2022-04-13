@@ -4,7 +4,7 @@
 CU4HTM0Calibrator::CU4HTM0Calibrator(QObject *parent)
     : CommonCalibrator(parent)
     , mDriver (nullptr)
-    , coeff(4)
+    , coeff(3)
 {
 
 }

@@ -9,5 +9,7 @@
 #include "sspdscpicommands.h"
 #include "temperaturescpicommands.h"
 #include "heaterscpicommands.h"
+#include "siscontrollinescpicommands.h"
+#include "sisbiassourcescpicommandparser.h"
 
 #endif // COMMANDPARSER_H

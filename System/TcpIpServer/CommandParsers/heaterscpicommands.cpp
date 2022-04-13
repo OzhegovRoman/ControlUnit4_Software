@@ -74,7 +74,7 @@ bool HeaterScpiCommands::executeCommand(QString command, QString params)
 
     // должны проверить тип устройства и выбрать правильный драйвер
     if (!devInfo->type().contains("CU4HT")){
-        executor()->prepareAnswer("ERROR: This address not correspond to SspdDriver\r\n");
+        executor()->prepareAnswer("ERROR: This address not correspond to Heater\r\n");
         return true;
     }
 

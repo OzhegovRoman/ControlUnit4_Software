@@ -23,6 +23,8 @@ cCommandExecutor::cCommandExecutor(QObject *parent)
     parsers << new SspdScpiCommands(this);
     parsers << new TemperatureScpiCommands(this);
     parsers << new HeaterScpiCommands(this);
+    parsers << new SisControlLineScpiCommands(this);
+    parsers << new SisBiasSourceScpiCommandParser(this);
 }
 
 void cCommandExecutor::doWork()

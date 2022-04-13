@@ -146,8 +146,8 @@ QJsonObject wSisBiasSourceDriver::eepromToJson()
 
     calibrObject["CurrentStep"] = ui->leCurrentStep -> text().toDouble();
 
-    value.append(ui->leVoltageAdcSlope->text().toDouble());
-    value.append(ui->leVoltageAdcIntercept->text().toDouble());
+    value[0] = ui->leVoltageAdcSlope->text().toDouble();
+    value[1] = ui->leVoltageAdcIntercept->text().toDouble();
     calibrObject["VoltageAdcCoeffs"] = value;
 
     value[0] = ui->leVoltageDacSlope->text().toDouble();
