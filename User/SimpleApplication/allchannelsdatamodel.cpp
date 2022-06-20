@@ -36,7 +36,7 @@ QVariant AllChannelsDataModel::data(const QModelIndex &index, int role) const
         auto driver = qobject_cast<SspdDriverM0*>(drivers[idx]);
         if (driver){
             if (role == Qt::DisplayRole)
-                return QString("%1 uA").arg(driver->current()->currentValue()*1e6, 6, 'f', 1);
+                return QString(tr("%1 uA")).arg(driver->current()->currentValue()*1e6, 6, 'f', 1);
             if (role == Qt::BackgroundRole){
                 if (!driver->status()->currentValue().stShorted){
                     if (qAbs(driver->voltage()->currentValue())<0.01)
@@ -51,7 +51,7 @@ QVariant AllChannelsDataModel::data(const QModelIndex &index, int role) const
         auto driver = qobject_cast<SspdDriverM1*>(drivers[idx]);
         if (driver){
             if (role == Qt::DisplayRole)
-                return QString("%1 uA").arg(driver->current()->currentValue()*1e6, 6, 'f', 1);
+                return QString(tr("%1 uA")).arg(driver->current()->currentValue()*1e6, 6, 'f', 1);
             if (role == Qt::BackgroundRole){
                 if (!driver->status()->currentValue().stShorted){
                     if (qAbs(driver->voltage()->currentValue())<0.01)
@@ -67,13 +67,13 @@ QVariant AllChannelsDataModel::data(const QModelIndex &index, int role) const
         if (driver){
             if ((std::isnan(driver->temperature()->currentValue())) || (qAbs(driver->temperature()->currentValue()) < 1e-5)){
                 if (role == Qt::DisplayRole)
-                    return QString("Not connected");
+                    return QString(tr("Not connected"));
                 if (role == Qt::BackgroundRole)
                     return QBrush(Qt::red);
             }
             else
                 if (role == Qt::DisplayRole){
-                    return QString("%1 K").arg(driver->temperature()->currentValue(), 4, 'f', 2);
+                    return QString(tr("%1 K")).arg(driver->temperature()->currentValue(), 4, 'f', 2);
                 }
         }
     }
@@ -85,7 +85,7 @@ QVariant AllChannelsDataModel::data(const QModelIndex &index, int role) const
                 QString tmpString;
                 for (int i = 0; i < 4; ++i){
                     if (driver->defaultParam(i).enable)
-                        tmpString.append(QString("T%1: %2 K; ")
+                        tmpString.append(QString(tr("T%1: %2 K; "))
                                          .arg(i)
                                          .arg(driver->currentTemperature(i), 4,'f', 2));
                 }
@@ -99,7 +99,7 @@ QVariant AllChannelsDataModel::data(const QModelIndex &index, int role) const
         auto driver = qobject_cast<HeaterDriverM0*>(drivers[idx]);
         if (driver){
             if (role == Qt::DisplayRole){
-                return QString("No Data");
+                return QString(tr("No Data"));
             }
         }
     }
@@ -108,7 +108,7 @@ QVariant AllChannelsDataModel::data(const QModelIndex &index, int role) const
         auto driver = qobject_cast<SisControlLineDriverM0*>(drivers[idx]);
         if (driver){
             if (role == Qt::DisplayRole){
-                return QString("I: %1 mA").arg(driver->current()->currentValue() * 1e3, 4,'f', 2);
+                return QString(tr("I: %1 mA")).arg(driver->current()->currentValue() * 1e3, 4,'f', 2);
             }
         }
     }
@@ -117,7 +117,7 @@ QVariant AllChannelsDataModel::data(const QModelIndex &index, int role) const
         auto driver = qobject_cast<SisBiasSourceDriverM0*>(drivers[idx]);
         if (driver){
             if (role == Qt::DisplayRole){
-                return QString("U: %1 mV; I: %2 uA")
+                return QString(tr("U: %1 mV; I: %2 uA"))
                         .arg(driver->voltage()->currentValue() * 1e3, 4,'f', 2)
                         .arg(driver->current()->currentValue() * 1e6, 4,'f', 1)
                         ;
@@ -133,19 +133,19 @@ QVariant AllChannelsDataModel::headerData(int section, Qt::Orientation orientati
         return QVariant();
     if (orientation == Qt::Vertical){
         if (qobject_cast<SspdDriverM0*>(drivers[section]))
-            return QString("SSPD#%1").arg(section);
+            return QString(tr("SSPD#%1")).arg(section);
         if (qobject_cast<SspdDriverM1*>(drivers[section]))
-            return QString("SSPD#%1").arg(section);
+            return QString(tr("SSPD#%1")).arg(section);
         if (qobject_cast<TempDriverM0*>(drivers[section]))
-            return ("Temperature");
+            return (tr("Temperature"));
         if (qobject_cast<TempDriverM1*>(drivers[section]))
-            return ("Temperature");
+            return (tr("Temperature"));
         if (qobject_cast<HeaterDriverM0*>(drivers[section]))
-            return ("Heater");
+            return (tr("Heater"));
         if (qobject_cast<SisControlLineDriverM0*>(drivers[section]))
-            return ("SIS Control Line");
+            return (tr("SIS Control Line"));
         if (qobject_cast<SisBiasSourceDriverM0*>(drivers[section]))
-            return ("SIS Bias Source");
+            return (tr("SIS Bias Source"));
     }
     return QAbstractListModel::headerData(section, orientation, role);
 }

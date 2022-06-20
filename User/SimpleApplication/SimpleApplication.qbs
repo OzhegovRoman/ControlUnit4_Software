@@ -1,4 +1,4 @@
-import qbs
+﻿import qbs
 import qbs.File
 import qbs.Process
 

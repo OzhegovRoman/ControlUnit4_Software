@@ -78,7 +78,7 @@ void HeaterWidget::startHeating()
 
     waitingTime = (eepromConst.frontEdgeTime + eepromConst.holdTime + eepromConst.rearEdgeTime) * 1000.0;
     ui->progressBar->setMaximum(waitingTime);
-    ui->progressBar->setFormat("Heaiting. Hold to stop...");
+    ui->progressBar->setFormat(tr("Heaiting. Hold to stop..."));
     heatingProgress = 0;
     QTimer::singleShot(10, this, &HeaterWidget::updateHeatingProgress);
 }
@@ -98,7 +98,7 @@ void HeaterWidget::updateProgressBar()
                 mDriver->emergencyStop()->executeSync(&ok, 10);
                 heatingProgress = waitingTime - mDriver->eepromConst()->currentValue().rearEdgeTime * 1000.0;
                 qDebug()<<"imediately stop";
-                ui->progressBar->setFormat("Wait...");
+                ui->progressBar->setFormat(tr("Wait..."));
                 qDebug()<<heatingProgress;
                 qDebug()<<waitingTime;
                 ui->progressBar->setMaximum(waitingTime);
@@ -119,7 +119,7 @@ void HeaterWidget::updateHeatingProgress()
         QTimer::singleShot(10, this, &HeaterWidget::updateHeatingProgress);
     else {
         heatingProgress = 0;
-        ui->progressBar->setFormat("Hold to Start Heating...");
+        ui->progressBar->setFormat(tr("Hold to Start Heating..."));
     }
     if (!mMousePressed){
         ui->progressBar->setMaximum(waitingTime);

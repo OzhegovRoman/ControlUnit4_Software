@@ -131,7 +131,7 @@ void TempM1Widget::saveLogToFile()
 
 void TempM1Widget::clearLog()
    {
-   if (QMessageBox::Yes == QMessageBox::question(this,"Clear Log","Do you want to clear recycle log?",QMessageBox::Yes|QMessageBox::No))
+   if (QMessageBox::Yes == QMessageBox::question(this,tr("Clear Log"),tr("Do you want to clear recycle log?"),QMessageBox::Yes|QMessageBox::No))
       ui->PTE_Log->clear();
    }
 
@@ -144,8 +144,8 @@ void TempM1Widget::onTimerTicker()
 
    for (int i = 0; i < 4; ++i){
       if (mDriver->defaultParam(i).enable){
-         strTemperature += QString("T%1: %2K\n").arg(i) .arg(mDriver->currentTemperature(i), 4, 'f', 2);
-         strVoltage += QString("U%1: %2V\n").arg(i) .arg(mDriver->currentVoltage(i), 0, 'g', 5);
+         strTemperature += QString(tr("T%1: %2K\n")).arg(i) .arg(mDriver->currentTemperature(i), 4, 'f', 2);
+         strVoltage += QString(tr("U%1: %2V\n")).arg(i) .arg(mDriver->currentVoltage(i), 0, 'g', 5);
          }
       }
 

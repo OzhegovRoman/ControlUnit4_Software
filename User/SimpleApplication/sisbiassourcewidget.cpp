@@ -27,7 +27,7 @@ void SisBiasSourceWidget::setDriver(SisBiasSourceDriverM0 *newDriver)
 
 void SisBiasSourceWidget::updateData(CU4BSM0_Data_t data)
 {
-    ui->lbData->setText(QString("U: %1 mV<br>I: %2 uA<br>")
+    ui->lbData->setText(QString(tr("U: %1 mV<br>I: %2 uA<br>"))
                         .arg(static_cast<double>(data.voltage) * 1e3, 6,'f', 2)
                         .arg(static_cast<double>(data.current) * 1e6, 6,'f', 1)
                         );

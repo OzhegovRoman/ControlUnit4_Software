@@ -64,7 +64,7 @@ void AllChannels::updateWidget()
                             QFile m_File(QString("%1\\TriggerLog.txt").arg(ui->leLogPath->text()));
                             m_File.open(QIODevice::ReadWrite | QIODevice::Append);
                             QTextStream out(&m_File);
-                            QString tmpStr = QString("[%1]: SSPD Unit Triggered. Adress: %2. Trigger counts: %3\r\n")
+                            QString tmpStr = QString(tr("[%1]: SSPD Unit Triggered. Adress: %2. Trigger counts: %3\r\n"))
                                     .arg(QDateTime::currentDateTime().toString("MM-dd-yyyy HH-mm-ss"))
                                     .arg(driver->devAddress())
                                     .arg(param.AutoResetCounts);
@@ -90,7 +90,7 @@ void AllChannels::updateWidget()
                             QFile m_File(QString("%1\\TriggerLog.txt").arg(ui->leLogPath->text()));
                             m_File.open(QIODevice::ReadWrite | QIODevice::Append);
                             QTextStream out(&m_File);
-                            QString tmpStr = QString("[%1]: SSPD Unit Triggered. Adress: %2. Trigger counts: %3\r\n")
+                            QString tmpStr = QString(tr("[%1]: SSPD Unit Triggered. Adress: %2. Trigger counts: %3\r\n"))
                                     .arg(QDateTime::currentDateTime().toString("MM-dd-yyyy HH-mm-ss"))
                                     .arg(driver->devAddress())
                                     .arg(param.AutoResetCounts);
@@ -150,6 +150,6 @@ void AllChannels::on_pbSetUpdateTime_clicked()
 
 void AllChannels::on_pbLogPath_clicked()
 {
-    QString str = QFileDialog::getExistingDirectory(this, "Open Directory for Log file...");
+    QString str = QFileDialog::getExistingDirectory(this, tr("Open Directory for Log file..."));
     if (!str.isEmpty()) ui->leLogPath->setText(str);
 }
