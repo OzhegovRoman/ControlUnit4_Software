@@ -41,7 +41,7 @@
     <name>AllChannelsDataModel</name>
     <message>
         <source>%1 uA</source>
-        <translation>%1 мкА</translation>
+        <translation>%1 uA</translation>
     </message>
     <message>
         <source>Not connected</source>
@@ -61,11 +61,11 @@
     </message>
     <message>
         <source>I: %1 mA</source>
-        <translation>Ток: %1 мА</translation>
+        <translation>I: %1 mA</translation>
     </message>
     <message>
         <source>U: %1 mV; I: %2 uA</source>
-        <translation>Напряжение: %1 мВ; Ток: %2 мкА</translation>
+        <translation>U: %1 mV; I: %2 uA</translation>
     </message>
     <message>
         <source>SSPD#%1</source>
@@ -197,7 +197,7 @@ Address: %1</source>
     </message>
     <message>
         <source>I (uA):</source>
-        <translation>Ток (мкА):</translation>
+        <translation>I (uA):</translation>
     </message>
     <message>
         <source>Set I</source>
@@ -217,7 +217,7 @@ Address: %1</source>
     </message>
     <message>
         <source>U: %1 mV&lt;br&gt;I: %2 uA&lt;br&gt;</source>
-        <translation>Напр.: %1 мВ&lt;br&gt;Ток: %2 мкА&lt;br&gt;</translation>
+        <translation>U: %1 mV&lt;br&gt;I: %2 uA&lt;br&gt;</translation>
     </message>
 </context>
 <context>
@@ -228,7 +228,7 @@ Address: %1</source>
     </message>
     <message>
         <source>I (mA):</source>
-        <translation>Ток (мА):</translation>
+        <translation>I (uA):</translation>
     </message>
     <message>
         <source>Set I</source>
@@ -240,14 +240,14 @@ Address: %1</source>
     </message>
     <message>
         <source>I: %1 mA&lt;br&gt;</source>
-        <translation>Ток: %1 мА&lt;br&gt;</translation>
+        <translation>I: %1 mA&lt;br&gt;</translation>
     </message>
 </context>
 <context>
     <name>SspdWidget</name>
     <message>
         <source>Form</source>
-        <translation>Форма</translation>
+        <translation>Драйвер детек.</translation>
     </message>
     <message>
         <source>Short</source>
@@ -283,7 +283,7 @@ Address: %1</source>
     </message>
     <message>
         <source>Set I</source>
-        <translation>Установить Ток</translation>
+        <translation>Установить ток</translation>
     </message>
     <message>
         <source>Cmp:</source>
@@ -291,7 +291,7 @@ Address: %1</source>
     </message>
     <message>
         <source>Set Cmp</source>
-        <translation>Установить ток компаратора</translation>
+        <translation>Установить ур. компарации</translation>
     </message>
     <message>
         <source>I: %1 uA&lt;br&gt;U: %2 mV&lt;br&gt;cps: %3</source>
@@ -496,7 +496,7 @@ U4</source>
     <message>
         <source>U%1: %2V
 </source>
-        <translation>Напр.%1: %2В</translation>
+        <translation>U%1: %2V</translation>
     </message>
 </context>
 <context>
@@ -511,7 +511,7 @@ U4</source>
     </message>
     <message>
         <source>&lt;h2&gt;T: %1&lt;/h2&gt;&lt;h3&gt;P: %2 mbar&lt;br&gt;Temp sensor voltage: %3 V&lt;br&gt;Press sensor Voltage: %4 mV&lt;/h3&gt;</source>
-        <translation>&lt;h2&gt;T: %1&lt;/h2&gt;&lt;h3&gt;P: %2 мБар&lt;br&gt;Напряжение температурного датчика: %3 V&lt;br&gt;Напряжение датчика давления: %4 mV&lt;/h3&gt;</translation>
+        <translation>&lt;h2&gt;T: %1&lt;/h2&gt;&lt;h3&gt;P: %2 mbar&lt;br&gt;Напряжение темп. датчика: %3 В&lt;br&gt;Напряжение датчика давления: %4 В&lt;/h3&gt;</translation>
     </message>
 </context>
 <context>
