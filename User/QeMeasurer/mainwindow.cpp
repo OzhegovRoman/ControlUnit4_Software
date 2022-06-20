@@ -11,6 +11,10 @@
 #include <QDesktopWidget>
 #endif
 
+#ifdef RS485
+#include <QSerialPortInfo>
+#endif
+
 MainWindow::MainWindow(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::MainWindow),
@@ -72,7 +76,8 @@ MainWindow::MainWindow(QWidget *parent) :
     device->setUDID(UDID);
 
 #elif defined(RS485)
-    mInterface->setPortName("COM3");
+    ui->lAddress->setText("COM Port:");
+//    mInterface->setPortName("COM3");
 #endif
 
     updateControlUnitList();
@@ -242,6 +247,11 @@ void MainWindow::on_pbInitialize_clicked()
     CommonDriver driver;
     driver.setIOInterface(mInterface);
     bool secretMode = QGuiApplication::queryKeyboardModifiers() == (Qt::ControlModifier | Qt::ShiftModifier);
+
+#ifdef RS485
+    mInterface->setPortName(ui->cbTcpIpAddress->currentText());
+    driver.setDevAddress(static_cast<const quint8>(ui->sbDeviceAddress->value()));
+#endif
 
 #ifdef TCPIP_SOCKET_INTERFACE
     QString str = ui->cbTcpIpAddress->currentText();
@@ -944,12 +954,19 @@ void MainWindow::updateControlUnitList()
 {
     setDisabled(true);
     qApp->processEvents();
-    QStringList list = availableControlUnits();
     ui->cbTcpIpAddress->clear();
+#ifdef RS485
+    QList<QSerialPortInfo> list = QSerialPortInfo::availablePorts();
+    if (!list.isEmpty())
+        foreach (const QSerialPortInfo &info, list) {
+            ui->cbTcpIpAddress->addItem(info.portName());
+        }
+#elif TCPIP_SOCKET_INTERFACE
+    QStringList list = availableControlUnits();
     if (!list.isEmpty())
         ui->cbTcpIpAddress->addItems(list);
     ui->cbTcpIpAddress->addItems(QStringList()<<"Update..."<<"Manual...");
-
+#endif
     setEnabled(true);
 }
 

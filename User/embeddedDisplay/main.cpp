@@ -114,7 +114,6 @@ int main(int argc, char *argv[])
     catchUnixSignals({SIGSYS, SIGQUIT, SIGINT, SIGTERM, SIGHUP});
 
     qDebug()<< "init interface";
-
     DataHarvester *_DataHarvester = new DataHarvester();
     _DataHarvester->setInterface(createInterface(parser, tcpIpOption, serialPortOption));
 

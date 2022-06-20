@@ -64,11 +64,14 @@ bool cuRs485IOInterface::pSendMsg(quint8 address, quint8 command, quint8 dataLen
     // аккуратно отсылаем данные в SerialPort
     QByteArray ba = QByteArray((const char*)starProtocol.buffer(),MaxBufferSize);
     int l = ba.indexOf(END_PACKET)+1;
+//    qDebug() << mSerialPort;
 
-    mSerialPort->write((const char*)starProtocol.buffer(), l);
-    mSerialPort->flush();
+   mSerialPort->write((const char*)starProtocol.buffer(), l);
+   mSerialPort->flush();
+
     // внимание-внимание flush отправляет в буфер? чтобы начать отправку надо сделать
-    QThread::usleep(2000);
+//    QThread::usleep(2);
+    while (mSerialPort->waitForBytesWritten(500)); //INFO: АЛЯРМА!!! добавил эту хрень и всё заработало (но не с первой же отправки подрубает)
 
     setReceverEnable();
     return true;
@@ -94,7 +97,7 @@ bool cuRs485IOInterface::pInitialize()
         }
 
     // когда данные будут готовы для чтения будем читать их через соединение сигнал-слот
-    connect(mSerialPort, SIGNAL(readyRead()), this, SLOT(dataReady()), Qt::QueuedConnection);
+    connect(mSerialPort, &QSerialPort::readyRead, this, &cuRs485IOInterface::dataReady, Qt::QueuedConnection);
     return true;
 }
 
