@@ -48,7 +48,7 @@ void SisControlLineWidget::updateWidget()
 
 void SisControlLineWidget::updateData(CU4CLM0V0_Data_t data)
 {
-    ui->lbData->setText(QString("I: %1 mA<br>")
+    ui->lbData->setText(QString(tr("I: %1 mA<br>"))
                         .arg(static_cast<double>(data.current) * 1e3, 6,'f', 2));
 
     ui->cbShort->setChecked(data.shortCircuit);

@@ -8,12 +8,22 @@
 #include <QThread>
 #include <QStyle>
 #include <QDesktopWidget>
+#include <QTranslator>
+#include <QDir>
 
 #include "tcpipaddressdialog.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    QString path = QDir::currentPath().append("\\");
+    path.replace("/","\\");
+
+
+    QTranslator myappTranslator;
+    if (myappTranslator.load(QLocale(QLocale::Russian), QLatin1String("SimpleApp"),"_",path))
+        a.installTranslator(&myappTranslator);
 
     a.setCursorFlashTime(1000);
 

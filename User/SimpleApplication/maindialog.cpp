@@ -208,7 +208,7 @@ bool MainDialog::createUI(const QString& deviceList)
             if (type.contains("CU4SDM0")){
                 //данное устройство - SspdDriver
                 tmpDriver = new SspdDriverM0(this);
-                ui->listWidget->addItem(QString("Sspd Driver\nAddress: %1").arg(address));
+                ui->listWidget->addItem(QString(tr("Sspd Driver\nAddress: %1")).arg(address));
                 auto* widget = new SspdWidget(this);
                 widget->setDriver(qobject_cast<SspdDriverM0*>(tmpDriver));
                 ui->stackedWidget->addWidget(widget);
@@ -216,7 +216,7 @@ bool MainDialog::createUI(const QString& deviceList)
             else if (type.contains("CU4SDM1")){
                 //данное устройство - SspdDriver
                 tmpDriver = new SspdDriverM1(this);
-                ui->listWidget->addItem(QString("Sspd Driver\nAddress: %1").arg(address));
+                ui->listWidget->addItem(QString(tr("Sspd Driver\nAddress: %1")).arg(address));
                 auto* widget = new SspdWidgetM1(this);
                 widget->setDriver(qobject_cast<SspdDriverM1*>(tmpDriver));
                 ui->stackedWidget->addWidget(widget);
@@ -224,7 +224,7 @@ bool MainDialog::createUI(const QString& deviceList)
             else if (type.contains("CU4TDM0")){
                 //данное устройство - TempDriver
                 tmpDriver = new TempDriverM0(this);
-                ui->listWidget->addItem(QString("Temperature\nAddress: %1").arg(address));
+                ui->listWidget->addItem(QString(tr("Temperature\nAddress: %1")).arg(address));
                 auto* widget = new TempWidget(this);
                 widget->setDriver(qobject_cast<TempDriverM0*>(tmpDriver));
                 ui->stackedWidget->addWidget(widget);
@@ -232,7 +232,7 @@ bool MainDialog::createUI(const QString& deviceList)
             else if (type.contains("CU4TDM1")){
                 //данное устройство - TempDriver
                 tmpDriver = new TempDriverM1(this);
-                ui->listWidget->addItem(QString("Temperature (M1)\nAddress: %1").arg(address));
+                ui->listWidget->addItem(QString(tr("Temperature (M1)\nAddress: %1")).arg(address));
 
                 auto* widget = new TempM1Widget(this);
                 widget->setDriver(qobject_cast<TempDriverM1*>(tmpDriver));
@@ -242,7 +242,7 @@ bool MainDialog::createUI(const QString& deviceList)
             else if (type.contains("CU4HTM")){
                 //данное устройство - HeaterDriver
                 tmpDriver = new HeaterDriverM0(this);
-                ui->listWidget->addItem(QString("Heater\nAddress: %1").arg(address));
+                ui->listWidget->addItem(QString(tr("Heater\nAddress: %1")).arg(address));
 
                 auto* widget = new HeaterWidget(this);
                 widget->setDriver(qobject_cast<HeaterDriverM0*>(tmpDriver));
@@ -250,7 +250,7 @@ bool MainDialog::createUI(const QString& deviceList)
             }
             else if (type.contains("CU4CLM")){
                 //данное устройство - SisControlLine
-                ui->listWidget->addItem(QString("SIS Control Line\nAddress: %1").arg(address));
+                ui->listWidget->addItem(QString(tr("SIS Control Line\nAddress: %1")).arg(address));
                 auto* widget = new SisControlLineWidget(this);
                 widget->setDriver(new SisControlLineDriverM0(this));
                 tmpDriver = widget->driver();
@@ -258,7 +258,7 @@ bool MainDialog::createUI(const QString& deviceList)
             }
             else if (type.contains("CU4BSM")){
                 //данное устройство - SisBiasSource
-                ui->listWidget->addItem(QString("SIS Bias Source\nAddress: %1").arg(address));
+                ui->listWidget->addItem(QString(tr("SIS Bias Source\nAddress: %1")).arg(address));
                 auto* widget = new SisBiasSourceWidget(this);
                 widget->setDriver(new SisBiasSourceDriverM0(this));
                 tmpDriver = widget->driver();
@@ -273,7 +273,7 @@ bool MainDialog::createUI(const QString& deviceList)
         }
     }
 
-    ui->listWidget->addItem("All Channels");
+    ui->listWidget->addItem(tr("All Channels"));
     aWidget = new AllChannels(this);
     ui->stackedWidget->addWidget(aWidget);
     aWidget->initialize(mDrivers);

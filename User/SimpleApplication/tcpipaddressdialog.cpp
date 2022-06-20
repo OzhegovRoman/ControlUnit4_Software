@@ -80,7 +80,7 @@ void TcpIpAddressDialog::updateControlUnitList()
     QStringList list = availableControlUnits();
     ui->cbTcpIp->clear();
     ui->cbTcpIp->addItems(list);
-    ui->cbTcpIp->addItems(QStringList()<<"Update..."<<"Manual...");
+    ui->cbTcpIp->addItems(QStringList()<<tr("Update...")<<tr("Manual..."));
     setEnabled(true);
 }
 
@@ -88,16 +88,16 @@ void TcpIpAddressDialog::on_cbType_activated(int index)
 {
     bool isSerialPort = index == 1;
     ui->stackedWidget->setCurrentIndex(ui->cbType->currentIndex());
-    ui->lbProtocolspecs->setText(isSerialPort ? "Port name:" : "TcpIp address:");
+    ui->lbProtocolspecs->setText(isSerialPort ? tr("Port name:") : tr("TcpIp address:"));
 }
 
 void TcpIpAddressDialog::on_cbTcpIp_activated(const QString &arg1)
 {
-    if (arg1.contains("Update")){
+    if (arg1.contains(tr("Update"))){
         updateControlUnitList();
         ui->cbTcpIp->setCurrentIndex(0);
     }
-    else if (arg1.contains("Manual")){
+    else if (arg1.contains(tr("Manual"))){
 
         QSettings settings("Scontel", "ControlUnit4_Calibration");
         QString LastTcpIpAddress = settings.value("TcpIpAddress","127.000.000.001").toString();

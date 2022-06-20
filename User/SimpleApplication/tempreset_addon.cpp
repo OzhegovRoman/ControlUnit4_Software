@@ -15,7 +15,7 @@ TemperatureResetAddon::TemperatureResetAddon(TemperatureRecycleInterface *tempRe
 
    applySettings();
 
-   setWindowTitle("Temperature recycle settings");
+   setWindowTitle(tr("Temperature recycle settings"));
 
    setTempRecycle(tempRecycle);
    }
@@ -54,7 +54,7 @@ void TemperatureResetAddon::setTempRecycle(TemperatureRecycleInterface *value)
       if (mIsRuning && !mTempRecycle->checkIntegrity()){
          emit aborted(false);
          changeAlgoritmState(false);
-         QMessageBox::critical(this,"Recycle procedure aborted","The temperature module relays have been modified externally.");
+         QMessageBox::critical(this,tr("Recycle procedure aborted"),tr("The temperature module relays have been modified externally."));
          }
       toggleIndicator(ui->L_25vIndicator,mTempRecycle->getReadedRelayState(cRelaysStatus::ri25V));
       toggleIndicator(ui->L_5vIndicator,mTempRecycle->getReadedRelayState(cRelaysStatus::ri5V));
@@ -109,16 +109,16 @@ void TemperatureResetAddon::showPreStartMsg()
          countDown.stop();
          msgBox.defaultButton()->click();
       }else{
-         msgBox.setText(QString("Auto recycle starts in  %1 seconds").arg(counter));
+         msgBox.setText(QString(tr("Auto recycle starts in  %1 seconds")).arg(counter));
          }
       });
 
-   msgBox.setWindowTitle("Recycle starting");
-   msgBox.setText("Auto recycle starts in 10 seconds");
+   msgBox.setWindowTitle(tr("Recycle starting"));
+   msgBox.setText(tr("Auto recycle starts in 10 seconds"));
    msgBox.setStandardButtons(QMessageBox::Ok| QMessageBox::Abort);
    msgBox.setDefaultButton(QMessageBox::Ok);
    auto buttonY = msgBox.button(QMessageBox::Ok);
-   buttonY->setText("Start Now");
+   buttonY->setText(tr("Start Now"));
    countDown.start(1000);
    int ret = msgBox.exec();
    switch (ret){
@@ -153,12 +153,12 @@ void TemperatureResetAddon::mousePressEvent(QMouseEvent *event)
       currentProgress = 0;
       progressTimer->start(10);
       if (mTempRecycle->getCurrentState() == TRS_Idle){
-         ui->progressBar->setFormat("Starting Recycle");
+         ui->progressBar->setFormat(tr("Starting Recycle"));
          ui->progressBar->setStyleSheet("");
          }
       else
          {
-         ui->progressBar->setFormat("Aborting Recycle");
+         ui->progressBar->setFormat(tr("Aborting Recycle"));
          ui->progressBar->setStyleSheet("QProgressBar { color : red; }");
          }
       }
@@ -174,11 +174,11 @@ void TemperatureResetAddon::mouseReleaseEvent(QMouseEvent *event)
    currentProgress = 0;
 
    if (mIsRuning){
-      ui->progressBar->setFormat("Hold To Abort Recycle");
+      ui->progressBar->setFormat(tr("Hold To Abort Recycle"));
       }
    else
       {
-      ui->progressBar->setFormat("Hold To Start Recycle");
+      ui->progressBar->setFormat(tr("Hold To Start Recycle"));
       }
    }
 
@@ -208,7 +208,7 @@ void TemperatureResetAddon::changeAlgoritmState(bool isRuning)
    mIsRuning = isRuning;
    toggleInterface(!mIsRuning);
    if (isRuning){
-      ui->progressBar->setFormat("Hold To Abort Recycle");
+      ui->progressBar->setFormat(tr("Hold To Abort Recycle"));
       mTempRecycle->startProcess(ui->SB_HeatingTime->value() * msecInMins,
                                  ui->SB_ThermalizationTime->value() * msecInMins,
                                  ui->SB_CoolingDown->value() * msecInMins);
@@ -218,7 +218,7 @@ void TemperatureResetAddon::changeAlgoritmState(bool isRuning)
    else
       {
       mTempRecycle->abortProcess();
-      ui->progressBar->setFormat("Hold To Start Recycle");
+      ui->progressBar->setFormat(tr("Hold To Start Recycle"));
       setWindowFlags(Qt::Window
                      | Qt::WindowCloseButtonHint);
       show();

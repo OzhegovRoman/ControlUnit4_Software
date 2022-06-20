@@ -47,7 +47,7 @@ void SspdWidget::updateData(CU4SDM0V1_Data_t data)
             .arg(static_cast<double>(mDriver->counts()->currentValue())/mDriver->params()->currentValue().Time_Const, 6, 'g', 4);
     tmp.replace("e+0","e");
 
-    ui->lbData->setText(QString("I: %1 uA<br>U: %2 mV<br>cps: %3")
+    ui->lbData->setText(QString(tr("I: %1 uA<br>U: %2 mV<br>cps: %3"))
                         .arg(static_cast<double>(data.Current) * 1e6, 6,'f', 1)
                         .arg(static_cast<double>(data.Voltage) * 1e3, 6, 'f', 2)
                         .arg(tmp));
