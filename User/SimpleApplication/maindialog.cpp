@@ -8,6 +8,9 @@
 #include "sspdwidgetm1.h"
 #include "heaterwidget.h"
 
+
+#include "testcontrol.h"
+
 #ifdef RASPBERRY_PI
 #include <QApplication>
 #include <QDesktopWidget>
@@ -21,6 +24,7 @@ MainDialog::MainDialog(QWidget *parent)
 {
 
     ui->setupUi(this);
+    ui->pbControl->hide();
 #ifdef RASPBERRY_PI
     QFrame *frame = new QFrame(this);
     frame->setFrameShape(QFrame::HLine);
@@ -281,3 +285,19 @@ bool MainDialog::createUI(const QString& deviceList)
     connect(aWidget, SIGNAL(setTimeOut(int)), SLOT(changeTimeOut(int)));
     return true;
 }
+
+void MainDialog::on_pbControl_clicked()
+{
+
+    qDebug()<<"control";
+    TestControl control(this);
+    QStringList list;
+    for (int i = 0; i < ui->listWidget->count()-1; i++){
+        list.append(ui->listWidget->item(i)->text());
+    }
+    control.setDeviceList(list);
+    control.setInterface(mInterface);
+            ;
+    if (control.exec());
+}
+

@@ -65,13 +65,15 @@ bool cuRs485IOInterface::pSendMsg(quint8 address, quint8 command, quint8 dataLen
     QByteArray ba = QByteArray((const char*)starProtocol.buffer(),MaxBufferSize);
     int l = ba.indexOf(END_PACKET)+1;
 //    qDebug() << mSerialPort;
+//    qDebug()<<ba.toHex();
 
    mSerialPort->write((const char*)starProtocol.buffer(), l);
    mSerialPort->flush();
 
     // внимание-внимание flush отправляет в буфер? чтобы начать отправку надо сделать
-//    QThread::usleep(2);
-    while (mSerialPort->waitForBytesWritten(500)); //INFO: АЛЯРМА!!! добавил эту хрень и всё заработало (но не с первой же отправки подрубает)
+   qApp->processEvents();
+    QThread::usleep(2);
+    bool ok = mSerialPort->waitForBytesWritten(5); //INFO: АЛЯРМА!!! добавил эту хрень и всё заработало (но не с первой же отправки подрубает)
 
     setReceverEnable();
     return true;

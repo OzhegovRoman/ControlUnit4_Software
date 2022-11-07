@@ -30,7 +30,7 @@ using IOInterface_t =
 #elif FAKE
     FakeIOInterface
 #elif RASPBERRY_PI
-    CuRaspPiRs485IOInterface
+    cuRs485IOInterface
 #elif RS485
     cuRs485IOInterface
 #endif

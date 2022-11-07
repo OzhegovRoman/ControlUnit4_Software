@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    QString path = QDir::currentPath().append("\\");
+    QString path = QDir::currentPath().append("/translations/");
     path.replace("/","\\");
 
 

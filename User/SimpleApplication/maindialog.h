@@ -55,6 +55,8 @@ private slots:
     void timerTimeOut();
     void msgReceived(quint8 address, quint8 command, quint8 dataLength, quint8* data);
 
+    void on_pbControl_clicked();
+
 private:
     Ui::MainDialog *ui;
     QVector<CommonDriver*> mDrivers;

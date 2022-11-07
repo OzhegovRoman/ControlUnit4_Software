@@ -73,7 +73,7 @@
     </message>
     <message>
         <source>Temperature</source>
-        <translation>Темпераьтурный модуль</translation>
+        <translation>Температурный модуль</translation>
     </message>
     <message>
         <source>Heater</source>

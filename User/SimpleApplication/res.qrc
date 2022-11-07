@@ -2,5 +2,8 @@
     <qresource prefix="/images">
         <file>splash.png</file>
         <file>splash_tirphotonics.png</file>
+        <file>testcontrol/error.png</file>
+        <file>testcontrol/ready.png</file>
+        <file>testcontrol/wait.png</file>
     </qresource>
 </RCC>
