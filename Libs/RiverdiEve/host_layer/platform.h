@@ -18,8 +18,8 @@
 #include <linux/types.h>
 #include <linux/spi/spidev.h>
 
-#include </home/roman/raspi/sysroot/usr/include/wiringPiSPI.h>
-#include </home/roman/raspi/sysroot/usr/include/wiringPi.h>
+#include </home/roman/Qt-CrossCompile/raspberrypi3/sysroot/usr/include/wiringPiSPI.h>
+#include </home/roman/Qt-CrossCompile/raspberrypi3/sysroot/usr/include/wiringPi.h>
 
 /*****************************************************************************/
 
