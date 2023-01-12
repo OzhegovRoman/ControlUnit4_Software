@@ -200,7 +200,7 @@ public:
         return DriverProperty<T>::currentValue();
     }
 
-    virtual void setCurrentValue(const T & value)
+    virtual void setCurrentValue(const T & value) override
     {
         DriverProperty<T>::setCurrentValue(value);
     }

@@ -16,9 +16,11 @@
 
 #ifdef TCPIP_SOCKET_INTERFACE
 #include "Interfaces/cutcpsocketiointerface.h"
-#include "servercommands.h"
+//#include "servercommands.h"
 #endif
 
+#include <QtCharts/QChartView>
+QT_CHARTS_USE_NAMESPACE
 
 namespace Ui {
 class MainWindow;
@@ -49,7 +51,6 @@ private slots:
     void on_stackedWidget_currentChanged(int arg1);
     void updateData();
     void setCurrentValue();
-    void addPoint2MeasureGraphs();
     void deleteMeasureData();
     void saveData();
     void enableControlsAtMeasure(bool value);
@@ -92,6 +93,8 @@ private:
 
     bool serverMessageReceived;
     bool sweepStoped;
+
+    QRectF chartRange;
 
 private slots:
     void serverMessageReceive(quint8 address, quint8 command, quint8 dataLength, quint8* data);

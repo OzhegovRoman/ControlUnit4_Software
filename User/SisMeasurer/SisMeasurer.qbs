@@ -46,7 +46,8 @@ CppApplication{
             "network",
             "serialport",
             "widgets",
-            "printsupport"
+            "printsupport",
+            "charts"
         ]
     }
 

@@ -52,8 +52,8 @@ CppApplication{
 
 
     cpp.defines: [
-        "RS485",
-//         "TCPIP_SOCKET_INTERFACE",
+//        "RS485",
+         "TCPIP_SOCKET_INTERFACE",
     ]
 
     Group {
