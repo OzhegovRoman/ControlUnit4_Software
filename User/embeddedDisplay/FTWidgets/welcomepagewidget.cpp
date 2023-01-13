@@ -4,7 +4,7 @@
 #include <QFile>
 
 const uint8_t welcome_screen[]={
-    #include "../Design/welcomepage_alt/images/LOGO_2.binh"
+    #include "../Design/welcomepage_alt/images/Logo_2.binh"
 };
 const uint8_t welcome_screen_tirphotonics[]={
     #include "../Design/welcomepage_tirphot/images/Tirphotonics_2.binh"

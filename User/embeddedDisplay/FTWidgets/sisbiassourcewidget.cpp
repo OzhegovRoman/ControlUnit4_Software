@@ -196,7 +196,7 @@ void SisBiasSourceWidget::loop()
                        .toLocal8Bit());
         Gpu_CoCmd_Text(host(), 214, 205, 31, OPT_CENTERY | OPT_RIGHTX,
                        QString("%1")
-                       .arg(static_cast<double>(mDriver->voltage()->currentValue()) * 1e3, 6,'f', 1)
+                       .arg(static_cast<double>(mDriver->voltage()->currentValue()) * 1e3, 6,'f', 2)
                        .toLocal8Bit());
         // кнопки
 
