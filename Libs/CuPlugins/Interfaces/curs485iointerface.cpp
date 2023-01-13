@@ -67,14 +67,18 @@ bool cuRs485IOInterface::pSendMsg(quint8 address, quint8 command, quint8 dataLen
 //    qDebug() << mSerialPort;
 //    qDebug()<<ba.toHex();
 
-   mSerialPort->write((const char*)starProtocol.buffer(), l);
-   mSerialPort->flush();
+    mSerialPort->write((const char*)starProtocol.buffer(), l);
+    mSerialPort->flush();
+#ifdef RASPBERRY_PI
+    //    qApp->processEvents();
+        QThread::usleep(2000);
 
     // внимание-внимание flush отправляет в буфер? чтобы начать отправку надо сделать
-   qApp->processEvents();
-    QThread::usleep(2);
-    bool ok = mSerialPort->waitForBytesWritten(5); //INFO: АЛЯРМА!!! добавил эту хрень и всё заработало (но не с первой же отправки подрубает)
-
+#elif
+        qApp->processEvents();
+        QThread::usleep(2);
+        bool ok = mSerialPort->waitForBytesWritten(5); //INFO: АЛЯРМА!!! добавил эту хрень и всё заработало (но не с первой же отправки подрубает)
+#endif
     setReceverEnable();
     return true;
 }
