@@ -93,6 +93,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->wChartView->setContextMenuPolicy(Qt::CustomContextMenu);
 
     connect(ui->wChartView, &QChartView::customContextMenuRequested, this, &MainWindow::measurerContextMenuRequest);
+
+    connect(ui->pbInitialize,   &QPushButton::clicked, this, &MainWindow::initialize);
+    connect(ui->pbStart,        &QPushButton::clicked, this, &MainWindow::startSweep);
+    connect(ui->pbStop,         &QPushButton::clicked, this, &MainWindow::stopSweep);
 }
 
 MainWindow::~MainWindow()
@@ -117,7 +121,7 @@ void MainWindow::measurerContextMenuRequest(QPoint pos)
     menu->popup(ui->wChartView->mapToGlobal(pos));
 }
 
-void MainWindow::on_pbInitialize_clicked()
+void MainWindow::initialize()
 {
     qDebug()<<"MainWindow::on_pbInitialize_clicked";
     // сначала нужно получить информацию от модуля и выбрать подходящий тип
@@ -138,7 +142,7 @@ void MainWindow::on_pbInitialize_clicked()
     mInterface->setAddress(convertToHostAddress(str));
     qDebug()<<mInterface->address();
     mInterface->setPort(SERVER_TCPIP_PORT);
-    driver.setDevAddress(static_cast<const quint8>(ui->sbDeviceAddress->value()));
+    driver.setDevAddress(ui->sbDeviceAddress->value());
 #endif
 
     if (!driver.getDeviceInfo()) {
@@ -172,12 +176,12 @@ void MainWindow::on_pbInitialize_clicked()
                              "Firmware: %4<br>"
                              "Description: %5<br>"
                              "DeviceId: %6")
-            .arg(driver.deviceType()->currentValue())
-            .arg(driver.modificationVersion()->currentValue())
-            .arg(driver.hardwareVersion()->currentValue())
-            .arg(driver.firmwareVersion()->currentValue())
-            .arg(driver.deviceDescription()->currentValue())
-            .arg(driver.UDID()->currentValue().toString());
+            .arg(driver.deviceType()->currentValue()
+                 , driver.modificationVersion()->currentValue()
+                 , driver.hardwareVersion()->currentValue()
+                 , driver.firmwareVersion()->currentValue()
+                 , driver.deviceDescription()->currentValue()
+                 , driver.UDID()->currentValue().toString());
 
     ui->lbStatus->setText(tmpStr);
 
@@ -205,10 +209,6 @@ void MainWindow::on_stackedWidget_currentChanged(int arg1)
         mTimer->setInterval(500);
         connect(mTimer, SIGNAL(timeout()), SLOT(updateData()));
         updateData();
-        break;
-    case 2:
-        // Measure
-        //        ui->cbSweepType->setCurrentIndex(0);
         break;
     default:
         break;
@@ -313,7 +313,7 @@ void MainWindow::on_cbShort_clicked(bool checked)
     if (!ok) qDebug()<<"can't set short";
 }
 
-void MainWindow::on_pbStart_clicked()
+void MainWindow::startSweep()
 {
 
     qDebug()<<"MainWindow::on_pbStart_clicked";
@@ -324,8 +324,8 @@ void MainWindow::on_pbStart_clicked()
 
     connect(series, &QScatterSeries::pointAdded, this, [=](int index){
         auto * xAxis = reinterpret_cast<QValueAxis *>(ui->wChartView->chart()->axes(Qt::Horizontal)[0]);
-                auto * yAxis = reinterpret_cast<QValueAxis *>(ui->wChartView->chart()->axes(Qt::Vertical)[0]);
-//        yAxis->setTickCount(10);
+        auto * yAxis = reinterpret_cast<QValueAxis *>(ui->wChartView->chart()->axes(Qt::Vertical)[0]);
+        //        yAxis->setTickCount(10);
 
         auto point = series->at(index);
 
@@ -350,7 +350,7 @@ void MainWindow::on_pbStart_clicked()
             NiceScale scale (chartRange.bottom(), chartRange.top());
             yAxis->setRange(scale.niceMin(), scale.niceMax());
             yAxis->setTickCount(scale.tickCount());
-       }
+        }
         if (point.y() > chartRange.top()){
             chartRange.setTop(point.y());
             NiceScale scale (chartRange.bottom(), chartRange.top());
@@ -370,8 +370,6 @@ void MainWindow::on_pbStart_clicked()
         chartRange = QRectF(0,0,0,0);
         auto * xAxis = reinterpret_cast<QValueAxis *>(ui->wChartView->chart()->axes(Qt::Horizontal)[0]);
         auto * yAxis = reinterpret_cast<QValueAxis *>(ui->wChartView->chart()->axes(Qt::Vertical)[0]);
-//        xAxis->setTickCount(10);
-//        yAxis->setTickCount(10);
         xAxis->setTitleText("Voltage, [mV]");
         yAxis->setTitleText("Current, [uA]");
     }
@@ -381,6 +379,9 @@ void MainWindow::on_pbStart_clicked()
     }
 
     enableControlsAtMeasure(false);
+
+    //сохраняем данные
+    auto tempData = mDriver->data()->getValueSync(nullptr, 5);
 
     //TODO: поправить в зависимости от режима
     CU4BSM0_SWEEP_PARAMS_t params;
@@ -425,14 +426,7 @@ void MainWindow::on_pbStart_clicked()
         return;
     }
 
-    // убираем закоротку
-    mDriver->shortEnable()->setValueSync(false, &ok, 5);
-    if (!ok){
-        enableControlsAtMeasure(true);
-        return;
-    }
-
-    // задержка 500 ms
+     // задержка 500 ms
     QElapsedTimer timer;
     timer.start();
     while (timer.elapsed()<500)
@@ -468,10 +462,24 @@ void MainWindow::on_pbStart_clicked()
     }
     disconnect(mInterface, &cuIOInterface::msgReceived, this, &MainWindow::serverMessageReceive);
 
+    //восстанавливыаем старое значение тока-напряжения
+    mDriver->mode()->setValueSync(tempData.mode, &ok, 5);
+    if (!ok){
+        enableControlsAtMeasure(true);
+        return;
+    }
+
+    // устанавливаем начальное значение тока
+    if (tempData.mode == CU4BSM0_UMODE){
+        mDriver->voltage()->setValueSync(tempData.voltage, &ok, 5);
+    }
+    else
+        mDriver->current()->setValueSync(tempData.current, &ok, 5);
+
     enableControlsAtMeasure(true);
 }
 
-void MainWindow::on_pbStop_clicked()
+void MainWindow::stopSweep()
 {
     //    mStopFlag = true;
 }

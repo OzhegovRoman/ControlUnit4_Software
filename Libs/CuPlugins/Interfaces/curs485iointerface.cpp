@@ -74,10 +74,10 @@ bool cuRs485IOInterface::pSendMsg(quint8 address, quint8 command, quint8 dataLen
         QThread::usleep(2000);
 
     // внимание-внимание flush отправляет в буфер? чтобы начать отправку надо сделать
-#elif
+#else
         qApp->processEvents();
         QThread::usleep(2);
-        bool ok = mSerialPort->waitForBytesWritten(5); //INFO: АЛЯРМА!!! добавил эту хрень и всё заработало (но не с первой же отправки подрубает)
+        mSerialPort->waitForBytesWritten(5); //INFO: АЛЯРМА!!! добавил эту хрень и всё заработало (но не с первой же отправки подрубает)
 #endif
     setReceverEnable();
     return true;

@@ -1,4 +1,5 @@
 #include "sisbiassourcedriverm0.h"
+#include "../StarProtocol/star_prc_commands.h"
 
 SisBiasSourceDriverM0::SisBiasSourceDriverM0(QObject *parent)
     : CommonDriver(parent)

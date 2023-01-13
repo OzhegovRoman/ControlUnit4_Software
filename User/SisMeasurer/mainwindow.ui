@@ -74,7 +74,7 @@
        <bool>true</bool>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="pInitialize">
        <layout class="QVBoxLayout" name="verticalLayout">
@@ -566,22 +566,6 @@
         </item>
         <item>
          <widget class="QChartView" name="wChartView"/>
-        </item>
-        <item>
-         <widget class="QLabel" name="lbMeasurerStatus">
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>20</height>
-           </size>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">font: 12pt &quot;MS Shell Dlg 2&quot;;</string>
-          </property>
-          <property name="text">
-           <string>Status:</string>
-          </property>
-         </widget>
         </item>
        </layout>
       </widget>

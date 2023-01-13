@@ -6,9 +6,6 @@
 
 #include "driverproperty.h"
 #include "../StarProtocol/star_prc_structs.h"
-#include "../StarProtocol/star_prc_commands.h"
-
-
 
 class SisBiasSourceDriverM0 : public CommonDriver
 {

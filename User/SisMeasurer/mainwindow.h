@@ -28,13 +28,13 @@ class MainWindow;
 
 using IOInterface_t =
 #ifdef TCPIP_SOCKET_INTERFACE
-     cuTcpSocketIOInterface
+cuTcpSocketIOInterface
 #elif FAKE
-    FakeIOInterface
+FakeIOInterface
 #elif RASPBERRY_PI
-    CuRaspPiRs485IOInterface
+CuRaspPiRs485IOInterface
 #elif RS485
-    cuRs485IOInterface
+cuRs485IOInterface
 #endif
 ;
 
@@ -47,7 +47,7 @@ public:
     ~MainWindow() override;
 
 private slots:
-    void on_pbInitialize_clicked();
+    void initialize();
     void on_stackedWidget_currentChanged(int arg1);
     void updateData();
     void setCurrentValue();
@@ -57,8 +57,8 @@ private slots:
     void measurerContextMenuRequest(QPoint pos);
     void on_pbSetI_clicked();
     void on_cbShort_clicked(bool checked);
-    void on_pbStart_clicked();
-    void on_pbStop_clicked();
+    void startSweep();
+    void stopSweep();
 
     void updateControlUnitList();
     void on_cbTcpIpAddress_activated(const QString &arg1);

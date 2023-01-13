@@ -265,7 +265,7 @@ void cDevMngr::run()
 
 void cDevMngr::sortDevList()
 {
-    qSort(mDevList.begin(), mDevList.end(),
+    std::sort(mDevList.begin(), mDevList.end(),
           [](const deviceInfo & a, const deviceInfo &b)
     {
         return a.devAddress < b.devAddress;
