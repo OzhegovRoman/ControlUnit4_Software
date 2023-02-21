@@ -3,7 +3,7 @@ import qbs.File
 import qbs.Process
 
 CppApplication{
-    name: "cu-sismeasurer"
+    name: "cu-tempmeasurer"
     consoleApplication: false
 
     cpp.includePaths: [
@@ -16,8 +16,8 @@ CppApplication{
     // preparation RC_File
     Depends {name: "RC_Prepare"}
     RC_Prepare.outputFileName:  name
-    RC_Prepare.description:     "SIS IV measurement application"
-    RC_Prepare.internalName:    "SisMeasurer"
+    RC_Prepare.description:     "Cryocooller temperature measurement application"
+    RC_Prepare.internalName:    "TempMeasurer"
     RC_Prepare.isDefaultIcon: false
 
     Group {
@@ -33,7 +33,6 @@ CppApplication{
     Depends { name: "qCustomPlot"   }
     Depends { name: "qCustomLib"    }
     Depends { name: "NiceScale"     }
-
     Depends {
         name: "RaspPiMMap"
         required: false
@@ -48,12 +47,14 @@ CppApplication{
             "network",
             "serialport",
             "widgets",
+            "printsupport",
             "charts"
         ]
     }
 
 
     cpp.defines: [
+//        "RS485",
          "TCPIP_SOCKET_INTERFACE",
     ]
 

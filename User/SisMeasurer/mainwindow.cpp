@@ -16,7 +16,8 @@
 #include <QMenu>
 #include <QFileDialog>
 
-#include "nicescale.h"
+#include "../NiceScale/nicescale.h"
+#include <QMessageBox>
 
 
 #ifdef RASPBERRY_PI
@@ -319,13 +320,22 @@ void MainWindow::startSweep()
     qDebug()<<"MainWindow::on_pbStart_clicked";
 
     // Запуск процесса измерения
-    QScatterSeries *series = new QScatterSeries(ui->wChartView->chart());
+    int count = ui->wChartView->chart()->series().count();
+    if (count >= MAX_SERIES_COUNT){
+        QMessageBox::warning(this,
+                             "Warning!!!",
+                             QString("Count of series >= %1. Please clear chart.").arg(MAX_SERIES_COUNT));
+        return;
+    }
+
+
+    QScatterSeries *series = new/*(&m_series[count])*/ QScatterSeries();//&m_series[count];
+    qDebug()<<series;
     series->setUseOpenGL();
 
     connect(series, &QScatterSeries::pointAdded, this, [=](int index){
         auto * xAxis = reinterpret_cast<QValueAxis *>(ui->wChartView->chart()->axes(Qt::Horizontal)[0]);
         auto * yAxis = reinterpret_cast<QValueAxis *>(ui->wChartView->chart()->axes(Qt::Vertical)[0]);
-        //        yAxis->setTickCount(10);
 
         auto point = series->at(index);
 
@@ -358,12 +368,12 @@ void MainWindow::startSweep()
             yAxis->setTickCount(scale.tickCount());
         }
 
+        ui->wChartView->update();
+
     });
 
     series->setMarkerShape(QScatterSeries::MarkerShapeCircle);
-    series->setBorderColor(series->pen().color());
     series->setMarkerSize(10.0);
-    series->setPen(QColor(Qt::transparent));
     ui->wChartView->chart()->addSeries(series);
     if (ui->wChartView->chart()->series().count() == 1){
         ui->wChartView->chart()->createDefaultAxes();
@@ -454,6 +464,17 @@ void MainWindow::startSweep()
         qApp->processEvents();
     }
 
+    ok = false;
+    count = 0;
+    while (!ok && (count < 10)){
+        mDriver->sweepStop()->executeSync(&ok);
+        if (!ok) {
+            timer.start();
+            while (timer.elapsed()<100)
+                qApp->processEvents();
+        }
+    }
+
     // выключаем pipe mode
     serverMessageReceived = false;
     mInterface->sendMsg(SERVER_ADDRESS, CMD_SERVER_PIPE_MODE_OFF, 0, nullptr);
@@ -481,7 +502,7 @@ void MainWindow::startSweep()
 
 void MainWindow::stopSweep()
 {
-    //    mStopFlag = true;
+    sweepStoped = true;  //    mStopFlag = true;
 }
 
 void MainWindow::updateControlUnitList()

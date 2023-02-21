@@ -36,6 +36,9 @@ using IOInterface_t =
 #endif
 ;
 
+#include <QtCharts/QChartView>
+QT_CHARTS_USE_NAMESPACE
+
 class MainWindow : public QWidget
 {
     Q_OBJECT
@@ -48,46 +51,22 @@ private slots:
     void initialize();
     void on_stackedWidget_currentChanged(int arg1);
     void updateData();
-    void updateCountsGraph();
-    void setCurrentValue();
-    void addPoint2MeasureGraphs();
+    void updateTemperatureGraph();
     void deleteMeasureData();
     void saveData();
-    void enableControlsAtMeasure(bool value);
-    void measurerContextMenuRequest(QPoint pos);
-    void counterContextMenuRequest(QPoint pos);
-    void setAutoScaleCounterPlot(bool isAuto);
-    void controlAutoScaleCounter();
-    void setRangesVisible(bool isVisible);
-    void on_pbSetI_clicked();
-    void on_pbSetCmp_clicked();
-    void on_cbShort_clicked(bool checked);
-    void on_cbComparator_clicked(bool checked);
-    void on_pbReadParams_clicked();
-    void on_pbSetParams_clicked();
-    void on_cbAmplifier_clicked(bool checked);
-    void on_pbStart_clicked();
-    void on_pbStop_clicked();
+    void chartContextMenuRequest(QPoint pos);
 
-    void on_cbType_currentIndexChanged(int index);
-    void on_pbGetSecretParams_clicked();
-    void on_pbSetSecretParams_clicked();
-    void on_pbReading_clicked();
-    void on_pbRecording_clicked();
-
-    void updateSecureData();
     void updateControlUnitList();
 
     void on_cbTcpIpAddress_activated(const QString &arg1);
-
-    void on_cbHFMode_clicked(bool checked);
+    void showActions(bool visible = true);
+    void setConnectedState(bool connected);
 
 private:
 
     Ui::MainWindow *ui;
     enum {
-        dtSspdM0,
-        dtSspdM1,
+        dtTempM0,
         dtUnknown
     } deviceType;
 
@@ -96,13 +75,13 @@ private:
     QTimer *mTimer;
     QString mLastTcpIpAddress;
     QString mFileName;
-    int mTimerCount_Interval;
     int mMode{};
     double mCurrentValue{};
 
     bool isEnabledCounterAutoscale = true;
     bool isRangesVisible = true;
 
+    QRectF chartRange;
 
 };
 

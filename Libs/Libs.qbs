@@ -10,6 +10,7 @@ Project {
         "qCustomPlot/qCustomPlot.qbs",
         "RaspPiMMap/RaspPiMMap.qbs",
         "qCustomLib/qCustomLib.qbs",
-        "RiverdiEve/RiverdiEve.qbs"
+        "RiverdiEve/RiverdiEve.qbs",
+        "NiceScale/nicescale.qbs"
     ]
 }

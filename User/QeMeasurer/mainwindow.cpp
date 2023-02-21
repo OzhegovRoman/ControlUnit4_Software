@@ -240,7 +240,7 @@ void MainWindow::setRangesVisible(bool isVisible)
     ui->L_YMax-> setVisible(isRangesVisible);
 }
 
-void MainWindow::on_pbInitialize_clicked()
+void MainWindow::initialize()
 {
     qDebug()<<"MainWindow::on_pbInitialize_clicked";
     // сначала нужно получить информацию от модуля и выбрать подходящий тип

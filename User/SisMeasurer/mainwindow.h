@@ -38,6 +38,10 @@ cuRs485IOInterface
 #endif
 ;
 
+#include <QtCharts/QScatterSeries>
+
+#define MAX_SERIES_COUNT 5
+
 class MainWindow : public QWidget
 {
     Q_OBJECT

@@ -4,6 +4,7 @@ Project {
     condition: project.SoftwareEnableList.contains("User") || buildAll
     references: [
         "QeMeasurer/QeMeasurer.qbs",
+        "TempMeasurer/TempMeasurer.qbs",
         "SisMeasurer/SisMeasurer.qbs",
         "SimpleApplication/SimpleApplication.qbs",
         "embeddedDisplay/EmbeddedDisplay.qbs",
