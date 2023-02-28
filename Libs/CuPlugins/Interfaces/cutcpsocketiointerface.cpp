@@ -60,20 +60,22 @@ QString cuTcpSocketIOInterface::tcpIpQuery(QString query, int TimeOut, bool *ok)
         return QString();
     }
 
-    buffer.clear();
 
-    disconnect(mSocket, SIGNAL(readyRead()), this, SLOT(dataReady()));
+    disconnect(mSocket, nullptr, nullptr, nullptr);
 
     mSocket->write(query.toLatin1());
+    mSocket->flush();
+    buffer.clear();
 
     QElapsedTimer timer;
     timer.start();
-    while (timer.elapsed()<TimeOut){
+    while ((timer.elapsed()<TimeOut) && (buffer.isEmpty())){
         qApp->processEvents();
-    };
+        buffer.append(mSocket->readAll());
+    }
 
     buffer.append(mSocket->readAll());
-    connect(mSocket, SIGNAL(readyRead()), this, SLOT(dataReady()), Qt::QueuedConnection);
+    connect(mSocket, &QTcpSocket::readyRead, this, &cuTcpSocketIOInterface::dataReady, Qt::QueuedConnection);
     return QString(buffer);
 }
 

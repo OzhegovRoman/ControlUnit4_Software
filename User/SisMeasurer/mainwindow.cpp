@@ -331,7 +331,7 @@ void MainWindow::startSweep()
 
     QScatterSeries *series = new/*(&m_series[count])*/ QScatterSeries();//&m_series[count];
     qDebug()<<series;
-    series->setUseOpenGL();
+    //series->setUseOpenGL();
 
     connect(series, &QScatterSeries::pointAdded, this, [=](int index){
         auto * xAxis = reinterpret_cast<QValueAxis *>(ui->wChartView->chart()->axes(Qt::Horizontal)[0]);

@@ -150,6 +150,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->wMeasurerPlot->yAxis->setLabelColor(QApplication::palette().text().color());
     ui->wMeasurerPlot->yAxis->setTickPen(QPen(QApplication::palette().text().color()));
     ui->wMeasurerPlot->yAxis->setSubTickPen(QPen(QApplication::palette().text().color()));
+
+    connect(ui->pbInitialize, &QPushButton::clicked, this, &MainWindow::initialize);
 }
 
 MainWindow::~MainWindow()
@@ -978,7 +980,7 @@ void MainWindow::on_cbTcpIpAddress_activated(const QString &arg1)
     }
     else if (arg1.contains("Manual")){
 
-        QSettings settings("Scontel", "ControlUnit4_Calibration");
+        QSettings settings("Scontel", "QeMeasurer");
         QString LastTcpIpAddress = settings.value("TcpIpAddress","127.000.000.001").toString();
 
         bool ok;

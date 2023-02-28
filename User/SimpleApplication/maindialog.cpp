@@ -143,19 +143,21 @@ bool MainDialog::initialize()
         mInterface = interface;
     }
 
-    connect(mInterface, SIGNAL(msgReceived(quint8,quint8,quint8,quint8*)),
-            this, SLOT(msgReceived(quint8,quint8,quint8,quint8*)));
+    connect(mInterface, &cuIOInterface::msgReceived, this, &MainDialog::msgReceived);
 
     // получаем список доступных устройств.
     mWaiting = true;
 
     qDebug()<<"answer: "<<answer;
+    qDebug()<<"current time:"<<QTime::currentTime();
     createUI(answer);
 
-    connect(mTimer, SIGNAL(timeout()), SLOT(timerTimeOut()));
-    mTimer->start(mTimerTimeOut);
     mInited = true;
+    qDebug()<<"UI Created time:"<<QTime::currentTime();
     on_stackedWidget_currentChanged(0);
+    qDebug()<<"Inited time:"<<QTime::currentTime();
+    connect(mTimer, &QTimer::timeout, this, &MainDialog::timerTimeOut);
+    mTimer->start(mTimerTimeOut);
     return true;
 }
 
@@ -239,8 +241,13 @@ bool MainDialog::createUI(const QString& deviceList)
                 ui->listWidget->addItem(QString(tr("Temperature (M1)\nAddress: %1")).arg(address));
 
                 auto* widget = new TempM1Widget(this);
+                //Вообще то это делается дальше. НО Юра перемудрил и запихнул в имнициализацию класса процесс общения с реальным устройством
+                tmpDriver->setDevAddress(address);
+                tmpDriver->setIOInterface(mInterface);
                 widget->setDriver(qobject_cast<TempDriverM1*>(tmpDriver));
-                widget->setTempReset(new TemperatureRecycleInterface(qobject_cast<TempDriverM1*>(tmpDriver),&mDrivers,widget));
+                auto *driver = qobject_cast<TempDriverM1*>(tmpDriver);
+                auto *trInterface = new TemperatureRecycleInterface(driver, &mDrivers, widget);
+                widget->setTempReset(trInterface);
                 ui->stackedWidget->addWidget(widget);
             }
             else if (type.contains("CU4HTM")){
@@ -297,7 +304,7 @@ void MainDialog::on_pbControl_clicked()
     }
     control.setDeviceList(list);
     control.setInterface(mInterface);
-            ;
-    if (control.exec());
+
+    control.exec();
 }
 

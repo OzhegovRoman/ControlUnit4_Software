@@ -103,70 +103,7 @@ MainWindow::MainWindow(QWidget *parent) :
     mTimer->setSingleShot(true);
     mTimer->setInterval(1000);
 
-    ui->chTemperature->setRenderHint(QPainter::Antialiasing);
-    auto * chart = ui->chTemperature->chart();
-    chart->setDropShadowEnabled(false);
-    chart->legend()->hide();
-
-    ui->chTemperature->setContextMenuPolicy(Qt::CustomContextMenu);
-    auto *series = new QLineSeries();
-    series->setUseOpenGL();
-
-    chart->addSeries(series);
-    //ui->chTemperature->chart()->createDefaultAxes();
-    {
-        QDateTimeAxis *axisX = new QDateTimeAxis;
-        axisX->setTickCount(10);
-        axisX->setFormat("hh:mm:ss");
-        axisX->setTitleText("Time");
-        chart->addAxis(axisX, Qt::AlignBottom);
-        series->attachAxis(axisX);
-
-        QValueAxis *axisY = new QValueAxis;
-        axisY->setLabelFormat("%g");
-        axisY->setTitleText("Temperature, [K]");
-        chart->addAxis(axisY, Qt::AlignLeft);
-        series->attachAxis(axisY);
-    }
-
-    chartRange = QRectF(0, 0, 0, 0);
-
     connect(ui->pbInitialize,   &QPushButton::clicked,                      this, &MainWindow::initialize);
-    connect(ui->cbConnection,   &QCheckBox::clicked,                        this, &MainWindow::setConnectedState);
-    connect(ui->chTemperature,  &QChartView::customContextMenuRequested,    this, &MainWindow::chartContextMenuRequest);
-
-    connect(series,             &QLineSeries::pointAdded,                   this, [=](int index){
-        auto * xAxis = reinterpret_cast<QDateTimeAxis *>(ui->chTemperature->chart()->axes(Qt::Horizontal)[0]);
-        auto * yAxis = reinterpret_cast<QValueAxis *>(ui->chTemperature->chart()->axes(Qt::Vertical)[0]);
-
-        auto point = series->at(index);
-
-        if ((chartRange.width() == 0) && (chartRange.height() == 0) && (chartRange.bottomLeft() == QPointF(0,0))){
-            chartRange = QRectF(QPointF(point.x(), point.y()),QSizeF(0,0));
-        }
-        if (point.x() < chartRange.left()){
-            chartRange.setLeft(point.x());
-            xAxis->setRange(QDateTime::fromMSecsSinceEpoch(chartRange.left()), QDateTime::fromMSecsSinceEpoch(chartRange.right()));
-        }
-        if (point.x() > chartRange.right()){
-            chartRange.setRight(point.x());
-            xAxis->setRange(QDateTime::fromMSecsSinceEpoch(chartRange.left()), QDateTime::fromMSecsSinceEpoch(chartRange.right()));
-        }
-        if (point.y() < chartRange.bottom()){
-            chartRange.setBottom(point.y());
-            NiceScale scale (chartRange.bottom(), chartRange.top());
-            yAxis->setRange(scale.niceMin(), scale.niceMax());
-            yAxis->setTickCount(scale.tickCount());
-        }
-        if (point.y() > chartRange.top()){
-            chartRange.setTop(point.y());
-            NiceScale scale (chartRange.bottom(), chartRange.top());
-            yAxis->setRange(scale.niceMin(), scale.niceMax());
-            yAxis->setTickCount(scale.tickCount());
-        }
-
-        ui->chTemperature->update();
-    });
 
 }
 
@@ -217,6 +154,75 @@ void MainWindow::initialize()
     mInterface->setPort(SERVER_TCPIP_PORT);
     driver.setDevAddress(ui->sbDeviceAddress->value());
 #endif
+    static bool firstTimeInitialize = true;
+    if (firstTimeInitialize){
+        ui->chTemperature->setRenderHint(QPainter::Antialiasing);
+        auto * chart = ui->chTemperature->chart();
+        chart->setDropShadowEnabled(false);
+        chart->legend()->hide();
+
+        ui->chTemperature->setContextMenuPolicy(Qt::CustomContextMenu);
+        auto *series = new QLineSeries();
+        //series->setUseOpenGL();
+
+        chart->addSeries(series);
+
+        {
+            QDateTimeAxis *axisX = new QDateTimeAxis;
+            axisX->setTickCount(10);
+            axisX->setFormat("hh:mm:ss");
+            axisX->setTitleText("Time");
+            chart->addAxis(axisX, Qt::AlignBottom);
+            series->attachAxis(axisX);
+
+            QValueAxis *axisY = new QValueAxis;
+            axisY->setLabelFormat("%g");
+            axisY->setTitleText("Temperature, [K]");
+            chart->addAxis(axisY, Qt::AlignLeft);
+            series->attachAxis(axisY);
+        }
+
+        chartRange = QRectF(0, 0, 0, 0);
+
+        connect(ui->cbConnection,   &QCheckBox::clicked,                        this, &MainWindow::setConnectedState);
+        connect(ui->chTemperature,  &QChartView::customContextMenuRequested,    this, &MainWindow::chartContextMenuRequest);
+
+        connect(series,             &QLineSeries::pointAdded,                   this, [=](int index){
+            auto * xAxis = reinterpret_cast<QDateTimeAxis *>(ui->chTemperature->chart()->axes(Qt::Horizontal)[0]);
+            auto * yAxis = reinterpret_cast<QValueAxis *>(ui->chTemperature->chart()->axes(Qt::Vertical)[0]);
+
+            auto point = series->at(index);
+
+            if ((chartRange.width() == 0) && (chartRange.height() == 0) && (chartRange.bottomLeft() == QPointF(0,0))){
+                chartRange = QRectF(QPointF(point.x(), point.y()),QSizeF(0,0));
+            }
+            if (point.x() < chartRange.left()){
+                chartRange.setLeft(point.x());
+                xAxis->setRange(QDateTime::fromMSecsSinceEpoch(chartRange.left()), QDateTime::fromMSecsSinceEpoch(chartRange.right()));
+            }
+            if (point.x() > chartRange.right()){
+                chartRange.setRight(point.x());
+                xAxis->setRange(QDateTime::fromMSecsSinceEpoch(chartRange.left()), QDateTime::fromMSecsSinceEpoch(chartRange.right()));
+            }
+            if (point.y() < chartRange.bottom()){
+                chartRange.setBottom(point.y());
+                NiceScale scale (chartRange.bottom(), chartRange.top());
+                yAxis->setRange(scale.niceMin(), scale.niceMax());
+                yAxis->setTickCount(scale.tickCount());
+            }
+            if (point.y() > chartRange.top()){
+                chartRange.setTop(point.y());
+                NiceScale scale (chartRange.bottom(), chartRange.top());
+                yAxis->setRange(scale.niceMin(), scale.niceMax());
+                yAxis->setTickCount(scale.tickCount());
+            }
+
+            ui->chTemperature->update();
+        });
+        firstTimeInitialize = false;
+    }
+
+
 
     if (!driver.getDeviceInfo()) {
         ui->lbStatus->setText("Status: Error at getDeviceInfo function");

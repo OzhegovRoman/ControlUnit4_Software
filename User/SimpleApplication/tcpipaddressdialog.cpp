@@ -99,7 +99,7 @@ void TcpIpAddressDialog::on_cbTcpIp_activated(const QString &arg1)
     }
     else if (arg1.contains(tr("Manual"))){
 
-        QSettings settings("Scontel", "ControlUnit4_Calibration");
+        QSettings settings("Scontel", "cu-simpleapp");
         QString LastTcpIpAddress = settings.value("TcpIpAddress","127.000.000.001").toString();
 
         bool ok;

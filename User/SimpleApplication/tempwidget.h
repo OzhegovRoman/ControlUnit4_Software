@@ -6,7 +6,7 @@
 #include "Drivers/tempdriverm0.h"
 #include "commonwidget.h"
 
-
+#include <QElapsedTimer>
 
 namespace Ui {
    class TempWidget;
@@ -33,6 +33,7 @@ private:
    Ui::TempWidget *ui;
    TempDriverM0 *mDriver{nullptr};
    bool mClosed{true};
+   QElapsedTimer TempTimer;
    };
 
 #endif // TEMPWIDGET_H
