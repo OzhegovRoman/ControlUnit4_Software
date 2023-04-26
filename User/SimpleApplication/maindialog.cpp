@@ -26,6 +26,7 @@ MainDialog::MainDialog(QWidget *parent)
     ui->setupUi(this);
     ui->pbControl->hide();
 #ifdef RASPBERRY_PI
+
     QFrame *frame = new QFrame(this);
     frame->setFrameShape(QFrame::HLine);
     frame->setFrameShadow(QFrame::Plain);
@@ -41,8 +42,8 @@ MainDialog::MainDialog(QWidget *parent)
     pPB->setFixedHeight(QApplication::style()->pixelMetric(QStyle::PM_TitleBarHeight));
     pPB->setFixedWidth(QApplication::style()->pixelMetric(QStyle::PM_TitleBarHeight));
 
-    QVBoxLayout *vlayout = new QVBoxLayout(ui->wTitle);
-    QHBoxLayout *hlayout = new QHBoxLayout(ui->wTitle);
+    auto *vlayout = new QVBoxLayout(ui->wTitle);
+    auto *hlayout = new QHBoxLayout(this);
     hlayout->addWidget(title);
     hlayout->addWidget(pPB);
 
@@ -50,6 +51,7 @@ MainDialog::MainDialog(QWidget *parent)
     vlayout->addWidget(frame);
     vlayout->setMargin(0);
 
+    ui->wTitle->setFixedHeight(ui->wTitle->minimumSizeHint().height());
     connect(pPB,SIGNAL(clicked()), this, SLOT(close()));
 
     this->setWindowState(Qt::WindowFullScreen);
