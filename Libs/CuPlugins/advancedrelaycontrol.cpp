@@ -367,8 +367,6 @@ uint32_t TemperatureRecycleInterface::getElapsed()
 
 uint8_t TemperatureRecycleInterface::reportProgress()
 {
-    uint32_t relay5Elapsed = mRelay5v->getElapsed();
-    uint32_t relay25Elapsed = mRelay25v->getElapsed();
 
     currentProgress = maxProgress / (mHeatingTime+mThermalizationTime+mCoolingDownTime)/progressReportTimer->interval();
 
